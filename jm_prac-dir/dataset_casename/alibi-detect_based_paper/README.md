@@ -70,6 +70,7 @@ pip install -e .
 </br>
 
 ### $KS$ $Test^{[1]}$
+---
 > **Kolmogorov-Smirnov test**  
     두 데이터 분포의 누적분포함수 CDF 차이를 계산해 가장 큰 차이를 통한 비모수적 검정으로 특정 차원별 분포 비교
 
