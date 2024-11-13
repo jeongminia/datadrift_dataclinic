@@ -119,6 +119,7 @@ $$
 </br>
 
 ### $LSDD^{[2]}$
+---
 > **Least-Squares Density Difference**  
     두 데이터 분포 간의 밀도 차이를 최소제곱법으로 계산해 전체 임베딩 벡터 비교에 유용
 
@@ -170,6 +171,7 @@ LSDD 통계량이 단순한 우연으로 발생한 것인지 아니면 실제로
 
 
 ### $MMD^{[2]}$
+---
 > **Maximum Mean Discrepancy**  
     Reproducing Kernel Hillbert Space 상에서 두 분포의 평균 차이를 측정해 고차원 임베딩 벡터에 사용
 
