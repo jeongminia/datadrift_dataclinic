@@ -30,6 +30,8 @@ pip install -e .
 <div style="border-left: 4px solid #f39c12; padding: 20px; background-color: #fdf2e9;">
 <strong>💡 Alibi Detect </strong> </br> 이상치 탐지, 적대적 공격 탐지, 드리프트 탐지에 초점을 맞춘 오픈소스 python 라이브러리로 테이블형 데이터, 텍스트, 이미지, 시계열 데이터에 대해 온라인 및 오프라인 탐지기를 모두 지원
 </div>
+
+</br>
 </br>
 
 **장점**
