@@ -156,9 +156,9 @@ train을 기준으로 valid, test와의 코사인 거리와 유클리디안 거�
 - 코사인 유사도는 패턴 변화(상대적 관계)에 민감하지만, 크기 변화에는 덜 민감
 - 유클리디안 거리는 값의 크기 변화(절대적 차이)에 민감하지만, 방향성 변화에는 덜 민감
 
-|         | `train`-`valid`           |  `train`-`test`           |
-|------------------|--------------------|--------------------|
-| **t-SNE**           | ![alt text](img_files/image-4.png) | ![alt text](img_files/image-5.png) |
+| `train`-`valid`           |  `train`-`test`           |
+|--------------------|--------------------|
+| ![alt text](img_files/image-4.png) | ![alt text](img_files/image-5.png) |
 
 
 > ➡️ 방향적으로 유사한 형태임을 알 수 있음
