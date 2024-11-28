@@ -11,7 +11,6 @@
 2. 저차원 공간에서 데이터 분포의 변화는 더 명확하게 나타나 drift detection 민감도 증가
     
 </aside>
-
 ---------------
 
 1. datadirft 기존 고차원에서 탐지
@@ -26,7 +25,7 @@
 
 ## Experiment Settings
 > * 분포 비교를 더 명확히 하고 싶기 때문에 각 데이터셋을 **병합**한 뒤 차원 축소를 적용해 시각화
-    > * 운영 환경에서 data drift 탐지를 목적으로 하기에 차원축소 전에 학습은 trainset으로만 적용 
+> * 운영 환경에서 data drift 탐지를 목적으로 하기에 차원축소 전에 학습은 trainset으로만 적용 
 > 
 
 ### Methods of Dimension Reduction
