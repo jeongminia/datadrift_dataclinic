@@ -29,7 +29,7 @@
 > 
 
 ### Methods of Dimension Reduction
-1. PCA
+1. PCAㄴ
 2. UMAP
 3. t-SNE
 4. SVD
@@ -97,7 +97,7 @@ Reconstruction Error을 기준으로 적합한 `n_components` 값 확인
 |base| 768 | ![alt text](image.png) | ![alt text](image-1.png) |
 |PCA| 186 | ![alt text](image-2.png) | ![alt text](image-5.png) |
 |Kernel PCA | 77 | ![alt text](image-9.png) | ![alt text](image-11.png) |
-|UMAP | 20 | ![alt text](image-14.png) | ![alt text](image-15.png) |
+|UMAP | 20 | ![alt text](image-14.png) | ![alt text](imsage-15.png) |
 
 
 ### Evaluation 
