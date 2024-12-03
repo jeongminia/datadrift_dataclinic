@@ -146,31 +146,45 @@ Reconstruction Error으로 계산한 결과, train 기준으로 `n_components=32
 
 ### 2.2 Visualization of Dimension Reduction Results
 
+데이터 드리프트 탐지 목적이기에, 차원 축소를 **train-valid**와 **train-test**에서 각각 따로 진행
+
 #### 2.2.1 Distance
 
 |  | dim | `valid` vs `train` | `test` vs **`train`** |
 | --- | --- | --- | --- |
-| PCA | 186 | ![image.png](img_files/image%2011.png) | ![image.png](img_files/image%2012.png) |
-| Kernel PCA | 77 | ![image.png](img_files/image%2013.png) | ![alt text](img_files/image3333333.png) |
-| UMAP | 20 |![image.png](img_files/image%2014.png) | ![image.png](img_files/image%2015.png) |
-| t-SNE | 3 | ![image.png](img_files/image%2016.png) | ![image.png](img_files/image%2017.png) |
-| SVD | 190 | ![image.png](img_files/image%2018.png) | ![image.png](img_files/image%2019.png) |
-| GRP | 65 | ![image.png](img_files/image%2020.png) | ![image.png](img_files/image%2021.png) |
-| AutoEncoder | 328 | ![image.png](img_files/image%2022.png) | ![image.png](img_files/image%2023.png) |
+| PCA | 186 | ![alt text](img_files/image-27.png) | ![alt text](img_files/image-25.png) |
+| Kernel PCA | 77 | ![alt text](img_files/image-23.png) | ![alt text](img_files/image-21.png) |
+| UMAP | 20 | ![alt text](img_files/image-19.png) | ![alt text](img_files/image-17.png) |
+| t-SNE | 3 | ![alt text](img_files/image-15.png) | ![alt text](img_files/image-13.png) |
+| SVD | 190 | ![alt text](img_files/image-11.png) | ![alt text](img_files/image-9.png) |
+| GRP | 65 | ![alt text](img_files/image-7.png) | ![alt text](img_files/image-5.png) |
+| AutoEncoder | 328 | ![alt text](img_files/image-3.png) | ![alt text](img_files/image-1.png) |
 
 
 #### 2.2.2 Plot
 
 |  | dim | `valid` vs `train` | `test` vs **`train`** |
 | --- | --- | --- | --- |
-| PCA | 186 | ![image.png](img_files/image%2024.png) | ![image.png](img_files/image%2025.png) |
-| Kernel PCA | 77 | ![image.png](img_files/image%2026.png) | ![image.png](img_files/image%2027.png) |
-| UMAP | 20 | ![image.png](img_files/image%2028.png) | ![image.png](img_files/image%2029.png) |
-| t-SNE | 3 | ![image.png](img_files/image%2030.png) | ![image.png](img_files/image%2031.png) |
-| SVD | 190 | ![image.png](img_files/image%2032.png) | ![image.png](img_files/image%2033.png) |
-| GRP | 65 | ![image.png](img_files/image%2034.png) | ![image.png](img_files/image%2035.png) |
-| AutoEncoder | 328 | ![image.png](img_files/image%2036.png) | ![image.png](img_files/image%2037.png) |
+| PCA | 186 | ![alt text](img_files/image-26.png) | ![alt text](img_files/image-24.png) |
+| Kernel PCA | 77 | ![alt text](img_files/image-22.png) | ![alt text](img_files/image-20.png) |
+| UMAP | 20 | ![alt text](img_files/image-18.png) | ![alt text](img_files/image-16.png) |
+| t-SNE | 3 | ![alt text](img_files/image-14.png) | ![alt text](img_files/image-12.png) |
+| SVD | 190 | ![alt text](img_files/image-10.png) | ![alt text](img_files/image-8.png) |
+| GRP | 65 | ![alt text](img_files/image-6.png) | ![alt text](img_files/image-4.png) |
+| AutoEncoder | 328 | ![alt text](img_files/image-2.png) | ![alt text](img_files/image-28.png) |
 
+#### 2.2.3 Evaluation
+**Pairwise Distance Preservation**
+
+- 차원 축소 전후 데이터 간의 쌍별 거리 유지율을 계산하며 평균 변화율로 평가
+
+| Pairwise Distance Preservation | PCA | Kernel PCA | UMAP | t-SNE | SVD | GRP | AutoEncoder |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **dim** | 186 | 77 | 20 | 3 | 190 | 65 | 328 |
+| **times** | 0.2s | 0.7s | 12.3s | 10.9s | 0.2s | 0.0s | 3.5s |
+| **train** | 0.9983 | 0.9807 | 0.3515 | 0.419 | 0.9984 | 0.8871 | 0.556 |
+| **valid** | 0.997 | 0.9771 | 0.3396 | 0.3107 | 0.9972 | 0.9021 | 0.6188 |
+| **test**  | 0.9935 | 0.9651 | 0.2564 | 0.4457 | 0.9939 | 0.9013 | 0.4337 |
 
 
 ## 3. Dimension Reduction through Ensemble Methods
