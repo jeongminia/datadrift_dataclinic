@@ -16,7 +16,7 @@
 ---
 
 
-## 1. DataDrift without Dimension Reduction
+## 1. [DataDrift without Dimension Reduction](datadrift_without-dr.ipynb)
 
 ---
 
@@ -34,8 +34,8 @@
 | **Kullback–Leibler Divergence** | EvidentlyAI | 한 분포가 다른 분포와 얼마나 차이나는지 비대칭적으로 측정 | 0 | 0.697 |
 | **JS Divergence** | EvidentlyAI | KL Divergence를 대칭적으로 변환, 두 분포 간 차이를 직관적으로 이해 | 0 | 0.897 |
 | **Energy Distacne** | EvidentlyAI | 거리 기반 접근으로 중심 및 분산 차이를 동시에 고려 | 0 | 0.474 |
-| **Latent Space Density Difference** | Alibi Detect | 잠재 공간에서 국소적인 밀도 차이를 기반으로 분포 간 드리프트 탐지 | 0.00097 | 0.191 |
-| **KDE-Based Drift Detection** | Alibi Detect | 커널 밀도 추정을 사용해 밀도 차이 기반으로 드리프트 탐지 | 0 | 0.206 |
+| **Latent Space Density Difference** | Alibi Detect | 잠재 공간에서 국소적인 밀도 차이를 기반으로 분포 간 드리프트 탐지 | 0.22 | 0.0 |
+| **KDE-Based Drift Detection** | Alibi Detect | 커널 밀도 추정을 사용해 밀도 차이 기반으로 드리프트 탐지 | 0.02 | 0.0 |
 
  * drift score : 선택된 메트릭을 통해 Reference Data와 Current Data의 분포 차이를 수치화한 값
 
@@ -53,7 +53,7 @@
 
 
 
-## 2. Methods for Dimension Reduction
+## 2. [Methods for Dimension Reduction](dimension-reduction_base.ipynb)
 
 ---
 
@@ -176,7 +176,7 @@ Reconstruction Error으로 계산한 결과, train 기준으로 `n_components=32
 #### 2.2.3 Evaluation
 **Pairwise Distance Preservation**
 
-- 차원 축소 전후 데이터 간의 쌍별 거리 유지율을 계산하며 평균 변화율로 평가
+차원 축소 전후 데이터 간의 쌍별 거리 유지율을 계산하며 평균 변화율로 평가
 
 | Pairwise Distance Preservation | PCA | Kernel PCA | UMAP | t-SNE | SVD | GRP | AutoEncoder |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -187,10 +187,33 @@ Reconstruction Error으로 계산한 결과, train 기준으로 `n_components=32
 | **test**  | 0.9935 | 0.9651 | 0.2564 | 0.4457 | 0.9939 | 0.9013 | 0.4337 |
 
 
-## 3. Dimension Reduction through Ensemble Methods
+## 3. [DataDrift with Dimension Reduction](datadrift_with-dr.ipynb)
 
 ---
 
-## 4. DataDrift with Dimension Reduction
+
+|  |  | PCA | Kernel PCA | SVD | GRP | Base |
+| --- | --- | --- | --- | --- | --- | --- |
+| dim |  | 186 | 77 | 190 | 65 | 768 |
+| **MMD** | `valid` vs `train` | 0.0001 | 0.0001 | 0.0001 | 0.0001 | 0 |
+|  | `test` vs `train` | 0.2216 | 0.2488 | 0.221 | 0.2071 | 0.209 |
+| **WD** | `valid` vs `train` | 0.0054 | 0.013 | 0.0105 | 0.0462 | 0.025 |
+|  | `test` vs `train` | 1.0 | 1.0 | 1.0 | 0.9846 | 0.964 |
+| **KL Divergence** | `valid` vs `train` | 0.0 | 0.0 | 0.0 | 0.0 | 0 |
+|  | `test` vs `train` | 0.8763 | 0.7792 | 0.8895 | 0.6615 | 0.697 |
+| **JS Divergence** | `valid` vs `train` | 0.0 | 0.0 | 0.0 | 0.0 | 0 |
+|  | `test` vs `train` | 0.9892 | 0.974 | 0.9895 | 0.9077 | 0.897 |
+| **Energy Distance** | `valid` vs `train` | 0.0 | 0.0 | 0.0 | 0.0 | 0 |
+|  | `test` vs `train` | 0.4032 | 0.5844 | 0.3895 | 0.7385 | 0.474 |
+| **LSDD** | `valid` vs `train` | 0.03 | 0.0 | 0.04 | 0.11 | 0.22 |
+| p_val=0.05 | `test` vs `train` | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| **KDE** | `valid` vs `train` | 0.02 | 0.02 | 0.02 | 0.03 | 0.02 |
+| p_val=0.05 | `test` vs `train` | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+
+
+- 차원축소를 적용한 경우, 대부분의 메트릭에서 Valid와 Test 간의 드리프트 점수가 Base보다 높거나 명확하게 나타남
+- 이는 고차원 데이터의 노이즈가 줄어들고, 데이터의 주요 특징만 남게 되어 드리프트 감지가 더 효과적으로 이루어진 것으로 해석
+
+## 4. DataDrift with Dimension Reduction through Ensemble Methods
 
 ---
