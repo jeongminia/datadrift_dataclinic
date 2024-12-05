@@ -8,6 +8,7 @@
 from evidently.metrics import EmbeddingsDriftMetric # Reports or Test Suites를 생성 ⇒ EmbeddingsDriftMetric or TestEmbeddingsDrift
 from evidently.report import Report
 ```
+</br>
 
 > 💬 Metric에 따라 달라지는 시각화
 
@@ -49,6 +50,8 @@ from evidently.report import Report
     
     - 선택된 drift_method에 따라 분포 비교 방식이 달라지고 계산된 **`drift_score`와 `drift_detected`** 값이 시각화에 반영
 
+</br>
+
 > 💬 valid vs train // test vs train 에 따라 달라지는 시각화
 
 - 해당 클래스를 분석한 결과,
@@ -58,6 +61,8 @@ from evidently.report import Report
         비교 대상 데이터(valid 또는 test)에 따라 공간을 재배치
         
     - `get_gaussian_kde` : 커널 밀도 추정(KDE)을 수행하기 때문에, 차원 축소된 좌표가 달라짐
+
+</br>
 
 ## Compare
 
@@ -72,6 +77,8 @@ from evidently.report import Report
 | **`ratio`** | • 개별 임베딩 구성 요소 간 분포 드리프트를 계산 </br> • 모든 tabular numerical 드리프트 탐지 방법 사용 가능 </br> • drift_score로 드리프트된 임베딩의 비율 반환 | `evidently.calculations.stattests` Wasserstein Distance, Kullback–Leibler Divergence, Jensen Shannon Divergence, Energy Distance | 
 | **`distance`** | • current와 reference 데이터셋 간 평균 임베딩 거리 계산 </br> • distance 값을 drift_score로 반환 | `scipy.spatial.distance` Euclidean, Cosine, Cityblock, Chebyshev |
 | **`mmd`** | • Maximum Mean Discrepancy MMD 를 계산 </br> • MMD값을 drift_score로 반환 | `evidently.metrics.data_drift.embedding_drift_methods` |
+
+</br>
 
 ## 1. `ratio`
 
@@ -97,6 +104,8 @@ n_drifted / reference_emb.shape[1] > self.threshold, # 드리프트 비율이 �
 "ratio"
 ```
 
+</br>
+
 ### 1.2  metric code & **mathematical expression**
 
 > 임베딩 데이터 즉, 수치형 데이터를 아래 메트릭을 통해 개별 임베딩 구성 요소 간 분포 계산
@@ -121,12 +130,16 @@ n_drifted / reference_emb.shape[1] > self.threshold, # 드리프트 비율이 �
     
     scipy 라이브러리에서 import 
 
+</br>
+
 ## 2. **`mmd`**
     
 
 > Maximum Mean Discrepancy MMD 값을 drift score 값으로 반환
 > 
 > - path : evidently/src/evidently/metrics/data_drift/embedding_drift_methods.py
+
+</br>
 
 ### 2.1 **code flow**
 
@@ -161,6 +174,8 @@ def mmd(
         pca_components=pca_components,
     )
 ```
+
+</br>
 
 ### 2.1 metric code & **mathematical expression**
 
