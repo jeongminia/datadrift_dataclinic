@@ -31,7 +31,7 @@
 | **Maximum Mean Discrepancy** | EvidentlyAI | 전체 데이터 분포를 직접 비교하는 고차원 분포 간 유사성 측정 | 0 | 0.209 |
 | **Wasserstein Distance** | EvidentlyAI | 분포 간의 이동 거리 계산, 분포 형태보다는 거리 비용에 초점 | 0.025 | 0.964 |
 | **Kullback–Leibler Divergence** | EvidentlyAI | 한 분포가 다른 분포와 얼마나 차이나는지 비대칭적으로 측정 | 0 | 0.697 |
-| **JS Divergence** | EvidentlyAI | KL Divergence를 대칭적으로 변환, 두 분포 간 차이를 직관적으로 이해 | 0 | 0.897 |
+| **Jensen-Shannon Divergence** | EvidentlyAI | KL Divergence를 대칭적으로 변환, 두 분포 간 차이를 직관적으로 이해 | 0 | 0.897 |
 | **Energy Distacne** | EvidentlyAI | 거리 기반 접근으로 중심 및 분산 차이를 동시에 고려 | 0 | 0.474 |
 | **Latent Space Density Difference** | Alibi Detect | 잠재 공간에서 국소적인 밀도 차이를 기반으로 분포 간 드리프트 탐지 | 0.22 | 0.0 |
 | **KDE-Based Drift Detection** | Alibi Detect | 커널 밀도 추정을 사용해 밀도 차이 기반으로 드리프트 탐지 | 0.02 | 0.0 |
