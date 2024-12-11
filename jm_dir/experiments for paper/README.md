@@ -27,17 +27,11 @@
 | **Wasserstein Distance** | EvidentlyAI | 분포 간의 이동 거리 계산, 분포 형태보다는 거리 비용에 초점 | 0.0247 | 0.9635 |
 | **Energy Distacne** | EvidentlyAI | 거리 기반 접근으로 중심 및 분산 차이를 동시에 고려 | 0.0 | 0.474 |
 
- * drift score : 선택된 메트릭을 통해 Reference Data와 Current Data의 분포 차이를 수치화한 값
 
-</br>
+* drift score : 선택된 메트릭을 통해 Reference Data와 Current Data의 분포 차이를 수치화한 값
 
-[EvidentlyAI](https://docs.evidentlyai.com/) 는 Report를 제공하고 있어 아래와 같은 시각화 결과를 도출할 수 있음
+* [EvidentlyAI](https://docs.evidentlyai.com/) 는 Report를 제공하고 있어 시각화 결과를 도출 가능
 
-|  | `valid` vs `train` | `test` vs `train` |
-| --- | --- | --- |
-| **MMD** | ![**valid** vs ** | ![**test**  |
-| **Wasserstein Distance** | ![**valid** vs ** | ![**test**  |
-| **Energy Distacne** | ! | ![**test** vs **train**]() |
 
 
 
@@ -60,11 +54,11 @@
 
 |  | PCA | KernelPCA | Truncated SVD | GRP | Autoencoder |
 | --------- | --------- | -------- | --------- | --------- | --------- |
-| **Plot**                     |  ![alt text](image.png) | ![alt text](image-15.png) |![alt text](image-5.png)| ![alt text](image-10.png)   |  |
-| **Stress**                   | 93                      |      91                   |          75          |       88          |  |
-| **Explained Variance Ratio** | 188                     |      -                     |           -          |           -      |  |
-| **Reconstruction Error**     | 115                     |     101                   |           111        |         -        |  |
-| **size of dim**              | 188                     |      101                     |         111          |       88          |                             |
+| **Plot**    |  ![alt text](img_files/image.png) | ![alt text](img_files/image-5.png) | ![alt text](img_files/image-10.png) | ![alt text](img_files/image-15.png)   |  ![alt text](img_files/image-20.png)|
+| **Stress**                   | 93                      |      91                   |          77          |       88          | 71 |
+| **Explained Variance Ratio** | 188                     |      -                     |           188          |           -      | - |
+| **Reconstruction Error**     | 115                     |     101                   |           104        |         -        | 328  |
+| **size of dim**              | 188                     |      101                     |         188          |       88          |    328                         |
 
 
 적절한 차원 선택을 위해 데이터의 구조적 변화를 감지하기 위해 평가방법에 따라 다른 메트릭을 선택
@@ -79,24 +73,22 @@
 
 |  | dim | `valid` vs `train` | `test` vs **`train`** |
 | --- | --- | --- | --- |
-| PCA | 188 | ![alt text](image-1.png) | ![alt text](image-2.png) |
-| Kernel PCA | 88 | ![alt text](image-16.png) | ![alt text](image-17.png) |
-| Truncated SVD | 111 | ![alt text](image-6.png) | ![alt text](image-7.png) |
-| GRP | 88 | ![alt text](image-11.png) | ![alt text](image-12.png) |
-| AutoEncoder | 328 | ![alt text](img_fil4es/image-3.png) | ![alt text](img_f4iles/image-1.png) |
+| PCA | 188 | ![alt text](img_files/image-1.png) | ![alt text](img_files/image-2.png) |
+| Kernel PCA | 88 | ![alt text](img_files/image-6.png) | ![alt text](img_files/image-7.png) |
+| Truncated SVD | 188 | ![alt text](img_files/image-11.png)| ![alt text](img_files/image-13.png) |
+| GRP | 88 | ![alt text](img_files/image-16.png) | ![alt text](img_files/image-17.png) |
+| AutoEncoder | 328 | ![alt text](img_files/image-21.png) | ![alt text](img_files/image-22.png) |
 
 
 #### 2.2.2 Plot
 
 |  | dim | `valid` vs `train` | `test` vs **`train`** |
 | --- | --- | --- | --- |
-| PCA | 188 | ![alt text](image-3.png) | ![alt text](image-4.png) |
-| Kernel PCA | 77 | ![alt text](image-18.png) | ![alt text](image-19.png) |
-| Truncated SVD | 111 | ![alt text](image-8.png) | ![alt text](image-9.png) |
-| GRP | 88 | ![alt text](image-13.png) | ![alt text](image-14.png) |
-| AutoEncoder | 328 | ![alt text](img_fil4es/image-2.png) | ![alt text](img_file4s/image-28.png) |
-
-#### 2.2.3 Evaluation
+| PCA | 188 | ![alt text](img_files/image-3.png) | ![alt text](img_files/image-4.png) |
+| Kernel PCA | 77 | ![alt text](img_files/image-8.png) | ![alt text](img_files/image-9.png) |
+| Truncated SVD | 188 | ![alt text](img_files/image-12.png) | ![alt text](img_files/image-14.png) |
+| GRP | 88 | ![alt text](img_files/image-18.png) | ![alt text](img_files/image-19.png) |
+| AutoEncoder | 328 | ![alt text](img_files/image-23.png) | ![alt text](img_files/image-24.png) |
 
 
 
@@ -104,6 +96,15 @@
 
 ## 3. [DataDrift with Dimension Reduction](datadrift_with-dr.ipynb)
 
+|  |  | **PCA** | **Kernel PCA** | **SVD** | **GRP** | Autoencoder | **Base** |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| dim |  | 188 | 101 | 188 | 88 | 328 | 768 |
+| **MMD** | `valid` vs `train` | 0.0001 | 0.0001 | 0.0001 | 0.0002 | 0.0002 | 0.0001 |
+| **MMD** | `test` vs `train` | 0.2213 | 0.241 | 0.2217 | 0.1965 | 0.1473 | 0.2087 |
+| **WD** | `valid` vs `train` | 0.0247 | 0.0099 | 0.016 | 0.0227 | 0.003 | 0.0247 |
+| **WD** | `test` vs `train` | 0.9635 | 1.0 | 1.0 | 0.9545 | 0.4055 | 0.9635 |
+| **Energy Distance** | `valid` vs `train` | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| **Energy Distance** | `test` vs `train` | 0.474 | 0.5327 | 0.3936 | 0.7614 | 0.1433 | 0.474 |
 ---
 
 
