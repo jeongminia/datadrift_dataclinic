@@ -96,7 +96,7 @@
 
 ## 3. [DataDrift with Dimension Reduction](datadrift_with-dr.ipynb)
 
-|  |  | **PCA** | **Kernel PCA** | **SVD** | **GRP** | Autoencoder | **Base** |
+|  |  | **PCA** | **Kernel PCA** | **SVD** | **GRP** | **Autoencoder** | **Base** |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | dim |  | 188 | 101 | 188 | 88 | 328 | 768 |
 | **MMD** | `valid` vs `train` | 0.0001 | 0.0001 | 0.0001 | 0.0002 | 0.0002 | 0.0001 |
