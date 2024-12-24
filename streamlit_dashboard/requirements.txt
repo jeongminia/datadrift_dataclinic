@@ -1,0 +1,9 @@
+numpy
+pandas
+matplotlib
+wordcloud
+streamlit
+seaborn
+evidently
+alibi-detect
+konlpy

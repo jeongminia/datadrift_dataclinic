@@ -3,4 +3,4 @@ import pandas as pd
 
 
 def render():
-    st.title("Detect Data Drift Page")
+    st.title("Detect DataDrift Page")
