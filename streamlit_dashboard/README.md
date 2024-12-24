@@ -17,7 +17,13 @@ page 구성은 다음과 같다
 3. 사이드 바를 통해 각 페이지 확인
 4. streamlit 중단
 
-    `ctrl` + `c`
+    - (window) `ctrl` + `c`
+    - (mac) `pkill -f streamlit`
+
+## Install Prerequisite
+- library : [requirements](requirements.txt)
+- fonts : [나눔고딕 레귤러](https://fonts.google.com/selection)
+- datasets : 법률 관련 문서 데이터셋 (한림대학교 연구팀 구축)
 
 ## Dir Structure
 ```
