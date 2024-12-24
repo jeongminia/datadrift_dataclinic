@@ -1,8 +1,3 @@
-README
-
-
-
-
 
 ## 주요 기능
 page 구성은 다음과 같다
@@ -10,8 +5,6 @@ page 구성은 다음과 같다
 - 베이스 시각화
 - 임베딩 시각화
 - 데이터 드리프트 탐지
-
-
 
 ## 사용 방법
 1. streamlit 접속
@@ -26,9 +19,22 @@ page 구성은 다음과 같다
 
     `ctrl` + `c`
 
+## Dir Structure
+```
+streamlit_dashboard/
+├── pages/
+│   ├── data_load.py
+│   ├── basic_visualization.py
+│   ├── embedding_visualization.py
+│   └── detect_datadrift.py
+├── main.py
+├── data/
+│   ├── train_data.csv
+│   ├── val_data.csv
+│   └── test_data.csv
+
+```
+
 ## Stacks
 
-<img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white">
-<img src="https://img.shields.io/badge/Pytorch-EE4C2C?style=for-the-badge&logo=Pytorch&logoColor=white">
-<img src="https://img.shields.io/badge/HuggingFace-FFD21E?style=for-the-badge&logo=HuggingFace&logoColor=white">
-<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white">
+<img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white"> <img src="https://img.shields.io/badge/Pytorch-EE4C2C?style=for-the-badge&logo=Pytorch&logoColor=white"> <img src="https://img.shields.io/badge/HuggingFace-FFD21E?style=for-the-badge&logo=HuggingFace&logoColor=white"> <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white">
