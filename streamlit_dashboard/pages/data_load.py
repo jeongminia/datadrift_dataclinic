@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd 
+import warnings
+warnings.filterwarnings(action='ignore')
 
 def load_data():
     train_df = pd.read_csv("data/train_data.csv")
