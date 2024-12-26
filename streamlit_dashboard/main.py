@@ -1,5 +1,7 @@
 import streamlit as st
 from pages import data_load, base_visualization, embedding_visualization, detect_datadrift
+import warnings
+warnings.filterwarnings(action='ignore')
 
 # 페이지 설정
 st.set_page_config(

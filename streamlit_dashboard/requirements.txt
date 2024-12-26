@@ -7,3 +7,6 @@ seaborn
 evidently
 alibi-detect
 konlpy
+torch
+transformers
+sentencepiece
