@@ -30,7 +30,7 @@ def split_columns(df):
         return text_columns, class_columns
 
 # 나눔 폰트 경로를 직접 설정 
-font_path = './fonts/NanumGothic.ttf'
+font_path = '../fonts/NanumGothic.ttf'
 fontprop = font_manager.FontProperties(fname=font_path)
 plt.rcParams['font.family'] = fontprop.get_name()
 
