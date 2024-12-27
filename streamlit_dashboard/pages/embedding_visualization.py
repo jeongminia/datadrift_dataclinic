@@ -4,67 +4,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics.pairwise import euclidean_distances, cosine_similarity
-# 모델
-from transformers import AutoTokenizer, AutoModel
+# data & model load, Embedding
+from utils import load_data, split_columns, EmbeddingPipeline
 import torch
-from torch.utils.data import DataLoader, Dataset
 # 치원축소
 from sklearn.decomposition import PCA
-
 import warnings
 warnings.filterwarnings(action='ignore')
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-# 모델과 토크나이저 로드
-@st.cache_resource
-def load_model():
-    model_name = "klue/roberta-base"
-    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
-    model = AutoModel.from_pretrained(model_name).to(device)
-    return tokenizer, model
-
-# 데이터 로드
-def load_data():
-    train_df = pd.read_csv("data/train_data.csv")
-    valid_df = pd.read_csv("data/val_data.csv")
-    test_df = pd.read_csv("data/test_data.csv")
-
-    train_df['class'] = train_df['class'].astype('category')
-    valid_df['class'] = valid_df['class'].astype('category')
-    test_df['class'] = test_df['class'].astype('category')
-    return train_df, valid_df, test_df
-
-def split_columns(df):
-        text_columns = df.select_dtypes(include=["object", "string"]).columns.tolist()
-        class_columns = df.select_dtypes(include=["int64", "float64", "category"]).columns.tolist()
-        return text_columns, class_columns
-
-# 임베딩
-class CustomDataset(Dataset):
-        def __init__(self, dataframe , text_col):
-            self.data = dataframe
-            # `text` 또는 `facts` 열 자동 선택
-            self.column_name = text_col
-            self.texts = self.data[self.column_name]
-
-        def __len__(self):
-            return len(self.texts)
-
-        def __getitem__(self, idx):
-            return self.texts.iloc[idx]
-
-def generate_embeddings(model, tokenizer, max_len, data_loader):
-    embeddings = []
-    model.eval()
-    with torch.no_grad():
-        for batch in data_loader:
-            inputs = tokenizer(list(batch), return_tensors="pt", padding=True, truncation=True, max_length=max_len).to(device)
-            outputs = model(**inputs)
-            cls_embeddings = outputs.last_hidden_state[:, 0, :]  # [CLS] 토큰의 임베딩 사용
-            embeddings.append(cls_embeddings.cpu())
-    return torch.cat(embeddings).numpy()
-
-# distance 시각화
+## --------------- Visualization --------------- ##
 def visualize_similarity_distance(valid_embeddings, test_embeddings, train_embeddings):
     # 코사인 유사도 및 유클리디안 거리 계산
     cosine_valid_train = cosine_similarity(valid_embeddings, train_embeddings)
@@ -98,12 +47,10 @@ def visualize_similarity_distance(valid_embeddings, test_embeddings, train_embed
     plt.tight_layout()
     return fig, axes
 
-# 시각화
+
 def plot_reduced(valid_pca, test_pca, train_pca, 
                  label_valid="Valid", label_test="Test", label_train="Train"):
-    """
-    차원 축소된 Train과 Valid 데이터를 입력으로 받아 주성분 분석 결과를 시각화.
-    """
+    # 분포 시각화
     fig, axes = plt.subplots(1, 6, figsize=(30, 5))  # 1x6 플롯 생성
 
     # 색상 설정
@@ -197,25 +144,19 @@ def render():
     st.title("Embedding Visualization Page")
 
     train_df, valid_df, test_df = load_data()
-    tokenizer, model = load_model()
+    
     train_text_cols, train_class_cols = split_columns(train_df) # 각 데이터셋의 컬럼 나누기
 
-    # max_len 구하기
-    token_lengths = [len(tokenizer.encode(text)) for text in train_df[train_text_cols[0]]]
-    max_len = min([64, 128, 256, 512], # thresholds 
-                  key=lambda x: abs(x - np.percentile(token_lengths, 90)))
-    st.write(f"Max length suggestion: {max_len}")
-
     # 임베딩
-    train_loader = DataLoader(CustomDataset(train_df, train_text_cols[0]), 
-                              batch_size=32, shuffle=False)
-    valid_loader = DataLoader(CustomDataset(valid_df, train_text_cols[0]), 
-                              batch_size=32, shuffle=False)
-    test_loader = DataLoader(CustomDataset(test_df, train_text_cols[0]), 
-                             batch_size=32, shuffle=False)
-    train_embeddings = generate_embeddings(model, tokenizer, max_len, train_loader)
-    valid_embeddings = generate_embeddings(model, tokenizer, max_len, valid_loader)
-    test_embeddings = generate_embeddings(model, tokenizer, max_len, test_loader)
+    pipeline = EmbeddingPipeline()
+    pipeline.load_model()
+
+    max_len = pipeline.calculate_max_len(train_df, train_text_cols[0])
+    st.write(f"Max Length: {max_len}")
+
+    train_embeddings = pipeline.generate_embeddings(train_df, train_text_cols[0], max_len=max_len)
+    valid_embeddings = pipeline.generate_embeddings(valid_df, train_text_cols[0], max_len=max_len)
+    test_embeddings = pipeline.generate_embeddings(test_df, train_text_cols[0], max_len=max_len)
     
     # distance 시각화
     st.subheader("Original Dimension")
