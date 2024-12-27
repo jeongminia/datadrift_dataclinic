@@ -1,16 +1,16 @@
 
-## 주요 기능
+## Key Features
 
-|  | [Data Load](pages/data_laod.py) | [Base Visualization](pages/base_visualization.py) | [Embedding Visualization](pages/embedding_visualization.py) | [Detect DataDrift](pages/detect_datadrift.py) |
-| ---------- | ---------- | ---------- | ---------- | ---------- |
-|            |     데이터 로드       |     베이스 시각화      |      임베딩 시각화      |    데이터 드리프트 탐지        |
-|            |      ![alt text](img_files/image.png)      |  ![alt text](img_files/image-1.png)      |     ![alt text](img_files/image-2.png)       |            |
-|            |  **Dataset**{Preview, Description, Information} | **Class Column Analysis**{Distribution Plot}, </br> **Text Column Analysis**{Length Plot, Length Dataframe, WordCloud}      |     **Original Dimension**{cosine_similarity euclidean_distances}, <br> **Dimension Reduction**{cosine_similarity euclidean_distances, 2D Scatter Plot, 2D Density Plot, 3D Scatter Plot}      |            |
-|            |    ☑️ (예정) csv 업로드        |    ☑️ (예정) 형태소 분석기 연결     |  ☑️ (예정) 차원축소 기법 선택 <br/> ☑️ (예정) 차원축소 기법 하이브리드 선택        |            |
+| [Data Load](pages/data_laod.py) | [Base Visualization](pages/base_visualization.py) | [Embedding Visualization](pages/embedding_visualization.py) | [Detect DataDrift](pages/detect_datadrift.py) |
+| ---------- | ---------- | ---------- | ---------- |
+|     데이터 로드       |     베이스 시각화      |      임베딩 시각화      |    데이터 드리프트 탐지        |
+|      ![alt text](img_files/image.png)      |  ![alt text](img_files/image-1.png)      |     ![alt text](img_files/image-2.png)       |            |
+|  **Dataset**{Preview, Description, Information} | **Class Column Analysis**{Distribution Plot}, </br> **Text Column Analysis**{Length Plot, Length Dataframe, WordCloud}      |     **Original Dimension**{Cosine Similarity, Euclidean Distances}, <br> **Dimension Reduction**{Cosine Similarity, Euclidean Distances, 2D Scatter Plot, 2D Density Plot, 3D Scatter Plot}      |            |
+|    ☑️ (예정) csv 업로드        |    ☑️ (예정) 형태소 분석기 연결     |  ☑️ (예정) 차원축소 기법 선택 <br/> ☑️ (예정) 차원축소 기법 하이브리드 선택        |            |
 
 
 
-## 사용 방법
+## Usage Instructions
 1. streamlit 접속
     
     ```
@@ -29,7 +29,7 @@
 - fonts : [나눔고딕 레귤러](https://fonts.google.com/selection)
 - datasets : 법률 관련 문서 데이터셋 (한림대학교 연구팀 구축)
 
-## Dir Structure
+## Directory Structure
 ```
 streamlit_dashboard/
 ├── pages/
