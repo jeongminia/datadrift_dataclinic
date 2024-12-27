@@ -5,32 +5,16 @@ import seaborn as sns
 import numpy as np
 # wordcloud
 import re
-from konlpy.tag import Mecab
 from collections import Counter
 from wordcloud import WordCloud
 from matplotlib import font_manager
-#import os
-#os.environ['MECAB_PATH'] = '/opt/homebrew/lib/mecab/dic/mecab-ko-dic' # mecab 경로 설정
 import warnings
 warnings.filterwarnings(action='ignore')
-
-def load_data():
-    train_df = pd.read_csv("data/train_data.csv")
-    valid_df = pd.read_csv("data/val_data.csv")
-    test_df = pd.read_csv("data/test_data.csv")
-
-    train_df['class'] = train_df['class'].astype('category')
-    valid_df['class'] = valid_df['class'].astype('category')
-    test_df['class'] = test_df['class'].astype('category')
-    return train_df, valid_df, test_df
-
-def split_columns(df):
-        text_columns = df.select_dtypes(include=["object", "string"]).columns.tolist()
-        class_columns = df.select_dtypes(include=["int64", "float64", "category"]).columns.tolist()
-        return text_columns, class_columns
+# data load
+from utils import load_data, split_columns
 
 # 나눔 폰트 경로를 직접 설정 
-font_path = '../fonts/NanumGothic.ttf'
+font_path = './fonts/NanumGothic.ttf'
 fontprop = font_manager.FontProperties(fname=font_path)
 plt.rcParams['font.family'] = fontprop.get_name()
 
@@ -49,6 +33,8 @@ def generate_wordcloud(df, column, font_path):
     wc = WordCloud(font_path=font_path, background_color="white")
     return wc.generate_from_frequencies(counter)
 
+
+## --------------- main --------------- ##
 def render():
     st.title("Base Visualization Page")
 

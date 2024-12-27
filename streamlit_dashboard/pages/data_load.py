@@ -2,13 +2,10 @@ import streamlit as st
 import pandas as pd 
 import warnings
 warnings.filterwarnings(action='ignore')
+# data load
+from utils import load_data
 
-def load_data():
-    train_df = pd.read_csv("data/train_data.csv")
-    valid_df = pd.read_csv("data/val_data.csv")
-    test_df = pd.read_csv("data/test_data.csv")
-    return train_df, valid_df, test_df
-
+## --------------- main --------------- ##
 def render():
     st.title("Data Load Page")
 
@@ -22,11 +19,6 @@ def render():
     else:
         dataset = test_df
 
-    ## base preprocessing
-    train_df['class'] = train_df['class'].astype('category')
-    valid_df['class'] = valid_df['class'].astype('category')
-    test_df['class'] = test_df['class'].astype('category')
-        
     # 데이터셋 미리보기
     st.subheader(f"{dataset_option} Dataset Preview")
     st.dataframe(dataset.head(10), use_container_width=True)

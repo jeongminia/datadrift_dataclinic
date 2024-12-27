@@ -30,20 +30,25 @@
 - datasets : 법률 관련 문서 데이터셋 (한림대학교 연구팀 구축)
 
 ## Directory Structure
+
 ```
 streamlit_dashboard/
 ├── pages/
 │   ├── data_load.py
 │   ├── basic_visualization.py
 │   ├── embedding_visualization.py
-│   └── detect_datadrift.py
+│   ├── detect_datadrift.py
 ├── main.py
+├── utils.py
 ├── data/
 │   ├── train_data.csv
 │   ├── val_data.csv
-│   └── test_data.csv
+│   ├── test_data.csv
+├── fonts/
+│   ├── NanumGothic.ttf
 
 ```
+
 
 ## Stacks
 
