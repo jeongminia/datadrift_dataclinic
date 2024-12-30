@@ -7,6 +7,12 @@ from evidently.metrics import EmbeddingsDriftMetric
 from evidently.report import Report
 from evidently.metrics.data_drift.embedding_drift_methods import mmd
 from evidently import ColumnMapping
+import streamlit.components.v1 as components  # HTML 렌더링을 위한 Streamlit 컴포넌트
+import os
+
+# HTML 저장 경로 설정
+HTML_SAVE_PATH = "./reports"
+
 
 ## --------------- main --------------- ##
 def render():
@@ -48,7 +54,15 @@ def render():
     ])
     report.run(reference_data = reference_df, current_data = current_df, 
            column_mapping = column_mapping)
-    st.pyplot(report.visualize())
+    
+    # report 출력
+    train_valid_report_path = os.path.join(HTML_SAVE_PATH, "train_valid_drift_report.html")
+    report.save_html(train_valid_report_path)
+    # HTML 렌더링
+    with open(train_valid_report_path, "r") as f:
+        html_content = f.read()
+    components.html(html_content, height=800, scrolling=True)
+
 
 
     st.subheader("Train-Test Data Drift Detection")
@@ -72,4 +86,12 @@ def render():
     ])
     report.run(reference_data = reference_df, current_data = current_df, 
            column_mapping = column_mapping)
-    st.pyplot(report.visualize())
+    
+     # HTML 파일 저장
+    train_test_report_path = os.path.join(HTML_SAVE_PATH, "train_test_drift_report.html")
+    report.save_html(train_test_report_path)
+
+    # HTML 렌더링
+    with open(train_test_report_path, "r") as f:
+        html_content = f.read()
+    components.html(html_content, height=800, scrolling=True)
