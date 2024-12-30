@@ -4,24 +4,24 @@ import numpy as np
 from transformers import AutoTokenizer, AutoModel
 from torch.utils.data import DataLoader, Dataset
 import torch
-from pages.upload_data import get_uploaded_data
 
 ## --------------- Load Data --------------- ##
-# 현재 파일의 디렉토리를 기준으로 데이터 경로 설정
 
 def load_data():
-    train_df, valid_df, test_df = get_uploaded_data()
-
-    if not (train_df and valid_df and test_df):
-        st.error("Failed to load all datasets. Please upload all three datasets (train, validation, test).")
+    if 'train_df' not in st.session_state or 'valid_df' not in st.session_state or 'test_df' not in st.session_state:
+        st.error("Datasets are not loaded. Please upload the datasets in the Upload Data tab.")
         return None, None, None, None
 
-    # 각 데이터셋에서 텍스트 및 클래스 컬럼 처리
+    # 세션 상태에서 데이터 가져오기
+    train_df = st.session_state['train_df']
+    valid_df = st.session_state['valid_df']
+    test_df = st.session_state['test_df']
+
+    # 컬럼 정보 추출
     train_text_col, train_class_cols = split_columns(train_df)
     valid_text_col, valid_class_cols = split_columns(valid_df)
     test_text_col, test_class_cols = split_columns(test_df)
 
-    # 각 데이터프레임에 대한 컬럼 정보 저장
     column_info = {
         "train": {"text_col": train_text_col, "class_cols": train_class_cols},
         "valid": {"text_col": valid_text_col, "class_cols": valid_class_cols},

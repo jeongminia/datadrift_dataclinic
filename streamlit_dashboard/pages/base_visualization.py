@@ -38,7 +38,7 @@ def generate_wordcloud(df, column, font_path):
 def render():
     st.title("Base Visualization Page")
 
-    train_df, valid_df, test_df = load_data()
+    train_df, valid_df, test_df, column_info = load_data()
 
     train_text_cols, train_class_cols = split_columns(train_df) # 각 데이터셋의 컬럼 나누기
     

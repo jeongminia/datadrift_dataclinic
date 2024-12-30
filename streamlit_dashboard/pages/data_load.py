@@ -9,14 +9,19 @@ from utils import load_data
 def render():
     st.title("Data Load Page")
 
-    train_df, valid_df, test_df = load_data()
+    train_df, valid_df, test_df, column_info = load_data()
+    if not (train_df and valid_df and test_df):
+        st.error("Failed to load datasets. Please upload datasets in the 'Upload Data' tab.")
+        return
+    
     dataset_option = st.selectbox("Select Dataset", ["Train", "Validation", "Test"])
 
+    dataset = None
     if dataset_option == "Train":
         dataset = train_df
     elif dataset_option == "Validation":
         dataset = valid_df
-    else:
+    elif dataset_option == "Test":
         dataset = test_df
 
     # 데이터셋 미리보기
