@@ -1,5 +1,5 @@
 import streamlit as st
-from pages import data_load, base_visualization, embedding_visualization, detect_datadrift
+from pages import upload_data, data_load, base_visualization, embedding_visualization, detect_datadrift
 import warnings
 warnings.filterwarnings(action='ignore')
 
@@ -15,10 +15,15 @@ st.set_page_config(
 st.sidebar.empty()
 
 # 페이지 구성
-tab1, tab2, tab3, tab4 = st.tabs(["Data Load", "Basic Visualization", "Embedding Visualization", "Detect DataDrift"])
+tab0, tab1, tab2, tab3, tab4 = st.tabs(["Upload Data", "Data Load", 
+                                        "Basic Visualization", "Embedding Visualization", 
+                                        "Detect DataDrift"])
 
 
 # 탭별로 해당 파일의 함수를 호출
+with tab0:
+    upload_data.render()
+
 with tab1:
     data_load.render()
 

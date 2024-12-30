@@ -1,48 +1,31 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import os
 from transformers import AutoTokenizer, AutoModel
 from torch.utils.data import DataLoader, Dataset
 import torch
-from pages.upload_data import get_uploaded_data
 
 ## --------------- Load Data --------------- ##
 # 현재 파일의 디렉토리를 기준으로 데이터 경로 설정
+base_dir = os.path.dirname(os.path.abspath(__file__))  # 현재 파일의 절대 경로
+data_dir = os.path.join(base_dir, "data")
 
 def load_data():
-    train_df, valid_df, test_df = get_uploaded_data()
+    train_df = pd.read_csv(os.path.join(data_dir, "train_data.csv"))
+    valid_df = pd.read_csv(os.path.join(data_dir, "val_data.csv"))
+    test_df = pd.read_csv(os.path.join(data_dir, "test_data.csv"))
 
-    if not (train_df and valid_df and test_df):
-        st.error("Failed to load all datasets. Please upload all three datasets (train, validation, test).")
-        return None, None, None, None
-
-    # 각 데이터셋에서 텍스트 및 클래스 컬럼 처리
-    train_text_col, train_class_cols = split_columns(train_df)
-    valid_text_col, valid_class_cols = split_columns(valid_df)
-    test_text_col, test_class_cols = split_columns(test_df)
-
-    # 각 데이터프레임에 대한 컬럼 정보 저장
-    column_info = {
-        "train": {"text_col": train_text_col, "class_cols": train_class_cols},
-        "valid": {"text_col": valid_text_col, "class_cols": valid_class_cols},
-        "test": {"text_col": test_text_col, "class_cols": test_class_cols},
-    }
-
-    return train_df, valid_df, test_df, column_info
+    train_df['class'] = train_df['class'].astype('category')
+    valid_df['class'] = valid_df['class'].astype('category')
+    test_df['class'] = test_df['class'].astype('category')
+    return train_df, valid_df, test_df
 
 def split_columns(df):
-    # text_col : 가장 긴 문자열을 가진 컬럼 선택
-    text_col = max(
-        (col for col in df.columns if pd.api.types.is_string_dtype(df[col])),
-        key=lambda col: df[col].dropna().astype(str).apply(len).max(),
-        default=None,
-    )
-    # ckass_col : 나머지 컬럼들을 클래스 컬럼으로 구분
-    class_cols = [col for col in df.columns if col != text_col]
-    if class_cols:
-        df[class_cols] = df[class_cols].astype('category')
-    
-    return text_col, class_cols
+        text_columns = df.select_dtypes(include=["object", "string"]).columns.tolist()
+        class_columns = df.select_dtypes(include=["int64", "float64", "category"]).columns.tolist()
+        return text_columns, class_columns
+
 
 ## --------------- Embedding --------------- ##
 class EmbeddingPipeline:
