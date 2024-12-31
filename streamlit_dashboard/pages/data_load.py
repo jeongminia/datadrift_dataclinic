@@ -10,7 +10,7 @@ def render():
     st.title("Data Load Page")
 
     train_df, valid_df, test_df, column_info = load_data()
-    if not (train_df and valid_df and test_df):
+    if train_df is None or valid_df is None or test_df is None:
         st.error("Failed to load datasets. Please upload datasets in the 'Upload Data' tab.")
         return
     
