@@ -8,6 +8,12 @@
 |  **Dataset**{Preview, Description, Information} | **Class Column Analysis**{Distribution Plot}, </br> **Text Column Analysis**{Length Plot, Length Dataframe, WordCloud}      |     **Original Dimension**{Cosine Similarity, Euclidean Distances}, <br> **Dimension Reduction**{Cosine Similarity, Euclidean Distances, 2D Scatter Plot, 2D Density Plot, 3D Scatter Plot}      | **Evidently AI report**{based MMD}          |
 |    ☑️ (예정) csv 업로드        |    ☑️ (예정) 형태소 분석기 연결     |  ☑️ (예정) 차원축소 기법 선택 <br/> ☑️ (예정) 차원축소 기법 하이브리드 선택        | ☑️ (예정) 탐지 방법 선택           |
 
+## Documentation
+데이터 드리프트 탐지와 관련해 아래 문서를 참고
+- [types of drift](docs/)
+- [open-sourece drift detection tools](docs/)
+- [test type for detecting data drift](docs/)
+- [dimesion reduction for effective detecting drift](docs/)
 
 
 ## Usage Instructions
@@ -35,6 +41,7 @@
 ```
 streamlit_dashboard/
 ├── pages/
+│   ├── upload_data.py
 │   ├── data_load.py
 │   ├── basic_visualization.py
 │   ├── embedding_visualization.py

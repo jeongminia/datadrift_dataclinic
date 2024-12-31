@@ -44,6 +44,33 @@ def split_columns(df):
     
     return text_col, class_cols
 
+def upload_and_store_data():
+    train_file = st.file_uploader("▶️ Train Dataset", type=["csv"])
+    valid_file = st.file_uploader("▶️ Validation Dataset", type=["csv"])
+    test_file = st.file_uploader("▶️ Test Dataset", type=["csv"])
+
+    if train_file and valid_file and test_file:
+        train_df = pd.read_csv(train_file)
+        valid_df = pd.read_csv(valid_file)
+        test_df = pd.read_csv(test_file)
+
+        # 세션 상태에 데이터 저장
+        st.session_state['train_df'] = train_df
+        st.session_state['valid_df'] = valid_df
+        st.session_state['test_df'] = test_df
+
+        st.success("Data uploaded and stored successfully!")
+        return train_df, valid_df, test_df
+    else:
+        st.error("Please upload all three files!")
+        return None, None, None
+
+def get_data_from_session():
+    train_df = st.session_state.get('train_df')
+    valid_df = st.session_state.get('valid_df')
+    test_df = st.session_state.get('test_df')
+    return train_df, valid_df, test_df
+
 ## --------------- Embedding --------------- ##
 class EmbeddingPipeline:
     def __init__(self, model_name="klue/roberta-base", device=None):
