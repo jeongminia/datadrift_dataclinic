@@ -31,17 +31,24 @@ def load_data():
     return train_df, valid_df, test_df, column_info
 
 def split_columns(df):
+    if df is None:
+        raise ValueError("Dataframe is None!")
+
     # text_col : 가장 긴 문자열을 가진 컬럼 선택
     text_col = max(
-        (col for col in df.columns if pd.api.types.is_string_dtype(df[col])),
-        key=lambda col: df[col].dropna().astype(str).apply(len).max(),
-        default=None,
+        (col for col in df.columns),
+        key=lambda col: df[col].dropna().astype(str).str.len().max(),
+        default=None
     )
-    # ckass_col : 나머지 컬럼들을 클래스 컬럼으로 구분
-    class_cols = [col for col in df.columns if col != text_col]
-    if class_cols:
-        df[class_cols] = df[class_cols].astype('category')
-    
+    # 모든 컬럼 object로 지정 후 텍스트 컬럼 제외한 나머지를 category로 변환
+    for col in df.columns:
+        if col == text_col:
+            df[col] = df[col].astype(str)  # 텍스트 컬럼은 문자열로 유지
+        else:
+            df[col] = df[col].astype("category")  # 나머지는 카테고리로 변환
+
+    class_cols = [col for col in df.columns if col != text_col] if text_col else list(df.columns)
+
     return text_col, class_cols
 
 def upload_and_store_data():

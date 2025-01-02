@@ -44,8 +44,7 @@ def visualize_similarity_distance(valid_embeddings, test_embeddings, train_embed
                 xticklabels=False, yticklabels=False, ax=axes[3])
     axes[3].set_title("Euclidean: Test-Train")
 
-    plt.tight_layout()
-    return fig, axes
+    st.pyplot(fig)
 
 
 def plot_reduced(valid_pca, test_pca, train_pca, 
@@ -137,13 +136,16 @@ def plot_reduced(valid_pca, test_pca, train_pca,
     ax_3d_test.legend()
 
     plt.tight_layout()
-    return fig, axes
+    return fig
 
 
 def render():
     st.title("Embedding Visualization Page")
 
     train_df, valid_df, test_df, column_info = load_data()
+    if train_df is None or valid_df is None or test_df is None:
+        st.error("Failed to load datasets. Please upload datasets in the 'Upload Data' tab.")
+        return
     
     train_text_cols, train_class_cols = split_columns(train_df) # 각 데이터셋의 컬럼 나누기
 
@@ -151,17 +153,17 @@ def render():
     pipeline = EmbeddingPipeline()
     pipeline.load_model()
 
-    max_len = pipeline.calculate_max_len(train_df, train_text_cols[0])
+    max_len = pipeline.calculate_max_len(train_df, train_text_cols)
     st.write(f"Max Length: {max_len}")
 
-    train_embeddings = pipeline.generate_embeddings(train_df, train_text_cols[0], max_len=max_len)
-    valid_embeddings = pipeline.generate_embeddings(valid_df, train_text_cols[0], max_len=max_len)
-    test_embeddings = pipeline.generate_embeddings(test_df, train_text_cols[0], max_len=max_len)
+    train_embeddings = pipeline.generate_embeddings(train_df, train_text_cols, max_len=max_len)
+    valid_embeddings = pipeline.generate_embeddings(valid_df, train_text_cols, max_len=max_len)
+    test_embeddings = pipeline.generate_embeddings(test_df, train_text_cols, max_len=max_len)
     
     # distance 시각화
     st.subheader("Original Dimension")
-    fig, axes = visualize_similarity_distance(valid_embeddings, test_embeddings, train_embeddings)
-    st.pyplot(fig)
+    visualize_similarity_distance(valid_embeddings, test_embeddings, train_embeddings)
+    
 
     # PCA 차원에 따라 시각화
     st.subheader("Dimension Reduction with PCA")
@@ -172,10 +174,10 @@ def render():
     valid_pca = pca.transform(valid_embeddings)
     test_pca = pca.transform(test_embeddings)
 
-    fig, axes = visualize_similarity_distance(valid_embeddings = valid_pca, 
+    visualize_similarity_distance(valid_embeddings = valid_pca, 
                                               test_embeddings = test_pca, 
                                               train_embeddings = train_pca)
     st.pyplot(fig)
 
-    fig, axes = plot_reduced(valid_pca, test_pca, train_pca)
+    fig = plot_reduced(valid_pca, test_pca, train_pca)
     st.pyplot(fig)
