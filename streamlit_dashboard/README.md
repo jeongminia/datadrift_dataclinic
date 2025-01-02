@@ -10,7 +10,7 @@
 
 ## Documentation
 데이터 드리프트 탐지와 관련해 아래 문서를 참고
-- [types of drift](docs/)
+- [Definition of Data Drift](docs/DataDrift.md)
 - [open-sourece drift detection tools](docs/)
 - [test type for detecting data drift](docs/)
 - [dimesion reduction for effective detecting drift](docs/)
