@@ -9,7 +9,7 @@ from utils import load_data
 def render():
     st.title("Data Load Page")
 
-    train_df, valid_df, test_df, column_info = load_data()
+    train_df, valid_df, test_df = load_data()
     if train_df is None or valid_df is None or test_df is None:
         st.error("Failed to load datasets. Please upload datasets in the 'Upload Data' tab.")
         return
@@ -42,16 +42,3 @@ def render():
     }
     info_df = pd.DataFrame(info_dict, index=dataset.columns)
     st.dataframe(info_df, use_container_width=True)
-
-    # 결측값이 있는 로우 제거
-    initial_row_count = len(dataset)
-    if dataset.isnull().values.any():
-        missing_value_count = dataset.isnull().sum().sum()
-        dataset = dataset.dropna()
-        final_row_count = len(dataset)
-        st.write(f"{dataset_option} dataset contained {missing_value_count} missing values. "
-                 f"Initially, there were {initial_row_count} rows. After dropping rows with missing values, "
-                 f"there are now {final_row_count} rows.")
-    else:
-        st.success(f"No missing values found in the {dataset_option} dataset.")
-
