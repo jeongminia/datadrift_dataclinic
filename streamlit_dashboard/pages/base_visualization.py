@@ -39,7 +39,7 @@ def generate_wordcloud(df, column, font_path):
 def render():
     st.title("Base Visualization Page")
 
-    train_df, valid_df, test_df, column_info = load_data()
+    train_df, valid_df, test_df = load_data()
     if train_df is None or valid_df is None or test_df is None:
         st.error("Failed to load datasets. Please upload datasets in the 'Upload Data' tab.")
         return
@@ -78,6 +78,8 @@ def render():
     for name, df in datasets.items():
         text_col = train_text_cols if train_text_cols else None
         if text_col and text_col in df.columns:
+            # text_col을 명시적으로 문자열로 변환하고 Null 값을 빈 문자열로 채움
+            df[text_col] = df[text_col].astype(str).fillna("")
             df['doc_len'] = df[text_col].apply(lambda words: len(words.split()))
             data_summary.append({
                 "Dataset": name,
