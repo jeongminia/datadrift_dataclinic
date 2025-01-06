@@ -45,12 +45,14 @@ def render():
         return
     
     train_text_cols, train_class_cols = split_columns(train_df) # 각 데이터셋의 컬럼 나누기
+    st.write(f"Text Column: {train_text_cols}")
+    st.write(f"Class Columns: {train_class_cols}")
+
     
     datasets = {"Train": train_df, "Validation": valid_df, "Test": test_df}
 
     ## 1. class column
     st.subheader("Class Column Analysis")
-    st.write(train_class_cols)
 
     fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharey=True)
 
@@ -72,7 +74,6 @@ def render():
 
     ## 2. Text column
     st.subheader("Text Column Analysis")
-    st.write(train_text_cols)
 
     data_summary = []
     for name, df in datasets.items():

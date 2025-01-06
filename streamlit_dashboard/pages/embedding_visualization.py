@@ -41,17 +41,34 @@ def render():
     st.write(f"Max Length: {max_len}")
 
     with st.spinner('Generating embeddings for train dataset...'):
-        train_embeddings = pipeline.generate_embeddings(train_df, train_text_cols, max_len=max_len)
+        try:
+            train_embeddings = pipeline.generate_embeddings(train_df, train_text_cols, max_len=max_len)
+            st.write(f"Train embeddings shape: {train_embeddings.shape}")
+        except Exception as e:
+            st.error(f"Error in generating train embeddings: {e}")
+            return
     with st.spinner('Generating embeddings for validation dataset...'):
-        valid_embeddings = pipeline.generate_embeddings(valid_df, train_text_cols, max_len=max_len)
+        try:
+            valid_embeddings = pipeline.generate_embeddings(valid_df, train_text_cols, max_len=max_len)
+            st.write(f"Validation embeddings shape: {valid_embeddings.shape}")
+        except Exception as e:
+            st.error(f"Error in generating validation embeddings: {e}")
+            return
     with st.spinner('Generating embeddings for test dataset...'):
-        test_embeddings = pipeline.generate_embeddings(test_df, train_text_cols, max_len=max_len)
+        try:
+            test_embeddings = pipeline.generate_embeddings(test_df, train_text_cols, max_len=max_len)
+            st.write(f"Test embeddings shape: {test_embeddings.shape}")
+        except Exception as e:
+            st.error(f"Error in generating test embeddings: {e}")
+            return
     
     # distance 시각화
     st.subheader("Original Dimension")
-    visualize_similarity_distance(valid_embeddings, test_embeddings, train_embeddings)
+    try:
+        visualize_similarity_distance(valid_embeddings, test_embeddings, train_embeddings)
+    except Exception as e:
+        st.error(f"Error in visualizing similarity distance: {e}")
     
-
     # PCA 차원에 따라 시각화
     st.subheader("Dimension Reduction with PCA")
     dim_option = st.selectbox("Select Size of Dimension", [10, 50, 100, 200, 300, 400, 500])
@@ -61,6 +78,13 @@ def render():
     valid_pca = pca.transform(valid_embeddings)
     test_pca = pca.transform(test_embeddings)
 
-    visualize_similarity_distance(valid_pca, test_pca, train_pca)
-    fig = plot_reduced(valid_pca, test_pca, train_pca)
-    st.pyplot(fig)
+    st.write(f"Train PCA shape: {train_pca.shape}")
+    st.write(f"Validation PCA shape: {valid_pca.shape}")
+    st.write(f"Test PCA shape: {test_pca.shape}")
+
+    try:
+        visualize_similarity_distance(valid_pca, test_pca, train_pca)
+        fig = plot_reduced(valid_pca, test_pca, train_pca)
+        st.pyplot(fig)
+    except Exception as e:
+        st.error(f"Error in PCA visualization: {e}")
