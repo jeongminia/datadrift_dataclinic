@@ -7,7 +7,8 @@ from utils import load_data
 
 ## --------------- main --------------- ##
 def render():
-    st.title("Data Load Page")
+    dataset_name = st.session_state.get('dataset_name', 'Dataset')
+    st.title(f"{dataset_name} Data Load Page")
 
     train_df, valid_df, test_df = load_data()
     if train_df is None or valid_df is None or test_df is None:
