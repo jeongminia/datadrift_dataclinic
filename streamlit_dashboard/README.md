@@ -1,6 +1,6 @@
 
 > **✔️ 진행사항 (01.07)**
-> 1. csv를 업로드하니까 시각화하는 데까지 너무 오랜 시간이 걸리며, plot_reduced가 작동하지 않음
+> 1. csv를 업로드하니까 시각화하는 데까지 너무 오랜 시간이 걸림
 > 2. docs 업로드(데이터 드리프트, 오픈소스 정리)
 > 3. 법률 데이터셋(한림대, LBOX) 모두 streamlit 내에서 잘 작동함
 
@@ -31,7 +31,7 @@
     streamlit run main.py
     ```
 
-2. ~~데이터셋 업로드~~(추후 수정 예정)
+2. 데이터셋 업로드
 3. 사이드 바를 통해 각 페이지 확인
 4. streamlit 중단
 
@@ -56,13 +56,10 @@ streamlit_dashboard/
 │   ├── detect_datadrift.py
 ├── main.py
 ├── utils.py
-├── data/
-│   ├── train_data.csv
-│   ├── val_data.csv
-│   ├── test_data.csv
 ├── fonts/
 │   ├── NanumGothic.ttf
-
+├── README.md
+├── docs/
 ```
 
 
