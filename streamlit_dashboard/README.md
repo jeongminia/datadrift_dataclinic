@@ -1,6 +1,8 @@
 
-> **✔️ 진행사항 (01.06)**
-> csv를 업로드하니까 시각화하는 데까지 너무 오랜 시간이 걸리며, plot_reduced가 작동하지 않음
+> **✔️ 진행사항 (01.07)**
+> 1. csv를 업로드하니까 시각화하는 데까지 너무 오랜 시간이 걸리며, plot_reduced가 작동하지 않음
+> 2. docs 업로드(데이터 드리프트, 오픈소스 정리)
+> 3. 법률 데이터셋(한림대, LBOX) 모두 streamlit 내에서 잘 작동함
 
 </br>
 
@@ -11,7 +13,8 @@
 |     데이터 로드       |     베이스 시각화      |      임베딩 시각화      |    데이터 드리프트 탐지        |
 |      ![alt text](img_files/image.png)      |  ![alt text](img_files/image-1.png)      |     ![alt text](img_files/image-2.png)       | ![alt text](img_files/image-3.png)     |
 |  **Dataset**{Preview, Description, Information} | **Class Column Analysis**{Distribution Plot}, </br> **Text Column Analysis**{Length Plot, Length Dataframe, WordCloud}      |     **Original Dimension**{Cosine Similarity, Euclidean Distances}, <br> **Dimension Reduction**{Cosine Similarity, Euclidean Distances, 2D Scatter Plot, 2D Density Plot, 3D Scatter Plot}      | **Evidently AI report**{based MMD}          |
-|    ☑️ (완료) csv 업로드        |    ☑️ (예정) 형태소 분석기 연결     |  ☑️ (예정) 차원축소 기법 선택 <br/> ☑️ (예정) 차원축소 기법 하이브리드 선택        | ☑️ (예정) 탐지 방법 선택           |
+|    ✔️ csv 업로드        |    ✔️ 결측치 공란으로 채워 진행     |  ✔️ 임베딩 세션에 저장한 후 재사용        |             |
+|   ☑️ (예정) 데이터셋 이름 입력 받기        |    ☑️ (예정) 형태소 분석기 연결     |  ☑️ (예정) 차원축소 기법 선택 <br/> ☑️ (예정) 차원축소 기법 하이브리드 선택 <br/> ☑️ (예정) 임베딩 시간 오래 걸림        | ☑️ (예정) 탐지 방법 선택           |
 
 ## Documentation
 데이터 드리프트 탐지와 관련해 아래 문서를 참고
