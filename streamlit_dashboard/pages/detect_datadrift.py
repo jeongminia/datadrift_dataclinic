@@ -16,21 +16,49 @@ HTML_SAVE_PATH = "./reports"
 
 ## --------------- main --------------- ##
 def render():
-    st.title("Detect DataDrift Page")
+    dataset_name = st.session_state.get('dataset_name', 'Dataset')
+    st.title(f"Detect {dataset_name} DataDrift Page")
 
     # 데이터 로드
-    train_df, valid_df, test_df = load_data()
-    train_text_cols, train_class_cols = split_columns(train_df) # 각 데이터셋의 컬럼 나누기
+    # train_df, valid_df, test_df = load_data()
+    # train_text_cols, train_class_cols = split_columns(train_df) # 각 데이터셋의 컬럼 나누기
 
     # 임베딩
-    pipeline = EmbeddingPipeline()
-    pipeline.load_model()
+    # pipeline = EmbeddingPipeline()
+    # pipeline.load_model()
 
-    max_len = pipeline.calculate_max_len(train_df, train_text_cols[0])
+    # max_len = pipeline.calculate_max_len(train_df, train_text_cols)
 
-    train_embeddings = pipeline.generate_embeddings(train_df, train_text_cols[0], max_len=max_len)
-    valid_embeddings = pipeline.generate_embeddings(valid_df, train_text_cols[0], max_len=max_len)
-    test_embeddings = pipeline.generate_embeddings(test_df, train_text_cols[0], max_len=max_len)
+    # with st.spinner('Generating embeddings for train dataset...'):
+    #     try:
+    #         train_embeddings = pipeline.generate_embeddings(train_df, train_text_cols, max_len=max_len)
+    #         st.write(f"Train embeddings shape: {train_embeddings.shape}")
+    #     except Exception as e:
+    #         st.error(f"Error in generating train embeddings: {e}")
+    #         return
+    # with st.spinner('Generating embeddings for validation dataset...'):
+    #     try:
+    #         valid_embeddings = pipeline.generate_embeddings(valid_df, train_text_cols, max_len=max_len)
+    #         st.write(f"Validation embeddings shape: {valid_embeddings.shape}")
+    #     except Exception as e:
+    #         st.error(f"Error in generating validation embeddings: {e}")
+    #         return
+    # with st.spinner('Generating embeddings for test dataset...'):
+    #     try:
+    #         test_embeddings = pipeline.generate_embeddings(test_df, train_text_cols, max_len=max_len)
+    #         st.write(f"Test embeddings shape: {test_embeddings.shape}")
+    #     except Exception as e:
+    #         st.error(f"Error in generating test embeddings: {e}")
+    #        return
+
+    if 'train_embeddings' not in st.session_state or 'valid_embeddings' not in st.session_state or 'test_embeddings' not in st.session_state:
+        st.error("Embeddings are not available. Please generate embeddings in the 'Embedding Visualization' tab first.")
+        return
+    
+    train_embeddings = st.session_state['train_embeddings']
+    valid_embeddings = st.session_state['valid_embeddings']
+    test_embeddings = st.session_state['test_embeddings']
+    
 
     # 데이터 드리프트 검출
     st.subheader("Train-Validation Data Drift Detection")

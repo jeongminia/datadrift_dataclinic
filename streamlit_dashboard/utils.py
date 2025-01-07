@@ -43,10 +43,23 @@ def split_columns(df):
     return text_col, class_cols
 
 def upload_and_store_data():
-    train_file = st.file_uploader("▶️ Train Dataset", type=["csv"])
-    valid_file = st.file_uploader("▶️ Validation Dataset", type=["csv"])
-    test_file = st.file_uploader("▶️ Test Dataset", type=["csv"])
+    dataset_name = st.text_input("Enter the name for the dataset :", "")
+    if dataset_name:
+        st.session_state['dataset_name'] = dataset_name
 
+    train_file = st.file_uploader(f"▶️ {dataset_name} Train Dataset", type=["csv"])
+    valid_file = st.file_uploader(f"▶️ {dataset_name} Validation Dataset", type=["csv"])
+    test_file = st.file_uploader(f"▶️ {dataset_name} Test Dataset", type=["csv"])
+
+    # 업로드 상태 확인 및 경고 메시지
+    if not train_file:
+        st.warning("Train dataset is missing!")
+    if not valid_file:
+        st.warning("Validation dataset is missing!")
+    if not test_file:
+        st.warning("Test dataset is missing!")
+
+    # 파일이 모두 업로드된 경우
     if train_file and valid_file and test_file:
         train_df = pd.read_csv(train_file)
         valid_df = pd.read_csv(valid_file)
@@ -59,9 +72,10 @@ def upload_and_store_data():
 
         st.success("Data uploaded and stored successfully!")
         return train_df, valid_df, test_df
-    else:
-        st.error("Please upload all three files!")
-        return None, None, None
+    
+    # 하나라도 누락된 경우
+    return None, None, None
+
 
 def get_data_from_session():
     train_df = st.session_state.get('train_df')

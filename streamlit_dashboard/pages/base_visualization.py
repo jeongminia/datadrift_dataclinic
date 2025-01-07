@@ -37,7 +37,8 @@ def generate_wordcloud(df, column, font_path):
 
 ## --------------- main --------------- ##
 def render():
-    st.title("Base Visualization Page")
+    dataset_name = st.session_state.get('dataset_name', 'Dataset')
+    st.title(f"Base Visualization Page of {dataset_name}")
 
     train_df, valid_df, test_df = load_data()
     if train_df is None or valid_df is None or test_df is None:
@@ -53,23 +54,42 @@ def render():
     ## 1. class column
     st.subheader("Class Column Analysis")
 
-    fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharey=True)
+    # fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharey=True)
 
-    for ax, (name, df) in zip(axes, datasets.items()):
-        class_col = train_class_cols[0] if train_class_cols else None  # class 컬럼 이름 가져오기
-        if class_col and class_col in df.columns:
-            class_counts = df[class_col].value_counts()
-            ax.bar(list(class_counts.index), list(class_counts.values))
-            ax.set_title(f'{name} Set Class Distribution')
-            ax.set_xlabel('Class')
-            ax.set_ylabel('Count')
-        else:
-            ax.set_title(f'{name} Set Class Distribution')
-            ax.set_xlabel('Class')
-            ax.set_ylabel('Count')
-            ax.text(0.5, 0.5, 'No class column found', horizontalalignment='center', verticalalignment='center')
+    # for ax, (name, df) in zip(axes, datasets.items()):
+    #     class_col = train_class_cols[0] if train_class_cols else None  # class 컬럼 이름 가져오기
+    #     if class_col and class_col in df.columns:
+    #         class_counts = df[class_col].value_counts()
+    #         ax.bar(list(class_counts.index), list(class_counts.values))
+    #         ax.set_title(f'{name} Set Class Distribution')
+    #         ax.set_xlabel('Class')
+    #         ax.set_ylabel('Count')
+    #     else:
+    #         ax.set_title(f'{name} Set Class Distribution')
+    #         ax.set_xlabel('Class')
+    #         ax.set_ylabel('Count')
+    #         ax.text(0.5, 0.5, 'No class column found', horizontalalignment='center', verticalalignment='center')
     
-    st.pyplot(fig) # st.pyplot(fig, transparent=True)
+    # st.pyplot(fig) # st.pyplot(fig, transparent=True)
+
+    for class_col in train_class_cols:
+        st.write(f"Class Column: {class_col}")
+        fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharey=True)
+
+        for ax, (name, df) in zip(axes, datasets.items()):
+            if class_col in df.columns:
+                class_counts = df[class_col].value_counts()
+                ax.bar(list(class_counts.index), list(class_counts.values))
+                ax.set_title(f'{name} Set Class Distribution')
+                ax.set_xlabel('Class')
+                ax.set_ylabel('Count')
+            else:
+                ax.set_title(f'{name} Set Class Distribution')
+                ax.set_xlabel('Class')
+                ax.set_ylabel('Count')
+                ax.text(0.5, 0.5, 'No class column found', horizontalalignment='center', verticalalignment='center')
+        
+        st.pyplot(fig) # st.pyplot(fig, transparent=True)
 
     ## 2. Text column
     st.subheader("Text Column Analysis")

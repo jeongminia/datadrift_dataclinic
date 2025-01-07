@@ -14,7 +14,8 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 def render():
-    st.title("Embedding Visualization Page")
+    dataset_name = st.session_state.get('dataset_name', 'Dataset')
+    st.title(f"Embedding Visualization Page of {dataset_name}")
 
     train_df, valid_df, test_df = load_data()
     if train_df is None or valid_df is None or test_df is None:
@@ -44,6 +45,7 @@ def render():
         try:
             train_embeddings = pipeline.generate_embeddings(train_df, train_text_cols, max_len=max_len)
             st.write(f"Train embeddings shape: {train_embeddings.shape}")
+            st.session_state["train_embeddings"] = train_embeddings
         except Exception as e:
             st.error(f"Error in generating train embeddings: {e}")
             return
@@ -51,6 +53,7 @@ def render():
         try:
             valid_embeddings = pipeline.generate_embeddings(valid_df, train_text_cols, max_len=max_len)
             st.write(f"Validation embeddings shape: {valid_embeddings.shape}")
+            st.session_state["valid_embeddings"] = valid_embeddings
         except Exception as e:
             st.error(f"Error in generating validation embeddings: {e}")
             return
@@ -58,10 +61,15 @@ def render():
         try:
             test_embeddings = pipeline.generate_embeddings(test_df, train_text_cols, max_len=max_len)
             st.write(f"Test embeddings shape: {test_embeddings.shape}")
+            st.session_state["test_embeddings"] = test_embeddings
         except Exception as e:
             st.error(f"Error in generating test embeddings: {e}")
             return
     
+    train_embeddings = st.session_state['train_embeddings']
+    valid_embeddings = st.session_state['valid_embeddings']
+    test_embeddings = st.session_state['test_embeddings']
+
     # distance 시각화
     st.subheader("Original Dimension")
     try:
@@ -72,6 +80,7 @@ def render():
     # PCA 차원에 따라 시각화
     st.subheader("Dimension Reduction with PCA")
     dim_option = st.selectbox("Select Size of Dimension", [10, 50, 100, 200, 300, 400, 500])
+
     pca = PCA(n_components = dim_option)
     pca.fit(train_embeddings)
     train_pca = pca.transform(train_embeddings)
