@@ -47,9 +47,9 @@ def upload_and_store_data():
     if dataset_name:
         st.session_state['dataset_name'] = dataset_name
 
-    train_file = st.file_uploader(f"▶️ {dataset_name} Train Dataset", type=["csv"])
-    valid_file = st.file_uploader(f"▶️ {dataset_name} Validation Dataset", type=["csv"])
-    test_file = st.file_uploader(f"▶️ {dataset_name} Test Dataset", type=["csv"])
+    train_file = st.file_uploader(f"▶️ Train Dataset of {dataset_name}", type=["csv"])
+    valid_file = st.file_uploader(f"▶️ Validation Dataset of {dataset_name}", type=["csv"])
+    test_file = st.file_uploader(f"▶️ Test Dataset of {dataset_name}", type=["csv"])
 
     # 업로드 상태 확인 및 경고 메시지
     if not train_file:
