@@ -52,7 +52,7 @@ def render():
            column_mapping = column_mapping)
     
     # report 출력
-    train_valid_report_path = os.path.join(HTML_SAVE_PATH, "train_valid_drift_report.html")
+    train_valid_report_path = os.path.join(HTML_SAVE_PATH, f"{dataset_name} train_valid_drift_report.html")
     report.save_html(train_valid_report_path)
     # HTML 렌더링
     with open(train_valid_report_path, "r") as f:
@@ -84,7 +84,7 @@ def render():
            column_mapping = column_mapping)
     
      # HTML 파일 저장
-    train_test_report_path = os.path.join(HTML_SAVE_PATH, "train_test_drift_report.html")
+    train_test_report_path = os.path.join(HTML_SAVE_PATH, f"{dataset_name} train_test_drift_report.html")
     report.save_html(train_test_report_path)
 
     # HTML 렌더링
