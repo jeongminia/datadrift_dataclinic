@@ -43,3 +43,10 @@ def render():
     }
     info_df = pd.DataFrame(info_dict, index=dataset.columns)
     st.dataframe(info_df, use_container_width=True)
+
+    # 결측값 확인
+    if dataset.isnull().values.any():
+        st.error("The dataset contains missing values. Please upload the dataset again after handling missing values.")
+        return
+
+    st.success("The dataset is ready for the next step.")

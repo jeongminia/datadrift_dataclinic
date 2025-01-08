@@ -47,30 +47,12 @@ def render():
     
     train_text_cols, train_class_cols = split_columns(train_df) # 각 데이터셋의 컬럼 나누기
     st.write(f"Text Column   : {train_text_cols}")
-    st.write(f"Class Columns : {' '.join(train_class_cols)}")
+    st.write(f"Class Columns : {',  '.join(train_class_cols)}")
     
     datasets = {"Train": train_df, "Validation": valid_df, "Test": test_df}
 
     ## 1. class column
     st.subheader("Class Column Analysis")
-
-    # fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharey=True)
-
-    # for ax, (name, df) in zip(axes, datasets.items()):
-    #     class_col = train_class_cols[0] if train_class_cols else None  # class 컬럼 이름 가져오기
-    #     if class_col and class_col in df.columns:
-    #         class_counts = df[class_col].value_counts()
-    #         ax.bar(list(class_counts.index), list(class_counts.values))
-    #         ax.set_title(f'{name} Set Class Distribution')
-    #         ax.set_xlabel('Class')
-    #         ax.set_ylabel('Count')
-    #     else:
-    #         ax.set_title(f'{name} Set Class Distribution')
-    #         ax.set_xlabel('Class')
-    #         ax.set_ylabel('Count')
-    #         ax.text(0.5, 0.5, 'No class column found', horizontalalignment='center', verticalalignment='center')
-    
-    # st.pyplot(fig) # st.pyplot(fig, transparent=True)
 
     for class_col in train_class_cols:
         st.write(f"Class Column: {class_col}")
