@@ -48,7 +48,6 @@ def render():
             st.session_state["train_embeddings"] = train_embeddings
         except Exception as e:
             st.error(f"Error in generating train embeddings: {e}")
-            return
     with st.spinner('Generating embeddings for validation dataset...'):
         try:
             valid_embeddings = pipeline.generate_embeddings(valid_df, train_text_cols, max_len=max_len)
@@ -56,7 +55,6 @@ def render():
             st.session_state["valid_embeddings"] = valid_embeddings
         except Exception as e:
             st.error(f"Error in generating validation embeddings: {e}")
-            return
     with st.spinner('Generating embeddings for test dataset...'):
         try:
             test_embeddings = pipeline.generate_embeddings(test_df, train_text_cols, max_len=max_len)
@@ -64,7 +62,6 @@ def render():
             st.session_state["test_embeddings"] = test_embeddings
         except Exception as e:
             st.error(f"Error in generating test embeddings: {e}")
-            return
     
     train_embeddings = st.session_state['train_embeddings']
     valid_embeddings = st.session_state['valid_embeddings']
