@@ -12,6 +12,7 @@ import warnings
 warnings.filterwarnings(action='ignore')
 # evidently
 import os
+from evidently import ColumnMapping
 import streamlit.components.v1 as components  # HTML 렌더링을 위한 Streamlit 컴포넌트
 from evidently.report import Report
 from evidently.metric_preset import DataDriftPreset
@@ -30,13 +31,6 @@ plt.rcParams['font.family'] = fontprop.get_name()
 def clean_text(sent):
     sent_clean = re.sub(r"[^가-힣ㄱ-ㅎㅏ-ㅣ\s]", " ", sent)
     return sent_clean
-
-# Evidently 실행 전 데이터 변환
-def preprocess_data_for_evidently(df, categorical_columns):
-    for col in categorical_columns:
-        if col in df.columns:
-            df[col] = df[col].astype('category')
-    return df
 
 # 워드클라우드 생성 함수
 def generate_wordcloud(df, column, font_path):
@@ -66,13 +60,14 @@ def render():
     
     datasets = {"Train": train_df, "Validation": valid_df, "Test": test_df}
 
-    # Evidentlyai visualization dashboard
-    categorical_columns = train_class_cols  # 범주형 컬럼 리스트
-    train_df = preprocess_data_for_evidently(train_df, categorical_columns)
-    test_df = preprocess_data_for_evidently(test_df, categorical_columns)
+    column_mapping = ColumnMapping(categorical_features=train_class_cols, 
+                                   text_features=[train_text_cols])
         
     dashboard = Report(metrics=[DataDriftPreset()])
-    dashboard.run(reference_data=train_df, current_data=test_df)
+    dashboard.run(reference_data=train_df, 
+                  current_data=test_df, 
+                  column_mapping=column_mapping)
+    
     visaulization_report_path = os.path.join(HTML_SAVE_PATH, 
                                              f"{dataset_name}_visualization.html")
     dashboard.save_html(visaulization_report_path)

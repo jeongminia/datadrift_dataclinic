@@ -3,7 +3,7 @@ import pandas as pd
 import warnings
 warnings.filterwarnings(action='ignore')
 # data load
-from utils import load_data
+from utils import load_data, split_columns
 
 ## --------------- main --------------- ##
 def render():
@@ -15,6 +15,31 @@ def render():
         st.error("Failed to load datasets. Please upload datasets in the 'Upload Data' tab.")
         return
     
+    # 데이터 타입 변경
+    train_text_cols, train_class_cols = split_columns(train_df)
+    for col in train_df.columns:
+        if col in train_text_cols:
+            train_df[col] = train_df[col].astype('object')
+        elif col in train_class_cols:
+            train_df[col] = train_df[col].astype('category')
+
+    for col in valid_df.columns:
+        if col in train_text_cols:
+            valid_df[col] = valid_df[col].astype('object')
+        elif col in train_class_cols:
+            valid_df[col] = valid_df[col].astype('category')
+
+    for col in test_df.columns:
+        if col in train_text_cols:
+            test_df[col] = test_df[col].astype('object')
+        elif col in train_class_cols:
+            test_df[col] = test_df[col].astype('category')
+
+    # 세션 상태에 변경된 데이터프레임 저장
+    st.session_state['train_df'] = train_df
+    st.session_state['valid_df'] = valid_df
+    st.session_state['test_df'] = test_df
+
     dataset_option = st.selectbox("Select Dataset", ["Train", "Validation", "Test"])
 
     dataset = None
@@ -35,6 +60,7 @@ def render():
 
     # 데이터 정보
     st.subheader("Dataset Information")
+
     info_dict = {
 #    "Column": ,
     "Non-Null Count": dataset.notnull().sum().values,
