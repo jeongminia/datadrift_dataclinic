@@ -5,7 +5,7 @@ warnings.filterwarnings(action='ignore')
 
 # 페이지 설정
 st.set_page_config(
-    page_title="Text Data Drift Detection for Classification Tasks",  
+    page_title="Embedding Drift Detection",  
     page_icon="📊", 
     layout="wide" ,
     initial_sidebar_state="collapsed"

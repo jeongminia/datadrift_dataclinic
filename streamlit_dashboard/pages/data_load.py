@@ -46,7 +46,7 @@ def render():
 
     # 결측값 확인
     if dataset.isnull().values.any():
-        st.error("The dataset contains missing values. Please upload the dataset again after handling missing values.")
-        return
+        st.error("The dataset contains missing values. Please handle the missing values and upload the dataset again.")
+        st.stop()
 
     st.success("The dataset is ready for the next step.")
