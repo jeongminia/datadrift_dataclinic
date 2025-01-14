@@ -1,6 +1,6 @@
 
-> **✔️ 진행사항 (01.13)**
-> 1. 대용량 데이터가 업로드 되지 않음
+> **✔️ 진행사항 (01.4)**
+> ![화면 기록 2025-01-14 오후 2-VEED](img_files/0114ver.gif)
 
 </br>
 
@@ -17,7 +17,7 @@
 데이터 드리프트 탐지와 관련해 아래 문서를 참고
 - [Definition of Data Drift](docs/DataDrift.md)
 - [Open-Sourece Tools for Detecting Data Drfit](docs/DriftDetection-Tools.md)
-- [Test Type for Detecting Data Drift](docs/)
+- [Test Type for Detecting Data Drift](docs/TestTypes.md)
 - [Dimesion Reduction for Effective Detecting Drift](docs/)
 
 

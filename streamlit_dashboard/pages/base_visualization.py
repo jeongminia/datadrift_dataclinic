@@ -14,6 +14,7 @@ warnings.filterwarnings(action='ignore')
 import os
 from evidently import ColumnMapping
 import streamlit.components.v1 as components  # HTML 렌더링을 위한 Streamlit 컴포넌트
+from evidently.metric_preset import TextEvals
 from evidently.report import Report
 from evidently.metric_preset import DataDriftPreset
 # data load
@@ -60,10 +61,14 @@ def render():
     
     datasets = {"Train": train_df, "Validation": valid_df, "Test": test_df}
 
+    # evidently dashboard
+    st.subheader("_Dashboard based_ :red[EvidentlyAI]")
     column_mapping = ColumnMapping(categorical_features=train_class_cols, 
                                    text_features=[train_text_cols])
         
-    dashboard = Report(metrics=[DataDriftPreset()])
+    dashboard = Report(metrics=[DataDriftPreset(),
+                                TextEvals(column_name=train_text_cols)
+                                ])
     dashboard.run(reference_data=train_df, 
                   current_data=test_df, 
                   column_mapping=column_mapping)
@@ -74,6 +79,8 @@ def render():
     with open(visaulization_report_path, "r") as f:
         html_content = f.read()
     components.html(html_content, height=800, scrolling=True)
+
+
 
     if train_df.isnull().values.any() or valid_df.isnull().values.any() or test_df.isnull().values.any():
         st.error("One or more datasets contain missing values. Please handle the missing values and upload the datasets again.")
