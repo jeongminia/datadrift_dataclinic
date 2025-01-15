@@ -1,5 +1,6 @@
 
-> **✔️ 진행사항 (01.4)**
+> **✔️ 진행사항 (01.15)**
+> 
 > ![화면 기록 2025-01-14 오후 2-VEED](img_files/0114ver.gif)
 
 </br>
@@ -19,7 +20,6 @@
 - [Open-Sourece Tools for Detecting Data Drfit](docs/DriftDetection-Tools.md)
 - [Test Type for Detecting Data Drift](docs/TestTypes.md)
 - [Dimesion Reduction for Effective Detecting Drift](docs/)
-
 
 ## Usage Instructions
 1. streamlit 접속
@@ -60,6 +60,10 @@ streamlit_dashboard/
 │   ├── NanumGothic.ttf
 ├── README.md
 ├── docs/
+│   ├── DataDrift.md
+│   ├── DriftDetection-Tools.md
+│   ├── TestTypes.md
+├───├── 
 ```
 
 
