@@ -5,9 +5,12 @@ def render():
     dataset_name = st.session_state.get('dataset_name', 'Dataset')
     st.title(f"Upload your datasets : {dataset_name}")
     
-    st.subheader("Text Data Drift Detection for Classification Tasks!")
-    drift_detection_types = ["Text Data Drift", "Numerical Data Drift", "Categorical Data Drift"]
-    selected_drift_detection_type = st.selectbox("Choose the type of data drift detection you want to perform:", drift_detection_types)
-
+    data_type = ['Text', 'Image', 'Tabular']
+    selected_data_type = st.selectbox("1. Choose data type:", 
+                                                 data_type)
+    task_type = ['Classification', 'Regression']
+    selected_task_type = st.selectbox("2. Choose task type:",
+                                                 task_type)
+    st.subheader(f"{selected_data_type} Data Drift Detection for {selected_task_type}!")
     st.write("Please upload your train, validation, and test datasets.")
     upload_and_store_data()
