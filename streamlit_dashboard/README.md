@@ -12,7 +12,6 @@
 |     데이터 로드       |     베이스 시각화      |      임베딩 시각화      |    데이터 드리프트 탐지        |
 |      ![alt text](img_files/image.png)      |  ![alt text](img_files/image-1.png)      |     ![alt text](img_files/image-2.png)       | ![alt text](img_files/image-3.png)     |
 |  **Dataset**{Preview, Description, Information} | **Class Column Analysis**{Distribution Plot}, </br> **Text Column Analysis**{Length Plot, Length Dataframe, WordCloud}      |     **Original Dimension**{Cosine Similarity, Euclidean Distances}, <br> **Dimension Reduction**{Cosine Similarity, Euclidean Distances, 2D Scatter Plot, 2D Density Plot, 3D Scatter Plot}      | **Evidently AI report**{based MMD}          |
-|   ☑️ (예정) 데이터셋 이름 입력 받기        |    ☑️ (예정) 형태소 분석기 연결     |  ☑️ (예정) 차원축소 기법 선택 <br/> ☑️ (예정) 차원축소 기법 하이브리드 선택 <br/> ☑️ (예정) 임베딩 시간 오래 걸림        | ☑️ (예정) 탐지 방법 선택           |
 
 ## Documentation
 데이터 드리프트 탐지와 관련해 아래 문서를 참고
