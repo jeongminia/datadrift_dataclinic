@@ -38,10 +38,11 @@
     - (mac) `pkill -f streamlit`
 
 ## Install Prerequisite
-- library : [requirements](requirements.txt)
 - fonts : [나눔고딕 레귤러](https://fonts.google.com/selection)
-- datasets : 법률 관련 문서 데이터셋 (한림대학교 연구팀 구축)
+- library : [requirements](requirements.txt)
 - open source : [EvidentlyAI](https://github.com/evidentlyai/evidently/tree/main/examples/integrations/streamlit_dashboard)
+- stemming for wordcloud : [Pecab](https://github.com/hyunwoongko/pecab)
+- datasets : 법률 관련 문서 데이터셋 (한림대학교 연구팀 구축)
 
 ## Directory Structure
 

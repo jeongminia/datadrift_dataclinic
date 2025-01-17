@@ -5,6 +5,7 @@ import seaborn as sns
 import numpy as np
 # wordcloud
 import re
+from pecab import PeCab
 from collections import Counter
 from wordcloud import WordCloud
 from matplotlib import font_manager
@@ -29,9 +30,18 @@ fontprop = font_manager.FontProperties(fname=font_path)
 plt.rcParams['font.family'] = fontprop.get_name()
 
 # 텍스트 전처리 함수
+stopwords = ['아니', '근데', '진짜', '너무', 'ㅋㅋ', '이게', '그런데', 
+             '정말', '그리고', 'ㅠ', 'ㅠㅠ', 'ㅋ', 'ㅎㅎ', '왜', '좀', '이거', '보고', 
+             '그럼', '이제', '그래서', '그거', '그런', '그래', '그냥', 
+             '뭐', '제발', '잘', '못', '안', '더', '이제']
+
+analyzer = PeCab()
+
 def clean_text(sent):
     sent_clean = re.sub(r"[^가-힣ㄱ-ㅎㅏ-ㅣ\s]", " ", sent)
-    return sent_clean
+    nouns = analyzer.nouns(sent_clean)
+    filtered_words = [word for word in nouns if word not in stopwords]
+    return ' '.join(filtered_words)
 
 # 워드클라우드 생성 함수
 def generate_wordcloud(df, column, font_path):
