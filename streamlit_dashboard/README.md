@@ -18,7 +18,7 @@
 - [Definition of Data Drift](docs/DataDrift.md)
 - [Open-Sourece Tools for Detecting Data Drfit](docs/DriftDetection-Tools.md)
 - [Test Type for Detecting Data Drift](docs/TestTypes.md)
-- [Dimesion Reduction for Effective Detecting Drift](docs/)
+- [Dimesionality Reduction for Effective Detecting Drift](docs/Dimensionality-Reduction.md)
 
 ## Usage Instructions
 1. streamlit 접속
