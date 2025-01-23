@@ -97,7 +97,7 @@ $$
 
 ----
 
-### Reference
+## Reference
 
 [1] Domain Divergences: A Survey and Empirical Analysis
 
