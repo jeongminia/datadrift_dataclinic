@@ -90,6 +90,17 @@ def render():
         html_content = f.read()
     components.html(html_content, height=800, scrolling=True)
 
+    # Displaying the text in Streamlit
+    st.markdown("""
+                 **▶️ All Descriptors**
+
+                - **`TextLength`**: Calculates the length of the text
+                - **`SentenceCount`**: Calculates the number of sentences in the text
+                - **`Sentiment`**: Performs sentiment analysis on the text to identify emotional tone, negative (-1) - neutral - positive (1)
+                - **`OOV`**: Measures the percentage of words in the text that are outside the defined vocabulary
+                - **`NonLetterCharacterPercentage`**: Calculates the percentage of non-letter characters in the text
+                """)
+
 
 
     if train_df.isnull().values.any() or valid_df.isnull().values.any() or test_df.isnull().values.any():
