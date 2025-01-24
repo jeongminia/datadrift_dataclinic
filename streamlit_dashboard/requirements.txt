@@ -10,3 +10,4 @@ konlpy
 torch
 transformers
 sentencepiece
+pecab
