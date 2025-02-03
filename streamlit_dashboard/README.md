@@ -3,7 +3,7 @@
 | [Data Load](pages/data_load.py) | [Base Visualization](pages/base_visualization.py) | [Embedding Visualization](pages/embedding_visualization.py) | [Detect DataDrift](pages/detect_datadrift.py) |
 | ---------- | ---------- | ---------- | ---------- |
 |     데이터 로드       |     베이스 시각화      |      임베딩 시각화      |    데이터 드리프트 탐지        |
-|      ![alt text](img_files/image.png)      |  ![alt text](img_files/image-1.png)      |     ![alt text](img_files/image-2.png)       | ![alt text](img_files/image-3.png)     |
+|      ![alt text](img_files/image.png)      |  ![alt text](img_files/image-1.png)      |     ![alt text](img_files/image-2.png)      | ![alt text](img_files/image-3.png)     |
 |  **Dataset**{Preview, Description, Information} | **Class Column Analysis**{Distribution Plot}, </br> **Text Column Analysis**{Length Plot, Length Dataframe, WordCloud}      |     **Original Dimension**{Cosine Similarity, Euclidean Distances}, <br> **Dimension Reduction**{Cosine Similarity, Euclidean Distances, 2D Scatter Plot, 2D Density Plot, 3D Scatter Plot}      | **Evidently AI report**{based MMD}          |
 
 ## Documentation
