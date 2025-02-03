@@ -87,5 +87,7 @@
 
 ## References
 [1] E. Bingham and H. Mannila, "Random projection in dimensionality reduction: Applications to image and text data," Proceedings of the Seventh ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, vol. 7, no. 1, pp. 245–250, 2001.
+
 [2] S. Mika, G. Ratsch, J. Weston, B. Scholkopf, A. Smola, "Fisher discriminant analysis with kernels,” Proceedings of the IEEE Neural Networks for Signal Processing IX, vol. 1, pp. 41-48, 1999.
+
 [3] C. Hu, X. Hou, Y. Lu, "Improving the Architecture of an Autoencoder for Dimension Reduction,” Proceedings of the 2014 IEEE International Conference on Ubiquitous Intelligence and Computing, Autonomic and Trusted Computing, Scalable Computing and Communications, and Its Associated Workshops, pp. 851-858, 2014.
