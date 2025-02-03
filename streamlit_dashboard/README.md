@@ -1,10 +1,3 @@
-
-> **✔️ 진행사항 (1/24)**
-> 
-> 
-
-</br>
-
 ## Key Features
 
 | [Data Load](pages/data_load.py) | [Base Visualization](pages/base_visualization.py) | [Embedding Visualization](pages/embedding_visualization.py) | [Detect DataDrift](pages/detect_datadrift.py) |
