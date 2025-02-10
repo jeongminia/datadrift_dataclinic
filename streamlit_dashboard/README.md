@@ -12,6 +12,7 @@
 - [Open-Sourece Tools for Detecting Data Drfit](docs/DriftDetection-Tools.md)
 - [Test Type for Detecting Data Drift](docs/TestTypes.md)
 - [Dimesionality Reduction for Effective Detecting Drift](docs/Dimensionality-Reduction.md)
+- [Text DataDrift](docs/Text-DataDrift.md)
 
 ## Usage Instructions
 1. streamlit 접속
