@@ -99,5 +99,3 @@ def render():
     with open(train_test_report_path, "r") as f:
         html_content = f.read()
     components.html(html_content, height=800, scrolling=True)
-
-    # alibidetect - 데이터 드리프트 검출
