@@ -57,8 +57,22 @@ def render():
     test_text.set_embeddings(test_embeddings)
 
     check = PropertyDrift()
-    result = check.run(train_text, test_text)
+    result = check.run(train_dataset=train_text, test_dataset=test_text)
+
+    # 결과 디버깅
+    st.write("Result object:", result)
 
     # 결과 출력
-    html_content = result.show(mode='html')
-    components.html(html_content, height=800, scrolling=True)
+    import webbrowser
+    html_path = os.path.join(HTML_SAVE_PATH, f"{dataset_name}_property_drift_report.html")
+
+    if os.path.exists(html_path):
+        st.success(f"📄 Report is ready: {html_path}")
+
+    # 브라우저에서 직접 열기
+        if st.button("🚀 Open Report in Browser"):
+            st.write("✅ Button Clicked!")
+            webbrowser.open(f"file://{html_path}")
+
+    else:
+        st.error("🚨 HTML report file was not found.")

@@ -1,3 +1,8 @@
+> 2/14 ⚠️ error ⚠️
+    ![alt text](img_files/image0214.png)
+
+---
+
 ## Key Features
 
 | [Data Load](pages/data_load.py) | [Base Visualization](pages/base_visualization.py) | [Embedding Visualization](pages/embedding_visualization.py) | [Detect DataDrift](pages/detect_datadrift.py) |
