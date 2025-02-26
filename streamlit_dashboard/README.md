@@ -42,22 +42,21 @@
 
 ```
 streamlit_dashboard/
-├── pages/
-│   ├── upload_data.py
-│   ├── data_load.py
-│   ├── basic_visualization.py
-│   ├── embedding_visualization.py
-│   ├── detect_datadrift.py
-├── main.py
-├── utils.py
-├── fonts/
-│   ├── NanumGothic.ttf
-├── README.md
 ├── docs/
+│   ├── img_files/
 │   ├── DataDrift.md
+│   ├── Dimensionality-Reduction.md
 │   ├── DriftDetection-Tools.md
 │   ├── TestTypes.md
-├───├── 
+│   ├── Text-DataDrift.md
+├── fonts/
+│   ├── NanumGothic.ttf
+├── img_files/
+├── pages/
+├── README.md
+├── main.py
+├── requirements.txt
+├── utils.py
 ```
 
 
