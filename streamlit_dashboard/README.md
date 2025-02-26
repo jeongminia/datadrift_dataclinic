@@ -4,7 +4,7 @@
 | ---------- | ---------- | ---------- | ---------- |
 |     데이터 로드       |     베이스 시각화      |      임베딩 시각화      |    데이터 드리프트 탐지        |
 |      ![alt text](img_files/image.png)      |  ![alt text](img_files/image-1.png)      |     ![alt text](img_files/image-2.png)      | ![alt text](img_files/image-3.png)     |
-|  **Dataset**{Preview, Description, Information} | **Class Column Analysis**{Distribution Plot}, </br> **Text Column Analysis**{Length Plot, Length Dataframe, WordCloud}      |     **Original Dimension**{Cosine Similarity, Euclidean Distances}, <br> **Dimension Reduction**{Cosine Similarity, Euclidean Distances, 2D Scatter Plot, 2D Density Plot, 3D Scatter Plot}      | **Evidently AI report**{based MMD}          |
+
 
 ## Documentation
 데이터 드리프트 탐지와 관련해 아래 문서를 참고
@@ -42,22 +42,21 @@
 
 ```
 streamlit_dashboard/
-├── pages/
-│   ├── upload_data.py
-│   ├── data_load.py
-│   ├── basic_visualization.py
-│   ├── embedding_visualization.py
-│   ├── detect_datadrift.py
-├── main.py
-├── utils.py
-├── fonts/
-│   ├── NanumGothic.ttf
-├── README.md
 ├── docs/
+│   ├── img_files/
 │   ├── DataDrift.md
+│   ├── Dimensionality-Reduction.md
 │   ├── DriftDetection-Tools.md
 │   ├── TestTypes.md
-├───├── 
+│   ├── Text-DataDrift.md
+├── fonts/
+│   ├── NanumGothic.ttf
+├── img_files/
+├── pages/
+├── README.md
+├── main.py
+├── requirements.txt
+├── utils.py
 ```
 
 
