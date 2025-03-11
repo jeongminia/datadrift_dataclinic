@@ -12,4 +12,4 @@ transformers
 sentencepiece
 pecab
 deepchecks
-reportlab
+pyppeteer
