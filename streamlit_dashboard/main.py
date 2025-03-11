@@ -1,49 +1,57 @@
 import streamlit as st
+import asyncio
+from pyppeteer import launch
+import os
 from pages import upload_data, data_load, base_visualization, embedding_visualization, detect_datadrift, detect_propertydrift
 import warnings
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-import time
-import os
 warnings.filterwarnings(action='ignore')
 
 st.set_page_config(
-    page_title="Embedding Drift Detection",  
-    page_icon="📊", 
-    layout="wide" ,
+    page_title="Embedding Drift Detection",
+    page_icon="📊",
+    layout="wide",
     initial_sidebar_state="collapsed"
 )
 
+# 페이지 렌더링
 upload_data.render()
-
 data_load.render()
 base_visualization.render()
 embedding_visualization.render()
 detect_datadrift.render()
 detect_propertydrift.render()
 
-# PDF 캡처 기능
-def capture_pdf():
-    options = Options()
-    options.add_argument("--headless")  # GUI 없이 실행
-    options.add_argument("--disable-gpu")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--print-to-pdf")  # PDF 저장 옵션 추가
-
-    driver = webdriver.Chrome(options=options)
-    driver.get("http://localhost:8501")  # Streamlit 실행 페이지 (로컬 주소)
-    time.sleep(3)  # 페이지 로딩 대기
-
+# HTML 저장 및 PDF 변환 함수
+async def generate_pdf():
+    browser = await launch(
+        headless=True, 
+        args=['--no-sandbox'],
+        handleSIGINT=False, 
+        handleSIGTERM=False, 
+        handleSIGHUP=False  # 🚨 시그널 핸들링 비활성화
+    )
+    page = await browser.newPage()
+    await page.goto("http://localhost:8501", {'waitUntil': 'networkidle2'})  # Streamlit 서버 URL
     pdf_path = "/tmp/streamlit_dashboard.pdf"
-    driver.execute_script(f'document.title="{pdf_path}"')
-    driver.quit()
-
+    await page.pdf({'path': pdf_path, 'format': 'A4'})  # PDF로 저장
+    await browser.close()
     return pdf_path
+
+def run_asyncio_task(task):
+    try:
+        loop = asyncio.get_running_loop() 
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        return loop.run_until_complete(task)
+    else:
+        return loop.run_until_complete(task)
 
 # PDF 저장 버튼
 if st.button("Save as PDF"):
-    pdf_file = capture_pdf()
+    pdf_file = run_asyncio_task(generate_pdf())
+
+    # PDF 다운로드 버튼 추가
     with open(pdf_file, "rb") as f:
         st.download_button(
             label="📥 Download PDF",
