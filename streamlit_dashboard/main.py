@@ -1,7 +1,9 @@
 import streamlit as st
 from pages import upload_data, data_load, base_visualization, embedding_visualization, detect_datadrift, detect_propertydrift
 import warnings
-import pdfkit
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+import time
 import os
 warnings.filterwarnings(action='ignore')
 
@@ -20,25 +22,32 @@ embedding_visualization.render()
 detect_datadrift.render()
 detect_propertydrift.render()
 
-# PDF
+# PDF 캡처 기능
+def capture_pdf():
+    options = Options()
+    options.add_argument("--headless")  # GUI 없이 실행
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--print-to-pdf")  # PDF 저장 옵션 추가
+
+    driver = webdriver.Chrome(options=options)
+    driver.get("http://localhost:8501")  # Streamlit 실행 페이지 (로컬 주소)
+    time.sleep(3)  # 페이지 로딩 대기
+
+    pdf_path = "/tmp/streamlit_dashboard.pdf"
+    driver.execute_script(f'document.title="{pdf_path}"')
+    driver.quit()
+
+    return pdf_path
+
+# PDF 저장 버튼
 if st.button("Save as PDF"):
-    # HTML 파일 경로
-    html_file_path = "/tmp/streamlit_page.html"
-    pdf_file_path = "/tmp/streamlit_page.pdf"
-    
-    # 디렉토리가 존재하지 않으면 생성
-    os.makedirs(os.path.dirname(html_file_path), exist_ok=True)
-    
-    with open(html_file_path, "w") as f:
-        f.write(st._get_page_html())
-    
-    config = pdfkit.configuration(wkhtmltopdf='/usr/local/bin/wkhtmltopdf')
-    pdfkit.from_file(html_file_path, pdf_file_path, configuration=config)
-    
-    with open(pdf_file_path, "rb") as f:
+    pdf_file = capture_pdf()
+    with open(pdf_file, "rb") as f:
         st.download_button(
-            label="Download PDF",
+            label="📥 Download PDF",
             data=f,
-            file_name="streamlit_page.pdf",
+            file_name="streamlit_dashboard.pdf",
             mime="application/pdf"
         )
