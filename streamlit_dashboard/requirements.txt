@@ -12,3 +12,4 @@ transformers
 sentencepiece
 pecab
 deepchecks
+pyppeteer
