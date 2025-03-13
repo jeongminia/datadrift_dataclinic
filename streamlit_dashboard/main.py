@@ -1,6 +1,7 @@
 import streamlit as st
 import asyncio
 from pyppeteer import launch
+import threading
 import os
 from pages import upload_data, data_load, base_visualization, embedding_visualization, detect_datadrift, detect_propertydrift
 import warnings
@@ -12,6 +13,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
+
+if "data_uploaded" not in st.session_state:
+    st.session_state["data_uploaded"] = False
 
 # 페이지 렌더링
 upload_data.render()
@@ -32,30 +36,36 @@ async def generate_pdf():
     )
     page = await browser.newPage()
     await page.goto("http://localhost:8501", {'waitUntil': 'networkidle2'})  # Streamlit 서버 URL
+
+    await page.reload()
+    await asyncio.sleep(15)  
+    await page.reload()  
+    await asyncio.sleep(5)
+
+    await page.waitForSelector("div[data-testid='stVerticalBlock']", timeout=20000)  
+    await page.waitForSelector("section[data-testid='stSidebar']", timeout=20000) 
+    await page.waitForSelector("div.stButton", timeout=20000) 
+    await asyncio.sleep(5)
+
     pdf_path = "/tmp/streamlit_dashboard.pdf"
-    await page.pdf({'path': pdf_path, 'format': 'A4'})  # PDF로 저장
+    await page.pdf({'path': pdf_path, 'format': 'A4', 'printBackground': True})  # 배경 포함하여 PDF 생성
     await browser.close()
     return pdf_path
 
-def run_asyncio_task(task):
-    try:
-        loop = asyncio.get_running_loop() 
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        return loop.run_until_complete(task)
-    else:
-        return loop.run_until_complete(task)
+async def get_pdf():
+    return await generate_pdf()
 
-# PDF 저장 버튼
-if st.button("Save as PDF"):
-    pdf_file = run_asyncio_task(generate_pdf())
+if st.session_state["data_uploaded"]:
+    if st.button("Save as PDF"):
+        with st.spinner("📄 PDF를 생성하는 중... 잠시만 기다려 주세요."):
+            pdf_file = asyncio.run(get_pdf())  
 
-    # PDF 다운로드 버튼 추가
-    with open(pdf_file, "rb") as f:
-        st.download_button(
-            label="📥 Download PDF",
-            data=f,
-            file_name="streamlit_dashboard.pdf",
-            mime="application/pdf"
-        )
+        with open(pdf_file, "rb") as f:
+            st.download_button(
+                label="📥 Download PDF",
+                data=f,
+                file_name="streamlit_dashboard.pdf",
+                mime="application/pdf"
+            )
+else:
+    st.warning("⚠ 데이터가 업로드되지 않았습니다. 먼저 데이터를 업로드하세요.")
