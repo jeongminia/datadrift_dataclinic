@@ -42,21 +42,22 @@
 
 ```
 streamlit_dashboard/
-├── docs/
-│   ├── img_files/
-│   ├── DataDrift.md
-│   ├── Dimensionality-Reduction.md
-│   ├── DriftDetection-Tools.md
-│   ├── TestTypes.md
-│   ├── Text-DataDrift.md
-├── fonts/
-│   ├── NanumGothic.ttf
-├── img_files/
 ├── pages/
-├── README.md
-├── main.py
-├── requirements.txt
-├── utils.py
+│   ├── base_visualization.py       # 기본적인 시각화 기능
+│   ├── data_load.py                # 데이터 로드 관련 기능
+│   ├── detect_datadrift.py         # 데이터 드리프트 감지
+│   ├── detect_propertydrift.py     # 속성(Property) 단위 드리프트 감지
+│   ├── embedding_visualization.py  # 벡터 임베딩 시각화
+│   ├── upload_data.py              # 데이터 업로드 기능
+├── img_files/
+├── reports/                        # 분석 및 로그 리포트
+├── fonts/
+├── docs/
+├── main.py                         # Streamlit 실행 메인 파일
+├── utils.py                         # 공통 유틸 함수
+├── vector_database.py               # 벡터 데이터베이스 관리
+├── requirements.txt                 
+├── README.md                       
 ```
 
 
