@@ -161,8 +161,14 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# Vector DB
+# Vector DB ; Milvus 자동 생성 데이터 무시
 temp_dir/vector_db_server/volumes/etcd/member/
-# Milvus 자동 생성 데이터 무시
-temp_dir/vector_db_server/milvus/
+
+temp_dir/vector_db_server/volumes/
 temp_dir/vector_db_server/minio/
+temp_dir/vector_db_server/rdb_data/
+*.bin
+*.meta
+*.sst
+*.log
+*.part*
