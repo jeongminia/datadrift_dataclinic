@@ -15,8 +15,3 @@ def render():
     st.write("Please upload your train, validation, and test datasets.")
     
     uploaded = upload_and_store_data()
-    
-    # ✅ 데이터가 업로드되었는지 확인 후 상태 변경
-    if uploaded:
-        st.session_state["data_uploaded"] = True
-        st.success("✅ successfully uploaded!")
