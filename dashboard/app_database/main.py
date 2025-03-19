@@ -1,9 +1,6 @@
 import streamlit as st
-import asyncio
-from pyppeteer import launch
-import threading
 import os
-from pages import upload_data, data_load, base_visualization
+from pages import upload_data, data_load, base_visualization, vector_database
 import warnings
 warnings.filterwarnings(action='ignore')
 
@@ -21,3 +18,4 @@ if "data_uploaded" not in st.session_state:
 upload_data.render()
 data_load.render()
 base_visualization.render()
+vector_database.render()
