@@ -4,6 +4,7 @@ from utils import upload_and_store_data
 def render():
     dataset_name = st.session_state.get('dataset_name', 'Dataset')
     st.title(f"Upload your datasets : {dataset_name}")
+    st.session_state['dataset_name'] = dataset_name
     
     data_type = ['Text', 'Image', 'Tabular']
     selected_data_type = st.selectbox("1. Choose data type:", 
