@@ -57,22 +57,18 @@ def render():
 
         collection_name = dataset_name 
 
-        # Train 데이터셋 임베딩
         train_embeddings = embedding_pipeline.generate_embeddings(train_df, text_col)
         train_class_labels = train_df[class_col[0]].squeeze().tolist()
         load_and_save_data(train_embeddings, collection_name, "train", train_class_labels)
 
-        # Validation 데이터셋 임베딩
         valid_embeddings = embedding_pipeline.generate_embeddings(valid_df, text_col)
         valid_class_labels = valid_df[class_col[0]].squeeze().tolist()
         load_and_save_data(valid_embeddings, collection_name, "valid", valid_class_labels)
 
-        # Test 데이터셋 임베딩
         test_embeddings = embedding_pipeline.generate_embeddings(test_df, text_col)
         test_class_labels = test_df[class_col[0]].squeeze().tolist()
         load_and_save_data(test_embeddings, collection_name, "test", test_class_labels)
 
-        # 모든 데이터셋이 성공적으로 저장되었음을 표시
         st.success("✅ All datasets (train, validation, test) have been successfully inserted into VectorDB.")
     else:
         st.error("The dataset does not contain valid text or class columns.")

@@ -4,55 +4,28 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 # data & model load, Embedding & visualization
-from utils import load_data, split_columns, EmbeddingPipeline, visualize_similarity_distance, plot_reduced
+from utils import visualize_similarity_distance, plot_reduced
 import torch
 # 치원축소
 from sklearn.decomposition import PCA
 import warnings
 warnings.filterwarnings(action='ignore')
-device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 def render():
     dataset_name = st.session_state.get('dataset_name', 'Dataset')
     st.title(f"Embedding Visualization Page of {dataset_name}")
 
-    train_df, valid_df, test_df = load_data()
-    if train_df is None or valid_df is None or test_df is None:
-        st.error("Failed to load datasets. Please upload datasets in the 'Upload Data' tab.")
+    if 'embedding_data' not in st.session_state:
+        st.error("Embedding data is not loaded. Please load the embeddings in the 'Load Embeddings' tab.")
         return
 
-    train_text_cols, train_class_cols = split_columns(train_df) # 각 데이터셋의 컬럼 나누기
+    embedding_data = st.session_state['embedding_data']
 
-    if "train_embeddings" not in st.session_state:
-        # 임베딩 파이프라인 초기화
-        pipeline = EmbeddingPipeline()
-        pipeline.load_model()
-
-        # 최대 길이 계산
-        max_len = pipeline.calculate_max_len(train_df, train_text_cols)
-        st.write(f"Max Length: {max_len}")
-
-        # 임베딩 생성 및 세션 저장
-        if "train_embeddings" not in st.session_state:
-            pipeline = EmbeddingPipeline()
-            pipeline.load_model()
-            max_len = pipeline.calculate_max_len(train_df, train_text_cols)
-
-            with st.spinner("Generating embeddings..."):
-                st.session_state["train_embeddings"] = pipeline.generate_embeddings(
-                    train_df, train_text_cols, max_len=max_len
-                )
-                st.session_state["valid_embeddings"] = pipeline.generate_embeddings(
-                    valid_df, train_text_cols, max_len=max_len
-                )
-                st.session_state["test_embeddings"] = pipeline.generate_embeddings(
-                    test_df, train_text_cols, max_len=max_len
-                )
-    
-    train_embeddings = st.session_state['train_embeddings']
-    valid_embeddings = st.session_state['valid_embeddings']
-    test_embeddings = st.session_state['test_embeddings']
+    # 데이터셋 분리
+    train_embeddings = np.array([res["vector"] for res in embedding_data if res["set_type"] == "train"])
+    valid_embeddings = np.array([res["vector"] for res in embedding_data if res["set_type"] == "valid"])
+    test_embeddings = np.array([res["vector"] for res in embedding_data if res["set_type"] == "test"])
 
     st.write(f"Train embeddings shape: {train_embeddings.shape}")
     st.write(f"Validation embeddings shape: {valid_embeddings.shape}")

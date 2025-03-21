@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd 
 import numpy as np
 # data & model load, Embedding
-from utils import load_data, split_columns, EmbeddingPipeline
+from utils import load_data, split_columns
 # Detect DataDrift
 from evidently.metrics import EmbeddingsDriftMetric
 from evidently.report import Report
