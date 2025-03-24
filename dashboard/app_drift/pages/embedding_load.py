@@ -11,9 +11,16 @@ def get_collection_fields(collection_name):
     collection = Collection(name=collection_name)
     return [field.name for field in collection.schema.fields]
 
-def query_collection(collection_name, expr="", output_fields=None):
+def load_collection(collection_name):
     collection = Collection(name=collection_name)
-    results = collection.query(expr=expr, output_fields=output_fields)
+    collection.load()
+
+def query_collection(collection_name, expr="", output_fields=None, limit=100):
+    collection = Collection(name=collection_name)
+    if expr:
+        results = collection.query(expr=expr, output_fields=output_fields)
+    else:
+        results = collection.query(expr="id >= 0", output_fields=output_fields, limit=limit)
     return results
 
 def render():
@@ -23,21 +30,18 @@ def render():
     collection_name = st.selectbox("Select the collection name", options=collection_names)
 
     if st.button("Load Data"):
-        # 컬렉션의 필드 이름 확인
+        # 컬렉션의 필드 이름 확인, 필드 설정
         fields = get_collection_fields(collection_name)
-        st.write(f"Fields in the collection: {fields}")
-
-        # 쿼리할 필드 설정
+        
         output_fields = ["id", "set_type", "class", "vector"]
         valid_fields = [field for field in output_fields if field in fields]
 
         if not valid_fields:
             st.error("No valid fields to query in the selected collection.")
             return
-
+        
+        load_collection(collection_name)
         results = query_collection(collection_name, output_fields=valid_fields)
-        st.write("Data loaded from VectorDB:")
-        st.write(results)
 
         # 세션 상태에 데이터 저장
         st.session_state['embedding_data'] = results
