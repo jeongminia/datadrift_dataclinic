@@ -13,11 +13,14 @@ warnings.filterwarnings(action='ignore')
 
 
 def render():
+    st.write("현재 세션 상태:", st.session_state)
+
     dataset_name = st.session_state.get('dataset_name', 'Dataset')
     st.title(f"Embedding Visualization Page of {dataset_name}")
 
     if 'embedding_data' not in st.session_state:
-        st.error("Embedding data is not loaded. Please load the embeddings in the 'Load Embeddings' tab.")
+        st.error("Embedding data is not loaded. "
+                    "Please load the embeddings in the 'Load Embeddings' tab.")
         return
 
     embedding_data = st.session_state['embedding_data']
@@ -26,6 +29,11 @@ def render():
     train_embeddings = np.array([res["vector"] for res in embedding_data if res["set_type"] == "train"])
     valid_embeddings = np.array([res["vector"] for res in embedding_data if res["set_type"] == "valid"])
     test_embeddings = np.array([res["vector"] for res in embedding_data if res["set_type"] == "test"])
+
+    # 데이터가 비어 있는지 확인
+    if train_embeddings.size == 0 or valid_embeddings.size == 0 or test_embeddings.size == 0:
+        st.error("One or more embedding datasets are empty. Please check the data.")
+        return
 
     st.write(f"Train embeddings shape: {train_embeddings.shape}")
     st.write(f"Validation embeddings shape: {valid_embeddings.shape}")
