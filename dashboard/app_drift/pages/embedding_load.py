@@ -32,13 +32,15 @@ def render():
     if st.button("Load Data"):
         # 컬렉션의 필드 이름 확인, 필드 설정
         fields = get_collection_fields(collection_name)
+        
         output_fields = ["id", "set_type", "class", "vector"]
         valid_fields = [field for field in output_fields if field in fields]
 
         if not valid_fields:
             st.error("No valid fields to query in the selected collection.")
             return
-
+        
+        load_collection(collection_name)
         results = query_collection(collection_name, output_fields=valid_fields)
 
         # 세션 상태에 데이터 저장

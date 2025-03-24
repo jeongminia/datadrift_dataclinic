@@ -13,7 +13,11 @@ warnings.filterwarnings(action='ignore')
 
 
 def render():
-    st.write("현재 세션 상태:", st.session_state)
+    if 'embedding_data' not in st.session_state or not st.session_state['embedding_data']:
+        st.error("❌ 'embedding_data' is not initialized or empty. Please load it from VectorDB.")
+        return
+
+    embedding_data = st.session_state['embedding_data']
 
     dataset_name = st.session_state.get('dataset_name', 'Dataset')
     st.title(f"Embedding Visualization Page of {dataset_name}")
@@ -22,13 +26,18 @@ def render():
         st.error("Embedding data is not loaded. "
                     "Please load the embeddings in the 'Load Embeddings' tab.")
         return
-
-    embedding_data = st.session_state['embedding_data']
+    
+    # 4. 필터링: set_type 이 잘 들어왔는지 확인
+    set_types = [res.get("set_type", "") for res in embedding_data]
+    st.write("Detected set_type values:", set(set_types))  # 디버깅
 
     # 데이터셋 분리
-    train_embeddings = np.array([res["vector"] for res in embedding_data if res["set_type"] == "train"])
-    valid_embeddings = np.array([res["vector"] for res in embedding_data if res["set_type"] == "valid"])
-    test_embeddings = np.array([res["vector"] for res in embedding_data if res["set_type"] == "test"])
+    train_embeddings = np.array([res["vector"] for res in embedding_data if res.get("set_type", "").lower() == "train"],
+                                dtype=np.float32)
+    valid_embeddings = np.array([res["vector"] for res in embedding_data if res.get("set_type", "").lower() == "valid"],
+                                dtype=np.float32)
+    test_embeddings = np.array([res["vector"] for res in embedding_data if res.get("set_type", "").lower() == "test"],
+                               dtype=np.float32)
 
     # 데이터가 비어 있는지 확인
     if train_embeddings.size == 0 or valid_embeddings.size == 0 or test_embeddings.size == 0:
