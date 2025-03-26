@@ -18,7 +18,10 @@ def create_collection(collection_name):
         collection = Collection(name=collection_name, schema=schema)
         collection.create_index(field_name="vector", 
                                 index_params={"index_type": "IVF_FLAT", "metric_type": "L2", "params": {"nlist": 128}})
-        collection.load()
+        st.write(f"✅ Created and loaded collection: {collection_name}")
+    else:
+        collection = Collection(name=collection_name)
+    collection.load()
 
 def insert_vectors(collection_name, vectors, set_type, class_labels):
     collection = Collection(name=collection_name)
@@ -28,12 +31,15 @@ def insert_vectors(collection_name, vectors, set_type, class_labels):
         vectors
     ]
     ids = collection.insert(data)
+    collection.flush()
     return ids
 
 def load_and_save_data(data, collection_name, set_type, class_labels):
+   # st.write(f"🔄 Saving data for set_type: {set_type} with {len(data)} vectors.")
     create_collection(collection_name)
     vectors = np.array(data)
     ids = insert_vectors(collection_name, vectors, set_type, class_labels)
+    st.write(f"✅ Successfully saved {ids.insert_count} records for set_type: {set_type}.")
     return ids
 
 def render():
@@ -61,16 +67,40 @@ def render():
         train_class_labels = train_df[class_col[0]].squeeze().tolist()
         load_and_save_data(train_embeddings, collection_name, "train", train_class_labels)
 
+        collection = Collection(name=collection_name)
+        collection.load()
+        train_results = collection.query(expr="set_type == 'train'", output_fields=["set_type"], limit=10000)
+        st.write(f"🔍 Train records in collection: {len(train_results)}")
+
         valid_embeddings = embedding_pipeline.generate_embeddings(valid_df, text_col)
         valid_class_labels = valid_df[class_col[0]].squeeze().tolist()
         load_and_save_data(valid_embeddings, collection_name, "valid", valid_class_labels)
+
+        valid_results = collection.query(expr="set_type == 'valid'", output_fields=["set_type"], limit=10000)
+        st.write(f"🔍 Valid records in collection: {len(valid_results)}")
 
         test_embeddings = embedding_pipeline.generate_embeddings(test_df, text_col)
         test_class_labels = test_df[class_col[0]].squeeze().tolist()
         load_and_save_data(test_embeddings, collection_name, "test", test_class_labels)
 
+        test_results = collection.query(expr="set_type == 'test'", output_fields=["set_type"], limit=10000)
+        # st.write(f"🔍 Test records in collection: {len(test_results)}")
+
         st.success("✅ All datasets (train, validation, test) have been successfully inserted into VectorDB.")
     else:
         st.error("The dataset does not contain valid text or class columns.")
+        return
+
+    collection = Collection(name=collection_name)
+    collection.load()
+    results = collection.query(expr="set_type in ['train', 'valid', 'test']", output_fields=["set_type"], limit=10000)
+    set_types = [res["set_type"] for res in results]
+    unique_types = set(set_types)
+
+    st.write("📊 Current set_type values in collection:", unique_types)
+    # 각 set_type별 데이터 개수 출력
+    for set_type in unique_types:
+        count = set_types.count(set_type)
+        st.write(f"  {set_type}: {count} records")
 
     return
