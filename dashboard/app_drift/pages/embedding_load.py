@@ -15,12 +15,23 @@ def load_collection(collection_name):
     collection = Collection(name=collection_name)
     collection.load()
 
-def query_collection(collection_name, expr="", output_fields=None, limit=100):
+def query_by_set_type(collection_name, set_types, output_fields, limit_per_type=10000):
+    collection = Collection(name=collection_name)
+    all_results = []
+
+    for stype in set_types:
+        expr = f"set_type == '{stype}'"
+        results = collection.query(expr=expr, output_fields=output_fields, limit=limit_per_type)
+        all_results.extend(results)
+
+    return all_results
+
+def query_collection(collection_name, expr="", output_fields=None, limit=None):
     collection = Collection(name=collection_name)
     if expr:
         results = collection.query(expr=expr, output_fields=output_fields)
     else:
-        results = collection.query(expr="id >= 0", output_fields=output_fields, limit=limit)
+        results = collection.query(expr="id >= 0", output_fields=output_fields, limit=limit or 100000)  # 충분히 큰 숫자
     return results
 
 def render():
@@ -30,9 +41,9 @@ def render():
     collection_name = st.selectbox("Select the collection name", options=collection_names)
 
     if st.button("Load Data"):
+
         # 컬렉션의 필드 이름 확인, 필드 설정
         fields = get_collection_fields(collection_name)
-        
         output_fields = ["id", "set_type", "class", "vector"]
         valid_fields = [field for field in output_fields if field in fields]
 
@@ -41,9 +52,14 @@ def render():
             return
         
         load_collection(collection_name)
-        results = query_collection(collection_name, output_fields=valid_fields)
 
-        # 세션 상태에 데이터 저장
+        # 미리 set_type 값 추출
+        collection = Collection(name=collection_name)
+        set_type_results = collection.query(expr="id >= 0", output_fields=["set_type"], limit=10000)
+        set_types = set([res["set_type"] for res in set_type_results])
+        st.write(f"📌 Detected set_type values: `{set_types}`")
+
+        results = query_by_set_type(collection_name, set_types, valid_fields)
         st.session_state['embedding_data'] = results
         st.success("✅ Embedding data successfully loaded and stored in session state.")
 
