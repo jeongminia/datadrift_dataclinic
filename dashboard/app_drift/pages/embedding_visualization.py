@@ -29,7 +29,6 @@ def render():
     
     # 4. 필터링: set_type 이 잘 들어왔는지 확인
     set_types = [res.get("set_type", "") for res in embedding_data]
-    st.write("Detected set_type values:", set(set_types))  # 디버깅
 
     # 데이터셋 분리
     train_embeddings = np.array([res["vector"] for res in embedding_data if res.get("set_type", "").lower() == "train"],
