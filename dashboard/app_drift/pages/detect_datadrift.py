@@ -23,11 +23,20 @@ def render():
 
     if 'train_embeddings' not in st.session_state or 'valid_embeddings' not in st.session_state or 'test_embeddings' not in st.session_state:
         st.error("Embeddings are not available. Please generate embeddings in the 'Embedding Visualization' tab first.")
+        st.write("Debug Info: ", st.session_state)
         return
     
     train_embeddings = st.session_state['train_embeddings']
     valid_embeddings = st.session_state['valid_embeddings']
     test_embeddings = st.session_state['test_embeddings']
+
+    # 데이터 형식 확인 및 변환
+    if not isinstance(train_embeddings, np.ndarray):
+        train_embeddings = np.array(train_embeddings)
+    if not isinstance(valid_embeddings, np.ndarray):
+        valid_embeddings = np.array(valid_embeddings)
+    if not isinstance(test_embeddings, np.ndarray):
+        test_embeddings = np.array(test_embeddings)
     
     # evidentlyai - 데이터 드리프트 검출
     st.subheader("Train(reference)-Test(current) Data Drift Detection")
