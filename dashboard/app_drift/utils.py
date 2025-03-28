@@ -7,6 +7,7 @@ import torch
 from sklearn.metrics.pairwise import euclidean_distances, cosine_similarity
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib.lines import Line2D
 
 ## --------------- Load Data --------------- ##
 
@@ -79,96 +80,76 @@ def visualize_similarity_distance(valid_embeddings, test_embeddings, train_embed
     except Exception as e:
         st.error(f"Error in visualize_similarity_distance: {e}")
 
+import matplotlib.lines as mlines
+
 def plot_reduced(valid_pca, test_pca, train_pca, 
                  label_valid="Valid", label_test="Test", label_train="Train"):
-    try:
-        # 분포 시각화
-        fig, axes = plt.subplots(1, 6, figsize=(30, 5))  # 1x6 플롯 생성
+    fig, axes = plt.subplots(1, 6, figsize=(30, 5))  # 1x6 플롯 생성
+    colors = {label_train: "orange", label_valid: "blue", label_test: "green"}
 
-        # 색상 설정
-        colors = {label_train: "orange", label_valid: "blue", label_test: "green"}
+    # 2D Scatter Plot (valid-train)
+    axes[0].scatter(train_pca[:, 0], train_pca[:, 1], alpha=0.5, label=label_train, c=colors[label_train])
+    axes[0].scatter(valid_pca[:, 0], valid_pca[:, 1], alpha=0.5, label=label_valid, c=colors[label_valid])
+    axes[0].set_title("2D Scatter Plot (valid-train)", fontsize=12)
+    axes[0].set_xlabel("PC1", fontsize=10)
+    axes[0].set_ylabel("PC2", fontsize=10)
+    axes[0].legend()
+    axes[0].grid(alpha=0.3)
 
-        # 2D Scatter Plot (valid-train)
-        axes[0].scatter(
-            train_pca[:, 0], train_pca[:, 1], alpha=0.5, label=label_train, c=colors[label_train]
-        )
-        axes[0].scatter(
-            valid_pca[:, 0], valid_pca[:, 1], alpha=0.5, label=label_valid, c=colors[label_valid]
-        )
-        axes[0].set_title("2D Scatter Plot (valid-train)", fontsize=12)
-        axes[0].set_xlabel("PC1", fontsize=10)
-        axes[0].set_ylabel("PC2", fontsize=10)
-        axes[0].legend()
-        axes[0].grid(alpha=0.3)
+    # 2D Scatter Plot (test-train)
+    axes[1].scatter(train_pca[:, 0], train_pca[:, 1], alpha=0.5, label=label_train, c=colors[label_train])
+    axes[1].scatter(test_pca[:, 0], test_pca[:, 1], alpha=0.5, label=label_test, c=colors[label_test])
+    axes[1].set_title("2D Scatter Plot (test-train)", fontsize=12)
+    axes[1].set_xlabel("PC1", fontsize=10)
+    axes[1].set_ylabel("PC2", fontsize=10)
+    axes[1].legend()
+    axes[1].grid(alpha=0.3)
 
-        # 2D Scatter Plot (test-train)
-        axes[1].scatter(
-            train_pca[:, 0], train_pca[:, 1], alpha=0.5, label=label_train, c=colors[label_train]
-        )
-        axes[1].scatter(
-            test_pca[:, 0], test_pca[:, 1], alpha=0.5, label=label_test, c=colors[label_test]
-        )
-        axes[1].set_title("2D Scatter Plot (test-train)", fontsize=12)
-        axes[1].set_xlabel("PC1", fontsize=10)
-        axes[1].set_ylabel("PC2", fontsize=10)
-        axes[1].legend()
-        axes[1].grid(alpha=0.3)
+    # 2D Density Plot (valid-train)
+    sns.kdeplot(x=train_pca[:, 0], y=train_pca[:, 1], ax=axes[2], fill=True, alpha=0.5, color=colors[label_train])
+    sns.kdeplot(x=valid_pca[:, 0], y=valid_pca[:, 1], ax=axes[2], fill=True, alpha=0.5, color=colors[label_valid])
+    axes[2].set_title("2D Density Plot (valid-train)", fontsize=12)
+    axes[2].set_xlabel("PC1", fontsize=10)
+    axes[2].set_ylabel("PC2", fontsize=10)
+    handles2 = [
+        mlines.Line2D([], [], color=colors[label_train], label=label_train),
+        mlines.Line2D([], [], color=colors[label_valid], label=label_valid)
+    ]
+    axes[2].legend(handles=handles2)
+    axes[2].grid(alpha=0.3)
 
-        # 2D Density Plot (valid-train)
-        sns.kdeplot(
-            x=train_pca[:, 0], y=train_pca[:, 1], ax=axes[2], fill=True, alpha=0.5, color=colors[label_train], label=label_train
-        )
-        sns.kdeplot(
-            x=valid_pca[:, 0], y=valid_pca[:, 1], ax=axes[2], fill=True, alpha=0.5, color=colors[label_valid], label=label_valid
-        )
-        axes[2].set_title("2D Density Plot (valid-train)", fontsize=12)
-        axes[2].set_xlabel("PC1", fontsize=10)
-        axes[2].set_ylabel("PC2", fontsize=10)
-        axes[2].legend()
-        axes[2].grid(alpha=0.3)
+    # 2D Density Plot (test-train)
+    sns.kdeplot(x=train_pca[:, 0], y=train_pca[:, 1], ax=axes[3], fill=True, alpha=0.5, color=colors[label_train])
+    sns.kdeplot(x=test_pca[:, 0], y=test_pca[:, 1], ax=axes[3], fill=True, alpha=0.5, color=colors[label_test])
+    axes[3].set_title("2D Density Plot (test-train)", fontsize=12)
+    axes[3].set_xlabel("PC1", fontsize=10)
+    axes[3].set_ylabel("PC2", fontsize=10)
+    handles3 = [
+        mlines.Line2D([], [], color=colors[label_train], label=label_train),
+        mlines.Line2D([], [], color=colors[label_test], label=label_test)
+    ]
+    axes[3].legend(handles=handles3)
+    axes[3].grid(alpha=0.3)
 
-        # 2D Density Plot (test-train)
-        sns.kdeplot(
-            x=train_pca[:, 0], y=train_pca[:, 1], ax=axes[3], fill=True, alpha=0.5, color=colors[label_train], label=label_train
-        )
-        sns.kdeplot(
-            x=test_pca[:, 0], y=test_pca[:, 1], ax=axes[3], fill=True, alpha=0.5, color=colors[label_test], label=label_test
-        )
-        axes[3].set_title("2D Density Plot (test-train)", fontsize=12)
-        axes[3].set_xlabel("PC1", fontsize=10)
-        axes[3].set_ylabel("PC2", fontsize=10)
-        axes[3].legend()
-        axes[3].grid(alpha=0.3)
+    # 3D Scatter Plot (valid-train)
+    ax_3d_valid = fig.add_subplot(1, 6, 5, projection="3d")
+    ax_3d_valid.scatter(train_pca[:, 0], train_pca[:, 1], train_pca[:, 2], alpha=0.5, label=label_train, c=colors[label_train])
+    ax_3d_valid.scatter(valid_pca[:, 0], valid_pca[:, 1], valid_pca[:, 2], alpha=0.5, label=label_valid, c=colors[label_valid])
+    ax_3d_valid.set_title("3D Scatter Plot (valid-train)", fontsize=12)
+    ax_3d_valid.set_xlabel("PC1", fontsize=10)
+    ax_3d_valid.set_ylabel("PC2", fontsize=10)
+    ax_3d_valid.set_zlabel("PC3", fontsize=10)
+    ax_3d_valid.legend()
 
-        # 3D Scatter Plot (valid-train)
-        ax_3d_valid = fig.add_subplot(1, 6, 5, projection="3d")
-        ax_3d_valid.scatter(
-            train_pca[:, 0], train_pca[:, 1], train_pca[:, 2], alpha=0.5, label=label_train, c=colors[label_train]
-        )
-        ax_3d_valid.scatter(
-            valid_pca[:, 0], valid_pca[:, 1], valid_pca[:, 2], alpha=0.5, label=label_valid, c=colors[label_valid]
-        )
-        ax_3d_valid.set_title("3D Scatter Plot (valid-train)", fontsize=12)
-        ax_3d_valid.set_xlabel("PC1", fontsize=10)
-        ax_3d_valid.set_ylabel("PC2", fontsize=10)
-        ax_3d_valid.set_zlabel("PC3", fontsize=10)
-        ax_3d_valid.legend()
+    # 3D Scatter Plot (test-train)
+    ax_3d_test = fig.add_subplot(1, 6, 6, projection="3d")
+    ax_3d_test.scatter(train_pca[:, 0], train_pca[:, 1], train_pca[:, 2], alpha=0.5, label=label_train, c=colors[label_train])
+    ax_3d_test.scatter(test_pca[:, 0], test_pca[:, 1], test_pca[:, 2], alpha=0.5, label=label_test, c=colors[label_test])
+    ax_3d_test.set_title("3D Scatter Plot (test-train)", fontsize=12)
+    ax_3d_test.set_xlabel("PC1", fontsize=10)
+    ax_3d_test.set_ylabel("PC2", fontsize=10)
+    ax_3d_test.set_zlabel("PC3", fontsize=10)
+    ax_3d_test.legend()
 
-        # 3D Scatter Plot (test-train)
-        ax_3d_test = fig.add_subplot(1, 6, 6, projection="3d")
-        ax_3d_test.scatter(
-            train_pca[:, 0], train_pca[:, 1], train_pca[:, 2], alpha=0.5, label=label_train, c=colors[label_train]
-        )
-        ax_3d_test.scatter(
-            test_pca[:, 0], test_pca[:, 1], test_pca[:, 2], alpha=0.5, label=label_test, c=colors[label_test]
-        )
-        ax_3d_test.set_title("3D Scatter Plot (test-train)", fontsize=12)
-        ax_3d_test.set_xlabel("PC1", fontsize=10)
-        ax_3d_test.set_ylabel("PC2", fontsize=10)
-        ax_3d_test.set_zlabel("PC3", fontsize=10)
-        ax_3d_test.legend()
-
-        plt.tight_layout()
-        return fig
-    except Exception as e:
-        st.error(f"Error in plot_reduced: {e}")
+    plt.tight_layout()
+    return fig
