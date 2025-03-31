@@ -35,6 +35,11 @@ def render():
     test_embeddings = np.array([res["vector"] for res in embedding_data if res.get("set_type", "").lower() == "test"],
                                dtype=np.float32)
 
+    st.session_state['train_embeddings'] = train_embeddings
+    st.session_state['valid_embeddings'] = valid_embeddings
+    st.session_state['test_embeddings'] = test_embeddings
+
+
     # 데이터가 비어 있는지 확인
     if train_embeddings.size == 0 or valid_embeddings.size == 0 or test_embeddings.size == 0:
         st.error("One or more embedding datasets are empty. Please check the data.")
