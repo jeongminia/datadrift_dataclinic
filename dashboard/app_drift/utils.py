@@ -153,3 +153,32 @@ def plot_reduced(valid_pca, test_pca, train_pca,
 
     plt.tight_layout()
     return fig
+
+## --------------- Embedding --------------- ##
+class EmbeddingPipeline:
+    def __init__(self, model_name="klue/roberta-base", device=None):
+        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        self.model_name = model_name
+        self.tokenizer = None
+        self.model = None
+
+    def load_model(self):
+        # 세션 상태를 사용하여 모델 로드 과정을 최적화
+        if 'tokenizer' not in st.session_state or 'model' not in st.session_state:
+            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name, use_fast=False)
+            self.model = AutoModel.from_pretrained(self.model_name).to(self.device)
+            st.session_state['tokenizer'] = self.tokenizer
+            st.session_state['model'] = self.model
+        else:
+            self.tokenizer = st.session_state['tokenizer']
+            self.model = st.session_state['model']
+
+    class CustomDataset(Dataset):
+        def __init__(self, dataframe, text_col):
+            self.texts = dataframe[text_col]
+
+        def __len__(self):
+            return len(self.texts)
+
+        def __getitem__(self, idx):
+            return self.texts.iloc[idx]
