@@ -1,5 +1,5 @@
 import streamlit as st
-from pages import embedding_visualization, detect_datadrift, embedding_load
+from pages import embedding_visualization, detect_datadrift, embedding_load #, detect_propertydrift
 import warnings
 warnings.filterwarnings(action='ignore')
 

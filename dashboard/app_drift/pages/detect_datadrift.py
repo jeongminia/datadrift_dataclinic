@@ -100,11 +100,23 @@ def render():
     report.run(reference_data = reference_df, current_data = current_df, 
            column_mapping = column_mapping)
     
-     # HTML 파일 저장
+    from weasyprint import HTML
+
+    # 1. HTML 저장
     train_test_report_path = os.path.join(HTML_SAVE_PATH, f"{dataset_name} train_test_drift_report.html")
     report.save_html(train_test_report_path)
 
-    # HTML 렌더링
-    with open(train_test_report_path, "r") as f:
-        html_content = f.read()
-    components.html(html_content, height=800, scrolling=True)
+    # 2. HTML → PDF 변환
+    pdf_path = train_test_report_path.replace(".html", ".pdf")
+    HTML(train_test_report_path).write_pdf(pdf_path)
+
+    # 3. 다운로드 버튼 제공
+    st.success("✅ PDF 저장 완료! 아래 버튼을 눌러 다운로드하세요.")
+
+    with open(pdf_path, "rb") as f:
+        st.download_button(
+            label="📄 Download PDF Report",
+            data=f,
+            file_name=os.path.basename(pdf_path),
+            mime="application/pdf"
+    )
