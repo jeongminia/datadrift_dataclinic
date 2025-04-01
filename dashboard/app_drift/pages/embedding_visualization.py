@@ -39,6 +39,8 @@ def render():
     st.session_state['valid_embeddings'] = valid_embeddings
     st.session_state['test_embeddings'] = test_embeddings
 
+    # 시각화 저장용 텍스트 추가
+    st.session_state['embedding_overview_text'] = f"Train: {train_embeddings.shape}, Valid: {valid_embeddings.shape}, Test: {test_embeddings.shape}"
 
     # 데이터가 비어 있는지 확인
     if train_embeddings.size == 0 or valid_embeddings.size == 0 or test_embeddings.size == 0:
@@ -52,7 +54,8 @@ def render():
     # distance 시각화
     st.subheader("Original Dimension")
     try:
-        visualize_similarity_distance(valid_embeddings, test_embeddings, train_embeddings)
+        fig_dist = visualize_similarity_distance(valid_embeddings, test_embeddings, train_embeddings)
+        st.session_state['embedding_distance_fig'] = fig_dist
     except Exception as e:
         st.error(f"Error in visualizing similarity distance: {e}")
     
@@ -76,4 +79,5 @@ def render():
 
     visualize_similarity_distance(valid_pca, test_pca, train_pca)
     fig = plot_reduced(valid_pca, test_pca, train_pca)
+    st.session_state['embedding_pca_fig'] = fig
     st.pyplot(fig)

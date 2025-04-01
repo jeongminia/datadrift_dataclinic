@@ -9,7 +9,7 @@ from evidently.report import Report
 from evidently.metrics.data_drift.embedding_drift_methods import mmd
 from evidently.metrics.data_drift.embedding_drift_methods import ratio
 from evidently import ColumnMapping
-import streamlit.components.v1 as components  # HTML 렌더링을 위한 Streamlit 컴포넌트
+import streamlit.components.v1 as components  # HTML 열론링을 위한 Streamlit 컨퍼런트
 import os
 import matplotlib.pyplot as plt
 # HTML 저장 경로 설정
@@ -25,7 +25,7 @@ def render():
         st.error("Embeddings are not available. Please generate embeddings in the 'Embedding Visualization' tab first.")
         st.write("Debug Info: ", st.session_state)
         return
-    
+
     train_embeddings = st.session_state['train_embeddings']
     valid_embeddings = st.session_state['valid_embeddings']
     test_embeddings = st.session_state['test_embeddings']
@@ -37,13 +37,13 @@ def render():
         valid_embeddings = np.array(valid_embeddings)
     if not isinstance(test_embeddings, np.ndarray):
         test_embeddings = np.array(test_embeddings)
-    
-    # evidentlyai - 데이터 드리프트 검출
+
+    # evidentlyai - 데이터 드리프트 검사
     st.subheader("Train(reference)-Test(current) Data Drift Detection")
     reference_df = pd.DataFrame(train_embeddings, 
-                            columns=[f"dim_{i}" for i in range(train_embeddings.shape[1])])
+                                columns=[f"dim_{i}" for i in range(train_embeddings.shape[1])])
     current_df = pd.DataFrame(test_embeddings, 
-                                columns=[f"dim_{i}" for i in range(test_embeddings.shape[1])])
+                              columns=[f"dim_{i}" for i in range(test_embeddings.shape[1])])
 
     column_mapping = ColumnMapping(
         embeddings={'all_dimensions': reference_df.columns.tolist()}
@@ -56,67 +56,58 @@ def render():
 
     if test_option == "MMD":
         report = Report(metrics=[EmbeddingsDriftMetric('all_dimensions', 
-                            drift_method = mmd(
-                              threshold = 0.015,
-                              bootstrap = None,
-                              quantile_probability = 0.95,
-                              pca_components = None,
-                          ))])
+                            drift_method=mmd(
+                                threshold=0.015,
+                                bootstrap=None,
+                                quantile_probability=0.95,
+                                pca_components=None,
+                            ))])
     elif test_option == "Wasserstein Distance":
         report = Report(metrics=[EmbeddingsDriftMetric('all_dimensions', 
-                            drift_method = ratio(
+                            drift_method=ratio(
                                 component_stattest='wasserstein',
                                 component_stattest_threshold=0.1,
-                                threshold = 0.015,
-                                pca_components = None,
+                                threshold=0.015,
+                                pca_components=None,
                             ))])
-        
     elif test_option == "KL Divergence":
         report = Report(metrics=[EmbeddingsDriftMetric('all_dimensions', 
-                            drift_method = ratio(
+                            drift_method=ratio(
                                 component_stattest='kl_div',
                                 component_stattest_threshold=0.1,
-                                threshold = 0.015,
-                                pca_components = None,
+                                threshold=0.015,
+                                pca_components=None,
                             ))])
     elif test_option == "JensenShannon Divergence":
         report = Report(metrics=[EmbeddingsDriftMetric('all_dimensions', 
-                            drift_method = ratio(
+                            drift_method=ratio(
                                 component_stattest='jensenshannon',
                                 component_stattest_threshold=0.1,
-                                threshold = 0.015,
-                                pca_components = None,
+                                threshold=0.015,
+                                pca_components=None,
                             ))])
     elif test_option == "Energy Distance":
         report = Report(metrics=[EmbeddingsDriftMetric('all_dimensions', 
-                            drift_method = ratio(
+                            drift_method=ratio(
                                 component_stattest='ed',
                                 component_stattest_threshold=0.1,
-                                threshold = 0.015,
-                                pca_components = None,
+                                threshold=0.015,
+                                pca_components=None,
                             ))])
 
-    
-    report.run(reference_data = reference_df, current_data = current_df, 
-           column_mapping = column_mapping)
-    
-    from weasyprint import HTML
+    report.run(reference_data=reference_df, current_data=current_df, 
+               column_mapping=column_mapping)
 
-    # 1. HTML 저장
+    # HTML 파일 저장
     train_test_report_path = os.path.join(HTML_SAVE_PATH, f"{dataset_name} train_test_drift_report.html")
     report.save_html(train_test_report_path)
 
-    # 2. HTML → PDF 변환
-    pdf_path = train_test_report_path.replace(".html", ".pdf")
-    HTML(train_test_report_path).write_pdf(pdf_path)
+    # HTML 복사본을 session state에 저장하기
+    with open(train_test_report_path, "r") as f:
+        html_content = f.read()
+    st.session_state['train_test_drift_report_html'] = html_content
 
-    # 3. 다운로드 버튼 제공
-    st.success("✅ PDF 저장 완료! 아래 버튼을 눌러 다운로드하세요.")
+    # Streamlit에서 HTML 바로 보여주기
+    components.html(html_content, height=800, scrolling=True)
 
-    with open(pdf_path, "rb") as f:
-        st.download_button(
-            label="📄 Download PDF Report",
-            data=f,
-            file_name=os.path.basename(pdf_path),
-            mime="application/pdf"
-    )
+    st.success("✅ Data Drift report is stored in session state.")
