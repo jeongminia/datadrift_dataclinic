@@ -1,5 +1,5 @@
 import streamlit as st
-from pages import embedding_visualization, detect_datadrift, embedding_load #, detect_propertydrift
+from pages import embedding_visualization, detect_datadrift, embedding_load, export_report
 import warnings
 warnings.filterwarnings(action='ignore')
 
@@ -17,4 +17,4 @@ if "data_uploaded" not in st.session_state:
 embedding_load.render()
 embedding_visualization.render()
 detect_datadrift.render()
-#detect_propertydrift.render()
+export_report.render()
