@@ -1,56 +1,69 @@
 import streamlit as st
 import os
-import time
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.common.exceptions import WebDriverException
+import pdfkit
 
-def save_html_to_pdf_via_browser(html_path, pdf_path):
-    chrome_options = Options()
-    chrome_options.add_argument('--headless=new')  # 안정적인 헤드리스 모드
-    chrome_options.add_argument('--disable-gpu')
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--window-size=1280,1024')
-    chrome_options.add_argument(f'--print-to-pdf={os.path.abspath(pdf_path)}')
+def generate_html_from_session(dataset_name):
+    html_parts = []
 
-    try:
-        # 만약 chromedriver 경로를 직접 지정해야 하면 아래 주석 해제 후 경로 설정
-        driver = webdriver.Chrome(executable_path='/usr/bin/chromedriver', options=chrome_options)
-        # driver = webdriver.Chrome(options=chrome_options)
+    html_parts.append(f"<h1>{dataset_name} Drift Report</h1>")
 
-        file_url = f"file://{os.path.abspath(html_path)}"
-        st.info("📤 Chrome을 통해 PDF로 변환 중입니다...")
-        driver.get(file_url)
+    if 'train_embeddings' in st.session_state:
+        shape = st.session_state['train_embeddings'].shape
+        html_parts.append(f"<p><b>Train Embedding Shape:</b> {shape}</p>")
 
-        # 페이지가 모두 렌더링될 시간을 확보
-        time.sleep(3)
-        driver.quit()
-    except WebDriverException as e:
-        st.error(f"❌ ChromeDriver 실행 실패: {e}")
-        return False
-    return True
+    if 'valid_embeddings' in st.session_state:
+        shape = st.session_state['valid_embeddings'].shape
+        html_parts.append(f"<p><b>Valid Embedding Shape:</b> {shape}</p>")
+
+    if 'test_embeddings' in st.session_state:
+        shape = st.session_state['test_embeddings'].shape
+        html_parts.append(f"<p><b>Test Embedding Shape:</b> {shape}</p>")
+
+    if 'train_test_drift_report_html' in st.session_state:
+        html_parts.append("<hr>")
+        html_parts.append("<h2>Drift Report</h2>")
+        html_parts.append(st.session_state['train_test_drift_report_html'])
+
+    html_template = f"""
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+            body {{ font-family: Arial, sans-serif; margin: 40px; }}
+            h1 {{ color: #2c3e50; }}
+        </style>
+    </head>
+    <body>
+        {''.join(html_parts)}
+    </body>
+    </html>
+    """
+    return html_template
+
 
 def render():
-    st.write("📄 Export Final PDF Report")
+    st.title("📄 Export Final PDF Report")
 
     dataset_name = st.session_state.get("dataset_name", "Dataset")
-    html_path = f"./reports/{dataset_name} train_test_drift_report.html"
-    pdf_path = html_path.replace(".html", ".pdf")
+    html_output_path = f"./reports/{dataset_name}_compiled_report.html"
+    pdf_output_path = html_output_path.replace(".html", ".pdf")
 
-    if not os.path.exists(html_path):
-        st.error(f"❌ HTML report file not found: {html_path}")
-        return
+    # HTML 직접 생성
+    final_html = generate_html_from_session(dataset_name)
+    with open(html_output_path, "w", encoding="utf-8") as f:
+        f.write(final_html)
 
-    success = save_html_to_pdf_via_browser(html_path, pdf_path)
-
-    if success and os.path.exists(pdf_path):
-        with open(pdf_path, "rb") as f:
+    # PDF로 변환
+    config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')  # 또는 자동
+    try:
+        pdfkit.from_file(html_output_path, pdf_output_path, configuration=config)
+        with open(pdf_output_path, "rb") as f:
             st.download_button(
                 label="📥 Download Final PDF Report",
                 data=f,
-                file_name=f"{dataset_name}_drift_report.pdf",
+                file_name=f"{dataset_name}_final_report.pdf",
                 mime="application/pdf"
             )
-        st.success("✅ PDF successfully generated from HTML using Chrome!")
-    else:
-        st.error("🚨 PDF 생성에 실패했습니다. ChromeDriver 설치 및 호환성 확인이 필요합니다.")
+        st.success("✅ PDF successfully generated from session data!")
+    except Exception as e:
+        st.error(f"❌ PDF 변환 실패: {e}")
