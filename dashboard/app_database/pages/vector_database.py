@@ -25,6 +25,7 @@ def create_collection(collection_name):
 
 def insert_vectors(collection_name, vectors, set_type, class_labels):
     collection = Collection(name=collection_name)
+    class_labels = [str(label) if not isinstance(label, str) else label for label in class_labels]
     data = [
         [set_type] * len(vectors),  # set_type을 리스트로 변환
         class_labels,
