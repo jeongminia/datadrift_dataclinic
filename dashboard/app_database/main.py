@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-from pages import upload_data, data_load, base_visualization, vector_database
+from pages import upload_data, data_load, base_visualization, vector_database, export_report
 import warnings
 warnings.filterwarnings(action='ignore')
 
@@ -19,3 +19,4 @@ upload_data.render()
 data_load.render()
 base_visualization.render()
 vector_database.render()
+export_report.render()

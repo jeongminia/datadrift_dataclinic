@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import pdfkit
+from bs4 import BeautifulSoup  # 💡 HTML 정제용
 
 def generate_html_from_session(dataset_name):
     html_parts = []
@@ -19,11 +20,16 @@ def generate_html_from_session(dataset_name):
         shape = st.session_state['test_embeddings'].shape
         html_parts.append(f"<p><b>Test Embedding Shape:</b> {shape}</p>")
 
+    # Evidently Drift Report 삽입
     if 'train_test_drift_report_html' in st.session_state:
-        html_parts.append("<hr>")
-        html_parts.append("<h2>Drift Report</h2>")
-        html_parts.append(st.session_state['train_test_drift_report_html'])
+        html_parts.append("<hr><h2>Drift Report</h2>")
 
+        # 🧼 BeautifulSoup으로 body 안의 내용만 추출
+        soup = BeautifulSoup(st.session_state['train_test_drift_report_html'], "html.parser")
+        drift_body = soup.body or soup  # body가 없으면 전체 사용
+        html_parts.append(str(drift_body))
+
+    # 전체 HTML 템플릿
     html_template = f"""
     <html>
     <head>
@@ -31,6 +37,8 @@ def generate_html_from_session(dataset_name):
         <style>
             body {{ font-family: Arial, sans-serif; margin: 40px; }}
             h1 {{ color: #2c3e50; }}
+            table {{ border-collapse: collapse; width: 100%; }}
+            table, th, td {{ border: 1px solid #ccc; padding: 8px; }}
         </style>
     </head>
     <body>
@@ -48,15 +56,14 @@ def render():
     html_output_path = f"./reports/{dataset_name}_compiled_report.html"
     pdf_output_path = html_output_path.replace(".html", ".pdf")
 
-    # HTML 직접 생성
     final_html = generate_html_from_session(dataset_name)
     with open(html_output_path, "w", encoding="utf-8") as f:
         f.write(final_html)
 
-    # PDF로 변환
-    config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')  # 또는 자동
     try:
+        config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
         pdfkit.from_file(html_output_path, pdf_output_path, configuration=config)
+
         with open(pdf_output_path, "rb") as f:
             st.download_button(
                 label="📥 Download Final PDF Report",
