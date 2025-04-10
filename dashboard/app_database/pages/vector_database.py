@@ -23,24 +23,33 @@ def create_collection(collection_name):
         collection = Collection(name=collection_name)
     collection.load()
 
-def insert_vectors(collection_name, vectors, set_type, class_labels):
+def insert_vectors(collection_name, vectors, set_type, class_labels, batch_size=256):
     collection = Collection(name=collection_name)
     class_labels = [str(label) if not isinstance(label, str) else label for label in class_labels]
-    data = [
-        [set_type] * len(vectors),  # set_type을 리스트로 변환
-        class_labels,
-        vectors
-    ]
-    ids = collection.insert(data)
+
+    for i in range(0, len(vectors), batch_size):
+        batch_vectors = vectors[i:i + batch_size]
+        batch_labels = class_labels[i:i + batch_size]
+        batch_set_type = [set_type] * len(batch_vectors)
+
+        data = [
+            batch_set_type,
+            batch_labels,
+            batch_vectors
+        ]
+
+        collection.insert(data)
+
     collection.flush()
-    return ids
+    # MutationResult에는 insert된 ID를 가져오는 기능이 없기 때문에 None을 리턴
+    return None
 
 def load_and_save_data(data, collection_name, set_type, class_labels):
    # st.write(f"🔄 Saving data for set_type: {set_type} with {len(data)} vectors.")
     create_collection(collection_name)
     vectors = np.array(data)
     ids = insert_vectors(collection_name, vectors, set_type, class_labels)
-    st.write(f"✅ Successfully saved {ids.insert_count} records for set_type: {set_type}.")
+    st.write(f"Successfully saved {len(vectors)} records for set_type: {set_type}.")
     return ids
 
 def render():
