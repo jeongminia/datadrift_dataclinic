@@ -69,12 +69,17 @@ def render():
         html_content = f.read()
     components.html(html_content, height=800, scrolling=True)
 
-    descriptor_msg = """
-        **▶️ All Descriptors**
-        - `TextLength`, `SentenceCount`, `Sentiment`, `OOV`, `NonLetterCharacterPercentage`
-    """
+    descriptor_msg = st.markdown("""
+                  **▶️ All Descriptors**
+ 
+                 - **`TextLength`**: Calculates the length of the text
+                 - **`SentenceCount`**: Calculates the number of sentences in the text
+                 - **`Sentiment`**: Performs sentiment analysis on the text to identify emotional tone, negative (-1) - neutral - positive (1)
+                 - **`OOV`**: Measures the percentage of words in the text that are outside the defined vocabulary
+                 - **`NonLetterCharacterPercentage`**: Calculates the percentage of non-letter characters in the text
+                 """)
     st.markdown(descriptor_msg)
-    st.session_state["descriptors_msg"] = descriptor_msg
+    #st.session_state["descriptors_msg"] = descriptor_msg
 
     if any(df.isnull().values.any() for df in [train_df, valid_df, test_df]):
         st.error("One or more datasets contain missing values. Please handle the missing values and upload the datasets again.")

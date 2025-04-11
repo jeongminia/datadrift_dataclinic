@@ -21,8 +21,8 @@ def generate_html_from_session(dataset_name):
 
     html_parts.append("<hr><h2>Visualizations</h2>")
 
-    if "descriptors_msg" in st.session_state:
-        html_parts.append(f"<p>{st.session_state['descriptors_msg']}</p>")
+    # if "descriptors_msg" in st.session_state:
+    #    html_parts.append(f"<p>{st.session_state['descriptors_msg']}</p>")
 
     if "class_dist_path" in st.session_state:
         abs_path = os.path.abspath(st.session_state["class_dist_path"])
