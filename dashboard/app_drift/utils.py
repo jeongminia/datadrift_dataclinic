@@ -47,38 +47,31 @@ def split_columns(df):
 ## --------------- Visualization --------------- ##
 def visualize_similarity_distance(valid_embeddings, test_embeddings, train_embeddings):
     try:
-        # 코사인 유사도 및 유클리디안 거리 계산
         cosine_valid_train = cosine_similarity(valid_embeddings, train_embeddings)
         cosine_test_train = cosine_similarity(test_embeddings, train_embeddings)
         euclidean_valid_train = euclidean_distances(valid_embeddings, train_embeddings)
         euclidean_test_train = euclidean_distances(test_embeddings, train_embeddings)
-        
-        # 시각화
+
         fig, axes = plt.subplots(1, 4, figsize=(20, 5))
 
-        # Cosine Similarity (Valid-Train)
-        sns.heatmap(cosine_valid_train, cmap="YlGnBu", 
-                    xticklabels=False, yticklabels=False, ax=axes[0])
+        sns.heatmap(cosine_valid_train, cmap="YlGnBu", xticklabels=False, yticklabels=False, ax=axes[0])
         axes[0].set_title("Cosine: Valid-Train")
 
-        # Cosine Similarity (Test-Train)
-        sns.heatmap(cosine_test_train, cmap="YlGnBu", 
-                    xticklabels=False, yticklabels=False, ax=axes[1])
+        sns.heatmap(cosine_test_train, cmap="YlGnBu", xticklabels=False, yticklabels=False, ax=axes[1])
         axes[1].set_title("Cosine: Test-Train")
 
-        # Euclidean Distance (Valid-Train)
-        sns.heatmap(euclidean_valid_train, cmap="YlGnBu", 
-                    xticklabels=False, yticklabels=False, ax=axes[2])
+        sns.heatmap(euclidean_valid_train, cmap="YlGnBu", xticklabels=False, yticklabels=False, ax=axes[2])
         axes[2].set_title("Euclidean: Valid-Train")
 
-        # Euclidean Distance (Test-Train)
-        sns.heatmap(euclidean_test_train, cmap="YlGnBu", 
-                    xticklabels=False, yticklabels=False, ax=axes[3])
+        sns.heatmap(euclidean_test_train, cmap="YlGnBu", xticklabels=False, yticklabels=False, ax=axes[3])
         axes[3].set_title("Euclidean: Test-Train")
 
-        st.pyplot(fig)
+        plt.tight_layout()
+        return fig
     except Exception as e:
         st.error(f"Error in visualize_similarity_distance: {e}")
+        return None
+
 
 import matplotlib.lines as mlines
 
