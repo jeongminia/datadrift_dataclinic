@@ -54,60 +54,40 @@ def render():
                                 "KL Divergence", "JensenShannon Divergence", 
                                 "Energy Distance"])
 
-    if test_option == "MMD":
-        report = Report(metrics=[EmbeddingsDriftMetric('all_dimensions', 
-                            drift_method=mmd(
-                                threshold=0.015,
-                                bootstrap=None,
-                                quantile_probability=0.95,
-                                pca_components=None,
-                            ))])
-    elif test_option == "Wasserstein Distance":
-        report = Report(metrics=[EmbeddingsDriftMetric('all_dimensions', 
-                            drift_method=ratio(
-                                component_stattest='wasserstein',
-                                component_stattest_threshold=0.1,
-                                threshold=0.015,
-                                pca_components=None,
-                            ))])
-    elif test_option == "KL Divergence":
-        report = Report(metrics=[EmbeddingsDriftMetric('all_dimensions', 
-                            drift_method=ratio(
-                                component_stattest='kl_div',
-                                component_stattest_threshold=0.1,
-                                threshold=0.015,
-                                pca_components=None,
-                            ))])
-    elif test_option == "JensenShannon Divergence":
-        report = Report(metrics=[EmbeddingsDriftMetric('all_dimensions', 
-                            drift_method=ratio(
-                                component_stattest='jensenshannon',
-                                component_stattest_threshold=0.1,
-                                threshold=0.015,
-                                pca_components=None,
-                            ))])
-    elif test_option == "Energy Distance":
-        report = Report(metrics=[EmbeddingsDriftMetric('all_dimensions', 
-                            drift_method=ratio(
-                                component_stattest='ed',
-                                component_stattest_threshold=0.1,
-                                threshold=0.015,
-                                pca_components=None,
-                            ))])
+    test_methods = {
+        "MMD": mmd(threshold=0.015),
+        "Wasserstein Distance": ratio(component_stattest='wasserstein', component_stattest_threshold=0.1, threshold=0.015),
+        "KL Divergence": ratio(component_stattest='kl_div', component_stattest_threshold=0.1, threshold=0.015),
+        "JensenShannon Divergence": ratio(component_stattest='jensenshannon', component_stattest_threshold=0.1, threshold=0.015),
+        "Energy Distance": ratio(component_stattest='ed', component_stattest_threshold=0.1, threshold=0.015),
+    }
 
-    report.run(reference_data=reference_df, current_data=current_df, 
-               column_mapping=column_mapping)
+    # 대시보드용 Report 생성 및 저장
+    selected_method = test_methods[test_option]
+    visual_report = Report(metrics=[EmbeddingsDriftMetric('all_dimensions', drift_method=selected_method)])
+    visual_report.run(reference_data=reference_df, current_data=current_df, column_mapping=column_mapping)
 
-    # HTML 파일 저장
-    train_test_report_path = os.path.join(HTML_SAVE_PATH, f"{dataset_name} train_test_drift_report.html")
-    report.save_html(train_test_report_path)
+    html_path = os.path.join(HTML_SAVE_PATH, f"{dataset_name}_train_test_drift_report.html")
+    visual_report.save_html(html_path)
+    with open(html_path, "r") as f:
+        st.session_state['train_test_drift_report_html'] = f.read()
 
-    # HTML 복사본을 session state에 저장하기
-    with open(train_test_report_path, "r") as f:
-        html_content = f.read()
-    st.session_state['train_test_drift_report_html'] = html_content
+    # 모든 방법에 대한 드리프트 점수 요약 저장
+    drift_summary = []
+    for name, method in test_methods.items():
+        try:
+            temp_report = Report(metrics=[EmbeddingsDriftMetric('all_dimensions', drift_method=method)])
+            temp_report.run(reference_data=reference_df, current_data=current_df, column_mapping=column_mapping)
+            result = temp_report.as_dict().get("metrics", [])[0].get("result", {})
+            score = result.get("drift_score", "N/A")
+            detected = result.get("drift_detected", "N/A")
+            drift_summary.append(f"- {name}: score = {score:.4f}, drift = {detected}")
+        except Exception as e:
+            drift_summary.append(f"- {name}: failed ({e})")
 
-    # Streamlit에서 HTML 바로 보여주기
-    components.html(html_content, height=800, scrolling=True)
+    summary_text = "\n".join(drift_summary)
+    st.session_state['drift_score_summary'] = summary_text
 
-    st.success("✅ Data Drift report is stored in session state.")
+    # Streamlit 내 HTML 시각화
+    components.html(st.session_state['train_test_drift_report_html'], height=800, scrolling=True)
+    st.success("✅ Drift report & all scores saved in session_state.")

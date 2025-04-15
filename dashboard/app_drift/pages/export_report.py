@@ -1,44 +1,61 @@
 import streamlit as st
+import base64
+from bs4 import BeautifulSoup
 import os
 import pdfkit
-from bs4 import BeautifulSoup  # 💡 HTML 정제용
 
-def generate_html_from_session(dataset_name):
+def generate_html_from_session():
     html_parts = []
 
+    dataset_name = st.session_state.get("dataset_name", "Dataset")
     html_parts.append(f"<h1>{dataset_name} Drift Report</h1>")
 
-    if 'train_embeddings' in st.session_state:
-        shape = st.session_state['train_embeddings'].shape
-        html_parts.append(f"<p><b>Train Embedding Shape:</b> {shape}</p>")
+    for key in ["train_embeddings", "valid_embeddings", "test_embeddings"]:
+        if key in st.session_state:
+            shape = st.session_state[key].shape
+            html_parts.append(f"<p><b>{key.replace('_', ' ').title()}:</b> {shape}</p>")
 
-    if 'valid_embeddings' in st.session_state:
-        shape = st.session_state['valid_embeddings'].shape
-        html_parts.append(f"<p><b>Valid Embedding Shape:</b> {shape}</p>")
+    if 'embedding_distance_img' in st.session_state:
+        img_bytes = st.session_state['embedding_distance_img'].getvalue()
+        img_base64 = base64.b64encode(img_bytes).decode("utf-8")
+        html_parts.append("<hr><h2>Embedding Distance (Original Dimension)</h2>")
+        html_parts.append(f'<img src="data:image/png;base64,{img_base64}" width="800"/>')
 
-    if 'test_embeddings' in st.session_state:
-        shape = st.session_state['test_embeddings'].shape
-        html_parts.append(f"<p><b>Test Embedding Shape:</b> {shape}</p>")
+    if 'pca_selected_dim' in st.session_state:
+        html_parts.append(f"<p><b>PCA Reduced Dimension:</b> {st.session_state['pca_selected_dim']}</p>")
 
-    # Evidently Drift Report 삽입
+    if 'embedding_pca_distance_img' in st.session_state:
+        img_bytes = st.session_state['embedding_pca_distance_img'].getvalue()
+        img_base64 = base64.b64encode(img_bytes).decode("utf-8")
+        html_parts.append("<hr><h2>Embedding Distance after PCA</h2>")
+        html_parts.append(f'<img src="data:image/png;base64,{img_base64}" width="800"/>')
+
+    if 'embedding_pca_img' in st.session_state:
+        img_bytes = st.session_state['embedding_pca_img'].getvalue()
+        img_base64 = base64.b64encode(img_bytes).decode("utf-8")
+        html_parts.append("<hr><h2>Embedding Visualization after PCA</h2>")
+        html_parts.append(f'<img src="data:image/png;base64,{img_base64}" width="800"/>')
+    
+    if 'drift_score_summary' in st.session_state:
+        html_parts.append("<hr><h2>Quantitative Drift Scores</h2>")
+        html_parts.append(f"<pre>{st.session_state['drift_score_summary']}</pre>")
+
     if 'train_test_drift_report_html' in st.session_state:
         html_parts.append("<hr><h2>Drift Report</h2>")
-
-        # 🧼 BeautifulSoup으로 body 안의 내용만 추출
         soup = BeautifulSoup(st.session_state['train_test_drift_report_html'], "html.parser")
-        drift_body = soup.body or soup  # body가 없으면 전체 사용
+        drift_body = soup.body or soup
         html_parts.append(str(drift_body))
 
-    # 전체 HTML 템플릿
-    html_template = f"""
+    return f"""
     <html>
     <head>
-        <meta charset="utf-8">
+        <meta charset=\"utf-8\">
         <style>
             body {{ font-family: Arial, sans-serif; margin: 40px; }}
             h1 {{ color: #2c3e50; }}
             table {{ border-collapse: collapse; width: 100%; }}
             table, th, td {{ border: 1px solid #ccc; padding: 8px; }}
+            pre {{ background: #f4f4f4; padding: 10px; border-radius: 5px; }}
         </style>
     </head>
     <body>
@@ -46,31 +63,38 @@ def generate_html_from_session(dataset_name):
     </body>
     </html>
     """
-    return html_template
-
 
 def render():
-    st.title("📄 Export Final PDF Report")
+    if 'dataset_summary' not in st.session_state:
+        st.error("No dataset info found.")
+        return
 
-    dataset_name = st.session_state.get("dataset_name", "Dataset")
-    html_output_path = f"./reports/{dataset_name}_compiled_report.html"
-    pdf_output_path = html_output_path.replace(".html", ".pdf")
+    dataset_name = st.session_state.get('dataset_name', 'Dataset')
 
-    final_html = generate_html_from_session(dataset_name)
-    with open(html_output_path, "w", encoding="utf-8") as f:
-        f.write(final_html)
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    reports_dir = os.path.join(root_dir, "reports")
+    os.makedirs(reports_dir, exist_ok=True)
+
+    html_out = generate_html_from_session()
+    html_path = os.path.join(reports_dir, f"{dataset_name}_report.html")
+    pdf_path = os.path.join(reports_dir, f"{dataset_name}_report.pdf")
+
+    with open(html_path, "w", encoding="utf-8") as f:
+        f.write(html_out)
 
     try:
-        config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
-        pdfkit.from_file(html_output_path, pdf_output_path, configuration=config)
+        config = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")  # 필요 시 수정
+        options = {
+            'enable-local-file-access': None
+        }
+        pdfkit.from_file(html_path, pdf_path, configuration=config, options=options)
 
-        with open(pdf_output_path, "rb") as f:
+        with open(pdf_path, "rb") as f:
             st.download_button(
-                label="📥 Download Final PDF Report",
+                label="📥 Download Dataset Report (PDF)",
                 data=f,
-                file_name=f"{dataset_name}_final_report.pdf",
+                file_name=f"{dataset_name}_report.pdf",
                 mime="application/pdf"
             )
-        st.success("✅ PDF successfully generated from session data!")
     except Exception as e:
-        st.error(f"❌ PDF 변환 실패: {e}")
+        st.error(f"PDF 생성 중 오류가 발생했습니다: {e}")
