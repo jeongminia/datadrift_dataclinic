@@ -2,6 +2,7 @@ import pandas as pd
 import pdfkit
 import streamlit as st
 import os
+from utils import generate_explanation
 
 def generate_html_from_session(dataset_name):
     html_parts = []
@@ -20,6 +21,20 @@ def generate_html_from_session(dataset_name):
         html_parts.append(summary["info"].to_html(index=False))
 
     html_parts.append("<hr><h2>Visualizations</h2>")
+
+    try:
+        context = f"""
+        총 문서 수: {st.session_state.get('total_docs', 0)}
+        평균 문서 길이: {st.session_state.get('avg_length', 0)} 단어
+        주요 키워드: {', '.join(st.session_state.get('top_keywords', []))}
+        """
+        comment = generate_explanation(context)
+        html_parts.append(f"<p><strong>📌 요약 코멘트:</strong> {comment}</p>")
+    except Exception as e:
+        html_parts.append(f"<p><strong>📌 요약 코멘트 생성 실패:</strong> {e}</p>")
+
+    html_parts.append("<hr><h2>Visualizations</h2>")
+
 
     # if "descriptors_msg" in st.session_state:
     #    html_parts.append(f"<p>{st.session_state['descriptors_msg']}</p>")
