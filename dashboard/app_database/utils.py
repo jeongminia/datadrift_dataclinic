@@ -141,15 +141,25 @@ class EmbeddingPipeline:
 ## --------------- LLM Explainer --------------- ##
 from gpt4all import GPT4All
 
-# 모델 로딩 (최초 1회)
-model = GPT4All("gpt4all-j")  # 또는 절대 경로 지정 가능
+model_path = "/home/keti/datadrift_jm/models/gpt4all/ggml-model-Q4_K_M.gguf"
+model = GPT4All(model_path)
 
 def generate_explanation(context: str) -> str:
     prompt = f"""
-    다음은 텍스트 데이터셋의 특성 요약입니다. 아래 내용을 기반으로 분석 결과를 이해하기 쉽게 설명해 주세요.
+            당신은 데이터 분석 보고서를 작성하는 전문가입니다.
+            지금부터 제공되는 통계 정보는 텍스트 기반 데이터셋에 대한 요약입니다.
 
-    {context}
+            아래 내용을 바탕으로 독자에게 도움이 되는 자연어 설명을 작성하세요.
+            설명은 총 4~6문장 정도로 작성하되 다음 항목을 반영하세요:
 
-    설명:
-    """
-    return model.generate(prompt, max_tokens=300, temp=0.7).strip()
+            1. 이 데이터가 어떤 도메인일 가능성이 있는지 추론
+            2. 문장 길이, 문서 수, 키워드로 유추 가능한 특성 요약
+            3. 어떤 종류의 자연어처리 작업에 적합한지 (예: 분류, 요약, QA 등)
+            4. 데이터 구조나 분포가 모델링에 줄 수 있는 시사점
+
+            [데이터 통계 정보]
+            {context}
+
+            → 당신의 설명은 비전문가도 이해할 수 있도록 친절하고 구체적으로 작성되어야 합니다.
+            """
+    return model.generate(prompt, max_tokens=600, temp=0.7).strip()
