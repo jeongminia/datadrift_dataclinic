@@ -78,7 +78,7 @@ def render():
                  - **`OOV`**: Measures the percentage of words in the text that are outside the defined vocabulary
                  - **`NonLetterCharacterPercentage`**: Calculates the percentage of non-letter characters in the text
                  """)
-    st.markdown(descriptor_msg)
+    # st.markdown(descriptor_msg)
     #st.session_state["descriptors_msg"] = descriptor_msg
 
     if any(df.isnull().values.any() for df in [train_df, valid_df, test_df]):
