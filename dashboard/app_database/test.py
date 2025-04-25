@@ -1,8 +1,35 @@
-from gpt4all import GPT4All
+import os
+import contextlib
+import tempfile
+from llama_cpp import Llama
 
+@contextlib.contextmanager
+def suppress_stdout_stderr():
+    """C-level stdout/stderr 억제용 context manager"""
+    with tempfile.TemporaryFile() as fnull:
+        fd_stdout = os.dup(1)
+        fd_stderr = os.dup(2)
+        os.dup2(fnull.fileno(), 1)
+        os.dup2(fnull.fileno(), 2)
+        try:
+            yield
+        finally:
+            os.dup2(fd_stdout, 1)
+            os.dup2(fd_stderr, 2)
+
+# 모델 경로
 model_path = "/home/keti/datadrift_jm/models/gpt4all/ggml-model-Q4_K_M.gguf"
-model = GPT4All(model_path)
 
+# suppress + verbose=False
+with suppress_stdout_stderr():
+    model = Llama(
+        model_path=model_path,
+        n_ctx=2048,
+        n_threads=8,
+        verbose=False
+    )
+
+# 프롬프트 설정
 test_prompt = """
 총 문서 수: 4078
 평균 문장 길이: 13 단어
@@ -18,5 +45,14 @@ full_prompt = f"""
 → 분석 요약:
 """
 
-output = model.generate(full_prompt, max_tokens=300)
-print("📌 테스트 응답:", output)
+# 응답 생성
+response = model(
+    full_prompt,
+    max_tokens=300,
+    temperature=0.7,
+    top_p=0.9,
+    repeat_penalty=1.1
+)
+
+# 원하는 출력만!
+print("📌 테스트 응답:", response["choices"][0]["text"].strip())

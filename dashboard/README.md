@@ -1,9 +1,12 @@
-## Key Features
+## System Flow
 
-| [Data Load](pages/data_load.py) | [Base Visualization](pages/base_visualization.py) | [Embedding Visualization](pages/embedding_visualization.py) | [Detect DataDrift](pages/detect_datadrift.py) |
-| ---------- | ---------- | ---------- | ---------- |
-|     데이터 로드       |     베이스 시각화      |      임베딩 시각화      |    데이터 드리프트 탐지        |
-|      ![alt text](img_files/image.png)      |  ![alt text](img_files/image-1.png)      |     ![alt text](img_files/image-2.png)      | ![alt text](img_files/image-3.png)     |
+- [**app_database/**](./app_database)  : Upload Data → Load Data → Text Visualization → Embedding → Store in DB → Export Report
+    
+    텍스트 데이터 업로드하여 벡터DB에 저장
+    
+- [**app_drift/**](./app_drift)  : Load Embeddings → Embeddings Visualization → Detect Drift → Export Report
+    
+    벡터DB에서 즉시 불러와 시각화해 드리프트 감지
 
 
 ## Documentation
@@ -41,26 +44,40 @@
 ## Directory Structure
 
 ```
-streamlit_dashboard/
-├── pages/
-│   ├── base_visualization.py       # 기본적인 시각화 기능
-│   ├── data_load.py                # 데이터 로드 관련 기능
-│   ├── detect_datadrift.py         # 데이터 드리프트 감지
-│   ├── detect_propertydrift.py     # 속성(Property) 단위 드리프트 감지
-│   ├── embedding_visualization.py  # 벡터 임베딩 시각화
-│   ├── upload_data.py              # 데이터 업로드 기능
-├── img_files/
-├── reports/                        # 분석 및 로그 리포트
-├── fonts/
-├── docs/
-├── main.py                         # Streamlit 실행 메인 파일
-├── utils.py                         # 공통 유틸 함수
-├── vector_database.py               # 벡터 데이터베이스 관리
-├── requirements.txt                 
-├── README.md                       
+dashboard/
+├── app_database/
+│   ├── pages/
+│   │   ├── base_visualization.py
+│   │   ├── data_load.py
+│   │   ├── export_report.py
+│   │   ├── llm_explainer.py
+│   │   ├── upload_data.py
+│   │   ├── vector_database.py
+│   ├── reports/
+│   ├── main.py               ◀ app_database 메인 실행 파일
+│   ├── utils.py              
+│
+├── app_drift/
+│   ├── pages/
+│   │   ├── detect_datadrift.py
+│   │   ├── detect_propertydrift.py
+│   │   ├── embedding_load.py
+│   │   ├── embedding_visualization.py
+│   ├── reports/
+│   ├── main.py               ◀ app_drift 메인 실행 파일
+│   ├── utils.py              
+│
+├── docs/                     ◀ 기술 문서 정리
+├── fonts/                   
+├── img_files/               
+├── reports/                 
+├── inspect-collections.py    ◀ Vector DB 저장 확인
+├── README.md
+├── requirements.txt          ◀ Streamlit 실행에 필요한 패키지 모음
+├── rm-collections.py         ◀ Vector DB 일부 데이터 제거            
 ```
 
 
 ## Stacks
 
-<img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white"> <img src="https://img.shields.io/badge/Pytorch-EE4C2C?style=for-the-badge&logo=Pytorch&logoColor=white"> <img src="https://img.shields.io/badge/HuggingFace-FFD21E?style=for-the-badge&logo=HuggingFace&logoColor=white"> <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white">
+<img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white"> <img src="https://img.shields.io/badge/Pytorch-EE4C2C?style=for-the-badge&logo=Pytorch&logoColor=white"> <img src="https://img.shields.io/badge/HuggingFace-FFD21E?style=for-the-badge&logo=HuggingFace&logoColor=white"> <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white"> <img src="https://img.shields.io/badge/Milvus-00A1EA?style=for-the-badge&logo=Milvus&logoColor=white">
