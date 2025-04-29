@@ -42,7 +42,7 @@ def generate_wordcloud(df, column, font_path):
     token_sentences = [text.split() for text in text_data]
     counter = Counter([token for tokens in token_sentences for token in tokens])
     wc = WordCloud(font_path=font_path, background_color="white")
-    return wc.generate_from_frequencies(counter)
+    return wc.generate_from_frequencies(counter), counter
 
 def render():
     dataset_name = st.session_state.get('dataset_name', 'Dataset')
@@ -119,6 +119,10 @@ def render():
                 "Sum of Sentences": len(df)
             })
 
+        if name == "Train":
+            st.session_state["total_docs"] = len(df)
+            st.session_state["avg_length"] = int(round(df['doc_len'].mean()))
+
     st.write("Length Plot of Text Column")
     fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharey=True)
     for ax, (name, df) in zip(axes, datasets.items()):
@@ -139,14 +143,19 @@ def render():
     st.write("Length Dataframe of Text Column")
     st.dataframe(text_len_table, use_container_width=True)
     st.session_state["doc_len_table"] = text_len_table.to_html(index=False)
-    st.session_state["doc_len_msg"] = "Document length distribution per dataset. Helps determine appropriate input length for models."
 
     st.write("Word Cloud of Text Column")
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
     for ax, (name, df) in zip(axes, datasets.items()):
         text_col = train_text_cols if train_text_cols else None
         if text_col and text_col in df.columns:
-            cloud = generate_wordcloud(df, text_col, font_path)
+            cloud, counter = generate_wordcloud(df, text_col, font_path)
+            
+            if name == "Train":
+                top_keywords = [word for word, count in counter.most_common(5)]
+                st.session_state["top_keywords"] = top_keywords
+                st.write("💬 top_keywords:", st.session_state["top_keywords"])
+
             ax.imshow(cloud, interpolation="bilinear")
             ax.axis("off")
             ax.set_title(f"{name} WordCloud")
@@ -156,3 +165,4 @@ def render():
     save_path = os.path.join("reports", f"wordcloud.png")
     fig.savefig(save_path, bbox_inches="tight")
     st.session_state["wordcloud_path"] = save_path
+    st.pyplot(fig)

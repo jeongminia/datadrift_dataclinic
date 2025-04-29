@@ -138,28 +138,99 @@ class EmbeddingPipeline:
         
         return torch.cat(embeddings).numpy()
 
-## --------------- LLM Explainer --------------- ##
-from gpt4all import GPT4All
+# top keywords 저장
+from collections import Counter
+import re
 
-model_path = "/home/keti/datadrift_jm/models/gpt4all/ggml-model-Q4_K_M.gguf"
-model = GPT4All(model_path)
+def extract_top_keywords_from_train(n_top=5):
+    """Train 데이터에서 상위 키워드 n개 추출하고 세션에 저장"""
+    # Train 데이터 불러오기
+    train_df = st.session_state['dataset_summary'].get('Train', {}).get('preview', None)
+    if train_df is None:
+        st.warning("Train 데이터가 없습니다.")
+        return
+
+    # 모든 텍스트 합치기 (train 데이터의 text 컬럼이 있다고 가정)
+    all_text = " ".join(train_df['text'].astype(str).tolist())
+
+    # 간단한 토큰화: 단어 단위로 자르기
+    tokens = re.findall(r'\w+', all_text)
+
+    # 너무 짧은 단어 제외 (예: 한 글자, 특수문자 등)
+    tokens = [token for token in tokens if len(token) > 1]
+
+    # 가장 많이 등장한 단어 뽑기
+    counter = Counter(tokens)
+    top_keywords = [word for word, count in counter.most_common(n_top)]
+
+    # 세션에 저장
+    st.session_state['top_keywords'] = top_keywords
+
+
+## --------------- LLM Explainer --------------- ##
+import os
+import tempfile
+import contextlib
+from llama_cpp import Llama
+
+@contextlib.contextmanager
+def suppress_stdout_stderr():
+    """C-level stdout/stderr 억제용 context manager"""
+    with tempfile.TemporaryFile() as fnull:
+        fd_stdout = os.dup(1)
+        fd_stderr = os.dup(2)
+        os.dup2(fnull.fileno(), 1)
+        os.dup2(fnull.fileno(), 2)
+        try:
+            yield
+        finally:
+            os.dup2(fd_stdout, 1)
+            os.dup2(fd_stderr, 2)
+
+# --- llama-cpp 모델 로드 (최상단에 1번만)
+with suppress_stdout_stderr():
+    model = Llama(
+        model_path="/home/keti/datadrift_jm/models/gpt4all/ggml-model-Q4_K_M.gguf",
+        n_ctx=2048,
+        n_threads=8,
+        verbose=False
+    )
 
 def generate_explanation(context: str) -> str:
+    """주어진 context를 요약하는 자연어 설명 생성"""
+    total_docs = st.session_state.get('total_docs', 0)
+    avg_length = st.session_state.get('avg_length', 0)
+    top_keywords = st.session_state.get('top_keywords', [])
+    
+    # context 구성
+    context = f"""
+    총 문서 수: {total_docs}
+    평균 문장 길이: {avg_length} 단어
+    주요 키워드: {', '.join(top_keywords)}
+    """
+
+    
     prompt = f"""
-            당신은 데이터 분석 보고서를 작성하는 전문가입니다.
-            지금부터 제공되는 통계 정보는 텍스트 기반 데이터셋에 대한 요약입니다.
+    당신은 데이터 분석가입니다.
 
-            아래 내용을 바탕으로 독자에게 도움이 되는 자연어 설명을 작성하세요.
-            설명은 총 4~6문장 정도로 작성하되 다음 항목을 반영하세요:
+    아래 데이터 통계를 읽고, 반드시 다음과 같은 형식으로 요약하세요:
 
-            1. 이 데이터가 어떤 도메인일 가능성이 있는지 추론
-            2. 문장 길이, 문서 수, 키워드로 유추 가능한 특성 요약
-            3. 어떤 종류의 자연어처리 작업에 적합한지 (예: 분류, 요약, QA 등)
-            4. 데이터 구조나 분포가 모델링에 줄 수 있는 시사점
+    - 총 4~5개의 요약 항목을 작성하세요.
+    - 각 문장 앞에 번호(1., 2., 3., 4., 5.)를 붙이세요.
+    - 줄바꿈으로 항목을 구분하세요.
+    - 줄글로 작성하지 마세요. 반드시 항목별로 작성하세요.
+    - "시사점"이나 "추측"은 하지 말고, 통계 내용에 근거한 객관적 요약만 하세요.
 
-            [데이터 통계 정보]
-            {context}
+    데이터 통계:
+    {context}
 
-            → 당신의 설명은 비전문가도 이해할 수 있도록 친절하고 구체적으로 작성되어야 합니다.
-            """
-    return model.generate(prompt, max_tokens=600, temp=0.7).strip()
+    → 요약 시작:
+    """
+    response = model(
+        prompt,
+        max_tokens=300,
+        temperature=0.7,
+        top_p=0.9,
+        repeat_penalty=1.1
+    )
+    return response["choices"][0]["text"].strip()
