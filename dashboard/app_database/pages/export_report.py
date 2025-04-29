@@ -2,7 +2,7 @@ import pandas as pd
 import pdfkit
 import streamlit as st
 import os
-from utils import generate_explanation
+from utils import generate_explanation, extract_top_keywords_from_train
 
 def generate_html_from_session(dataset_name):
     html_parts = []
@@ -22,29 +22,9 @@ def generate_html_from_session(dataset_name):
 
     html_parts.append("<hr><h2>Visualizations</h2>")
 
-    try:
-        context = f"""
-        총 문서 수: {st.session_state.get('total_docs', 0)}
-        평균 문서 길이: {st.session_state.get('avg_length', 0)} 단어
-        주요 키워드: {', '.join(st.session_state.get('top_keywords', []))}
-        """
-        comment = generate_explanation(context)
-        html_parts.append(f"<p><strong>📌 요약 코멘트:</strong> {comment}</p>")
-    except Exception as e:
-        html_parts.append(f"<p><strong>📌 요약 코멘트 생성 실패:</strong> {e}</p>")
-
-    html_parts.append("<hr><h2>Visualizations</h2>")
-
-
-    # if "descriptors_msg" in st.session_state:
-    #    html_parts.append(f"<p>{st.session_state['descriptors_msg']}</p>")
-
     if "class_dist_path" in st.session_state:
         abs_path = os.path.abspath(st.session_state["class_dist_path"])
         html_parts.append(f"<h3>Class Distribution</h3><img src='file://{abs_path}' width='800'><br><br>")
-
-    if "doc_len_msg" in st.session_state:
-        html_parts.append(f"<h3>Text Length Summary</h3><p>{st.session_state['doc_len_msg']}</p>")
 
     if "doc_len_path" in st.session_state:
         abs_path = os.path.abspath(st.session_state["doc_len_path"])
@@ -56,6 +36,28 @@ def generate_html_from_session(dataset_name):
     if "wordcloud_path" in st.session_state:
         abs_path = os.path.abspath(st.session_state["wordcloud_path"])
         html_parts.append(f"<h3>Word Cloud</h3><img src='file://{abs_path}' width='900'><br><br>")
+
+    try:
+        context = f"""
+        총 문서 수: {st.session_state.get('total_docs', 0)}
+        평균 문서 길이: {st.session_state.get('avg_length', 0)} 단어
+        주요 키워드: {', '.join(st.session_state.get('top_keywords', []))}
+        """
+        comment = generate_explanation(context)
+        html_parts.append("<h3>📌 요약 코멘트:</h3><ul>")
+        for line in comment.splitlines():
+            line = line.strip()
+            if line:
+                # 1. 2. 3. 번호 있는 경우 깔끔하게 처리
+                if line[0].isdigit() and line[1] == '.':
+                    text = line[2:].strip()
+                else:
+                    text = line
+                html_parts.append(f"<li>{text}</li>")
+        html_parts.append("</ul>")
+
+    except Exception as e:
+        html_parts.append(f"<p><strong>📌 요약 코멘트 생성 실패:</strong> {e}</p>")
 
     html_template = f"""
     <html>
@@ -99,6 +101,9 @@ def render():
         st.error("No dataset info found.")
         return
 
+    dataset_name = st.session_state.get('dataset_name', 'Dataset')
+
+    extract_top_keywords_from_train()
     dataset_name = st.session_state.get('dataset_name', 'Dataset')
 
     root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
