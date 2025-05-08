@@ -25,7 +25,8 @@ plt.rcParams['font.family'] = fontprop.get_name()
 
 stopwords = ['아니', '근데', '진짜', '너무', 'ㅋㅋ', '이게', '그런데', '정말', '그리고', 'ㅠ', 'ㅠㅠ', 'ㅋ', 'ㅎㅎ', '왜', '좀', '이거',
              '보고', '그럼', '이제', '그래서', '그거', '그런', '그래', '그냥', '뭐', '제발', '잘', '못', '안', '더', "만", "억", "원", "천",
-             "등", "년", "일", "명", "월", "위", "중", '시', '주', '전', '후', '조']
+             "등", "년", "일", "명", "월", "위", "중", '시', '주', '전', '후', '조', '게', '거', '듯', '씨', '때', '애', '이', '것', '나',
+             '수', '건', '점']
 
 analyzer = PeCab()
 
@@ -154,7 +155,7 @@ def render():
             if name == "Train":
                 top_keywords = [word for word, count in counter.most_common(5)]
                 st.session_state["top_keywords"] = top_keywords
-                st.write("💬 top_keywords:", st.session_state["top_keywords"])
+                #st.write("💬 top_keywords:", st.session_state["top_keywords"])
 
             ax.imshow(cloud, interpolation="bilinear")
             ax.axis("off")

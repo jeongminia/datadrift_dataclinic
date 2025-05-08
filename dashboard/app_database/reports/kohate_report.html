@@ -1,0 +1,476 @@
+
+    <html>
+        <head>
+            <meta charset="utf-8">
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    padding: 30px;
+                }
+                h1 { font-size: 28px; }
+                h2 { font-size: 22px; margin-top: 40px; }
+                h3 { font-size: 18px; margin-top: 25px; }
+                table {
+                    border-collapse: collapse;
+                    width: 100%;
+                    margin-bottom: 20px;
+                    font-size: 13px;
+                }
+                th, td {
+                    border: 1px solid #ccc;
+                    padding: 6px;
+                    text-align: left;
+                }
+                th { background-color: #f5f5f5; }
+                img {
+                    margin-top: 10px;
+                    margin-bottom: 20px;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>kohate Dataset Report</h1><h2>Train Dataset</h2><h3>Preview</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>comments</th>
+      <th>contain_gender_bias</th>
+      <th>bias</th>
+      <th>hate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ㅇ정보부에서 조사하나봐요 .. 승리 곧 자살하겠네 아니..경찰이 질소넣고 자살했다고 하겠네..</td>
+      <td>False</td>
+      <td>others</td>
+      <td>hate</td>
+    </tr>
+    <tr>
+      <td>어차피 속바지인데 뭔 노출ㅋㅋ</td>
+      <td>True</td>
+      <td>gender</td>
+      <td>hate</td>
+    </tr>
+    <tr>
+      <td>손담비 나혼에 고정으로 가자~~매력 넘침~</td>
+      <td>False</td>
+      <td>none</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>개듣보네 ㅋㅋㅋㅋㅋㅋ남자 뭔 프로게이머같이생겼네</td>
+      <td>False</td>
+      <td>none</td>
+      <td>hate</td>
+    </tr>
+    <tr>
+      <td>누가봐도 한거다. ㅎㅎㅎ</td>
+      <td>False</td>
+      <td>none</td>
+      <td>offensive</td>
+    </tr>
+    <tr>
+      <td>처음 본 여자한테 찝적 거렸는데, 여자가 기분 나빳다 ? 이게 죄야 ? 성적 발언을 한 것도 아니고, 상대가 기분이 나쁘면 무조건 피해자로 규정하나 ? 이건 아니지 싶다 ㅋㅋㅋ</td>
+      <td>True</td>
+      <td>gender</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>에이핑큰줄알았더니 짝퉁김남주였네</td>
+      <td>False</td>
+      <td>none</td>
+      <td>offensive</td>
+    </tr>
+    <tr>
+      <td>개쳐늙으면 꼴보기 싫어지는게 사람의 마음이지 얘네야 광고수익으로 번게 많으니 얼굴에 돈들이고 관리하니 금술이 당연히 좋을수밖에 사람이란 다 그런거임 아무리 이쁘고 잘생겼어도 관리안하면 상대쪽에서 싫어하게되어있음</td>
+      <td>False</td>
+      <td>others</td>
+      <td>hate</td>
+    </tr>
+    <tr>
+      <td>미투 최대 피해자김생민ᆢ불쌍해</td>
+      <td>True</td>
+      <td>gender</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>솔직히 인성이 종아리에서 나왔음</td>
+      <td>False</td>
+      <td>none</td>
+      <td>offensive</td>
+    </tr>
+  </tbody>
+</table><h3>Description</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>comments</th>
+      <th>contain_gender_bias</th>
+      <th>bias</th>
+      <th>hate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>6316</td>
+      <td>6316</td>
+      <td>6316</td>
+      <td>6316</td>
+    </tr>
+    <tr>
+      <td>6316</td>
+      <td>2</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>ㅇ정보부에서 조사하나봐요 .. 승리 곧 자살하겠네 아니..경찰이 질소넣고 자살했다고 하겠네..</td>
+      <td>False</td>
+      <td>none</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>5336</td>
+      <td>4126</td>
+      <td>2798</td>
+    </tr>
+  </tbody>
+</table><h3>Info</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Non-Null Count</th>
+      <th>Null Count</th>
+      <th>Dtype</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>6316</td>
+      <td>0</td>
+      <td>object</td>
+    </tr>
+    <tr>
+      <td>6316</td>
+      <td>0</td>
+      <td>category</td>
+    </tr>
+    <tr>
+      <td>6316</td>
+      <td>0</td>
+      <td>category</td>
+    </tr>
+    <tr>
+      <td>6316</td>
+      <td>0</td>
+      <td>category</td>
+    </tr>
+  </tbody>
+</table><h2>Validation Dataset</h2><h3>Preview</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>comments</th>
+      <th>contain_gender_bias</th>
+      <th>bias</th>
+      <th>hate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>제발~~부끄러운줄알았음..이혼은왜하셨나요??사생활지저분한쇼호스트가 티비나와서할소린아닌줄..</td>
+      <td>False</td>
+      <td>others</td>
+      <td>hate</td>
+    </tr>
+    <tr>
+      <td>윌리엄 그동안 스킵했었는데 오늘 이모습하고 서준이에서 눈여겨볼 아이로 성장했움</td>
+      <td>False</td>
+      <td>none</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>우익 꺼지셈</td>
+      <td>False</td>
+      <td>others</td>
+      <td>offensive</td>
+    </tr>
+    <tr>
+      <td>이뻐보이진 않는데..</td>
+      <td>False</td>
+      <td>none</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>와ㅜㅜ 고배우 연기 진짜ㅜㅜ 와 소름돋음</td>
+      <td>False</td>
+      <td>none</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>방금 유동근 아재 회장여자 한테 엄포 놓을때 포스 ㅎㄷㄷ간만에 정도전때 포스 나오더만 진작 이렇게 만들지 이상하게 캐릭터를 만들어 놓아서.</td>
+      <td>False</td>
+      <td>none</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>백상까지 조작한 sm.문재인들어서고 방송 문화 경제등 비리와 부패가 더 심각하고 망하고있다.조작사기댜 sm비리와 조작으로 인기구걸하는데도 조사없는 문재인끌어내려야지</td>
+      <td>False</td>
+      <td>others</td>
+      <td>hate</td>
+    </tr>
+    <tr>
+      <td>당신을 보면 딱 이구절만 생각나네요바보가 신념을 가지면 무섭습니다.결혼한다니 축하드리고 잘사시길 바랍니다.자기 주제에 맞게 사시길.</td>
+      <td>False</td>
+      <td>none</td>
+      <td>offensive</td>
+    </tr>
+    <tr>
+      <td>육아하는 아빠라니 육아는 부모라면 당연한거고요....ㅋ..;;</td>
+      <td>False</td>
+      <td>none</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>저런곳에 일하는여자가 저런거 당했다고 하루하루 괴롭게 지낸다고?개가 웃겠다ㅋㅋ돈만주면 2차 나가는거 졸 좋아하는 애들 아니냐? 그리고 성매매 업소도 아니라고? 성매매 업소도 성매매 업소라고 안하고 성매매하거든?어이없네</td>
+      <td>True</td>
+      <td>gender</td>
+      <td>hate</td>
+    </tr>
+  </tbody>
+</table><h3>Description</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>comments</th>
+      <th>contain_gender_bias</th>
+      <th>bias</th>
+      <th>hate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1580</td>
+      <td>1580</td>
+      <td>1580</td>
+      <td>1580</td>
+    </tr>
+    <tr>
+      <td>1580</td>
+      <td>2</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>제발~~부끄러운줄알았음..이혼은왜하셨나요??사생활지저분한쇼호스트가 티비나와서할소린아닌줄..</td>
+      <td>False</td>
+      <td>none</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>1328</td>
+      <td>1022</td>
+      <td>688</td>
+    </tr>
+  </tbody>
+</table><h3>Info</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Non-Null Count</th>
+      <th>Null Count</th>
+      <th>Dtype</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1580</td>
+      <td>0</td>
+      <td>object</td>
+    </tr>
+    <tr>
+      <td>1580</td>
+      <td>0</td>
+      <td>category</td>
+    </tr>
+    <tr>
+      <td>1580</td>
+      <td>0</td>
+      <td>category</td>
+    </tr>
+    <tr>
+      <td>1580</td>
+      <td>0</td>
+      <td>category</td>
+    </tr>
+  </tbody>
+</table><h2>Test Dataset</h2><h3>Preview</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>comments</th>
+      <th>contain_gender_bias</th>
+      <th>bias</th>
+      <th>hate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>송중기 시대극은 믿고본다. 첫회 신선하고 좋았다.</td>
+      <td>False</td>
+      <td>none</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>지현우 나쁜놈</td>
+      <td>False</td>
+      <td>none</td>
+      <td>offensive</td>
+    </tr>
+    <tr>
+      <td>알바쓰고많이만들면되지 돈욕심없으면골목식당왜나온겨 기댕기게나하고 산에가서팔어라</td>
+      <td>False</td>
+      <td>none</td>
+      <td>hate</td>
+    </tr>
+    <tr>
+      <td>설마 ㅈ 현정 작가 아니지??</td>
+      <td>True</td>
+      <td>gender</td>
+      <td>hate</td>
+    </tr>
+    <tr>
+      <td>이미자씨 송혜교씨 돈이 그리 많으면 탈세말고 그돈으로 평소에 불우이웃에게 기부도 좀 하고사시죠.</td>
+      <td>False</td>
+      <td>none</td>
+      <td>offensive</td>
+    </tr>
+    <tr>
+      <td>일베충들 ㅂㄷ거리는것봐라 ㅉㅉ</td>
+      <td>False</td>
+      <td>others</td>
+      <td>hate</td>
+    </tr>
+    <tr>
+      <td>아이즈원 힘내세요...일본 진출도 했으니 일본서 좋은 모습 보여줘도 팬들은 응원 합니다.</td>
+      <td>False</td>
+      <td>none</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>강부자 선생님 전미선 비보에 오열을 하셨다니 눈물이 나네요 힘내세요</td>
+      <td>False</td>
+      <td>none</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>알았어 그만</td>
+      <td>False</td>
+      <td>none</td>
+      <td>offensive</td>
+    </tr>
+    <tr>
+      <td>이영자씨는 진정성 있는거라면 녹화불참으로 끝내지말고 자진하차해라 시청자는 고려도 안하고 일방적 불참은 아닌듯 엠비씨도 시청율 좋아서 고민하는거 같은데 결방할게 아니고 폐지해라</td>
+      <td>False</td>
+      <td>none</td>
+      <td>offensive</td>
+    </tr>
+  </tbody>
+</table><h3>Description</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>comments</th>
+      <th>contain_gender_bias</th>
+      <th>bias</th>
+      <th>hate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>471</td>
+      <td>471</td>
+      <td>471</td>
+      <td>471</td>
+    </tr>
+    <tr>
+      <td>471</td>
+      <td>2</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>송중기 시대극은 믿고본다. 첫회 신선하고 좋았다.</td>
+      <td>False</td>
+      <td>none</td>
+      <td>offensive</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>404</td>
+      <td>342</td>
+      <td>189</td>
+    </tr>
+  </tbody>
+</table><h3>Info</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Non-Null Count</th>
+      <th>Null Count</th>
+      <th>Dtype</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>471</td>
+      <td>0</td>
+      <td>object</td>
+    </tr>
+    <tr>
+      <td>471</td>
+      <td>0</td>
+      <td>category</td>
+    </tr>
+    <tr>
+      <td>471</td>
+      <td>0</td>
+      <td>category</td>
+    </tr>
+    <tr>
+      <td>471</td>
+      <td>0</td>
+      <td>category</td>
+    </tr>
+  </tbody>
+</table><hr><h2>Visualizations</h2><h3>Class Distribution</h3><img src='file:///home/keti/datadrift_jm/datadrift_dataclinic/dashboard/reports/class_dist.png' width='800'><br><br><img src='file:///home/keti/datadrift_jm/datadrift_dataclinic/dashboard/reports/doc_len.png' width='800'><br><br><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Dataset</th>
+      <th>Longest Sentence</th>
+      <th>Shortest Sentence</th>
+      <th>Mean Sentence Length</th>
+      <th>Sum of Sentences</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Train</td>
+      <td>39</td>
+      <td>2</td>
+      <td>8</td>
+      <td>6316</td>
+    </tr>
+    <tr>
+      <td>Validation</td>
+      <td>32</td>
+      <td>2</td>
+      <td>8</td>
+      <td>1580</td>
+    </tr>
+    <tr>
+      <td>Test</td>
+      <td>39</td>
+      <td>2</td>
+      <td>9</td>
+      <td>471</td>
+    </tr>
+  </tbody>
+</table><h3>Word Cloud</h3><img src='file:///home/keti/datadrift_jm/datadrift_dataclinic/dashboard/reports/wordcloud.png' width='900'><br><br><h3>📌 요약 코멘트:</h3><ul><li>📈 감정 분석: 긍정: 0.45, 부정: 0.23, 중립: 0.32</li></ul>
+        </body>
+    </html>
+    
