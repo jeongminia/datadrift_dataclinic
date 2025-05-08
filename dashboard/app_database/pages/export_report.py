@@ -2,7 +2,8 @@ import pandas as pd
 import pdfkit
 import streamlit as st
 import os
-from utils import generate_explanation, extract_top_keywords_from_train
+from utils import generate_explanation
+
 
 def generate_html_from_session(dataset_name):
     html_parts = []
@@ -103,7 +104,6 @@ def render():
 
     dataset_name = st.session_state.get('dataset_name', 'Dataset')
 
-    extract_top_keywords_from_train()
     dataset_name = st.session_state.get('dataset_name', 'Dataset')
 
     root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
