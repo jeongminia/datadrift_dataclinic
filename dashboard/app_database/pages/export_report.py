@@ -2,7 +2,7 @@ import pandas as pd
 import pdfkit
 import streamlit as st
 import os
-from utils import generate_explanation
+from utils import gen_summarization, gen_explanation
 
 
 def generate_html_from_session(dataset_name):
@@ -38,28 +38,37 @@ def generate_html_from_session(dataset_name):
         abs_path = os.path.abspath(st.session_state["wordcloud_path"])
         html_parts.append(f"<h3>Word Cloud</h3><img src='file://{abs_path}' width='900'><br><br>")
 
+    # 📌 통계 기반 요약
     try:
-        context = f"""
-        총 문서 수: {st.session_state.get('total_docs', 0)}
-        평균 문서 길이: {st.session_state.get('avg_length', 0)} 단어
-        주요 키워드: {', '.join(st.session_state.get('top_keywords', []))}
-        """
-        comment = generate_explanation(context)
-        html_parts.append("<h3>📌 요약 코멘트:</h3><ul>")
-        for line in comment.splitlines():
+        summarization = gen_summarization()
+        html_parts.append("<h3>📌 통계 요약 코멘트:</h3>")
+        html_parts.append('<div class="comment-box"><ul>')
+        for line in summarization.splitlines():
             line = line.strip()
             if line:
-                # 1. 2. 3. 번호 있는 경우 깔끔하게 처리
                 if line[0].isdigit() and line[1] == '.':
-                    text = line[2:].strip()
-                else:
-                    text = line
-                html_parts.append(f"<li>{text}</li>")
-        html_parts.append("</ul>")
-
+                    line = line[2:].strip()
+                html_parts.append(f"<li>{line}</li>")
+        html_parts.append("</ul></div>")
     except Exception as e:
-        html_parts.append(f"<p><strong>📌 요약 코멘트 생성 실패:</strong> {e}</p>")
+        html_parts.append(f"<p><strong>통계 요약 실패:</strong> {e}</p>")
 
+    # 📌 드리프트 추정
+    try:
+        explanation = gen_explanation()
+        html_parts.append("<h3>📌 드리프트 관련 해석:</h3>")
+        html_parts.append('<div class="comment-box"><ul>')
+        for line in explanation.splitlines():
+            line = line.strip()
+            if line:
+                if line[0].isdigit() and line[1] == '.':
+                    line = line[2:].strip()
+                html_parts.append(f"<li>{line}</li>")
+        html_parts.append("</ul></div>")
+    except Exception as e:
+        html_parts.append(f"<p><strong>드리프트 설명 실패:</strong> {e}</p>")
+
+    # ✅ 스타일 포함한 템플릿
     html_template = f"""
     <html>
         <head>
@@ -87,6 +96,19 @@ def generate_html_from_session(dataset_name):
                 img {{
                     margin-top: 10px;
                     margin-bottom: 20px;
+                }}
+                .comment-box {{
+                    background-color: #f4f4f4;
+                    padding: 15px;
+                    margin: 10px 0 30px 0;
+                    border-radius: 8px;
+                }}
+                ul {{
+                    margin: 0;
+                    padding-left: 20px;
+                }}
+                li {{
+                    margin-bottom: 6px;
                 }}
             </style>
         </head>
