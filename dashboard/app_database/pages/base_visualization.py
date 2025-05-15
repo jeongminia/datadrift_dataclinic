@@ -58,6 +58,17 @@ def render():
     st.write(f"Text Column   : {train_text_cols}")
     st.write(f"Class Columns : {',  '.join(train_class_cols)}")
 
+    # --- 여기서 cleaned_facts 컬럼을 각 데이터셋에 미리 생성 ---
+    text_col = train_text_cols if train_text_cols else None
+    if text_col:
+        for df in [train_df, valid_df, test_df]:
+            if text_col in df.columns:
+                df[text_col] = df[text_col].astype(str).fillna("")
+                df['cleaned_facts'] = df[text_col].apply(clean_text)
+            else:
+                df['cleaned_facts'] = ""
+    # ------------------------------------------------------
+
     datasets = {"Train": train_df, "Validation": valid_df, "Test": test_df}
 
     column_mapping = ColumnMapping(categorical_features=train_class_cols, text_features=[train_text_cols])
@@ -69,18 +80,6 @@ def render():
     with open(visualization_report_path, "r") as f:
         html_content = f.read()
     components.html(html_content, height=800, scrolling=True)
-
-    descriptor_msg = st.markdown("""
-                  **▶️ All Descriptors**
- 
-                 - **`TextLength`**: Calculates the length of the text
-                 - **`SentenceCount`**: Calculates the number of sentences in the text
-                 - **`Sentiment`**: Performs sentiment analysis on the text to identify emotional tone, negative (-1) - neutral - positive (1)
-                 - **`OOV`**: Measures the percentage of words in the text that are outside the defined vocabulary
-                 - **`NonLetterCharacterPercentage`**: Calculates the percentage of non-letter characters in the text
-                 """)
-    # st.markdown(descriptor_msg)
-    #st.session_state["descriptors_msg"] = descriptor_msg
 
     if any(df.isnull().values.any() for df in [train_df, valid_df, test_df]):
         st.error("One or more datasets contain missing values. Please handle the missing values and upload the datasets again.")
@@ -144,6 +143,33 @@ def render():
     st.write("Length Dataframe of Text Column")
     st.dataframe(text_len_table, use_container_width=True)
     st.session_state["doc_len_table"] = text_len_table.to_html(index=False)
+
+    # 전체 요약 통계
+    st.session_state["summary_total_docs"] = train_df.shape[0] + valid_df.shape[0] + test_df.shape[0]
+    st.session_state["summary_avg_length"] = int(round(
+        (train_df['doc_len'].mean() * len(train_df) +
+         valid_df['doc_len'].mean() * len(valid_df) +
+         test_df['doc_len'].mean() * len(test_df)) /
+        (len(train_df) + len(valid_df) + len(test_df))
+    ))
+    all_cleaned_text = " ".join(
+        train_df['cleaned_facts'].tolist() +
+        valid_df['cleaned_facts'].tolist() +
+        test_df['cleaned_facts'].tolist()
+    )
+    st.session_state["summary_top_keywords"] = [w for w, _ in Counter(all_cleaned_text.split()).most_common(5)]
+
+    # 각 세트별 요약 통계
+    for name, df in datasets.items():
+        if "cleaned_facts" in df.columns:
+            doc_len = df['doc_len'].mean()
+            counter = Counter(" ".join(df['cleaned_facts']).split())
+            stats = {
+                "total_docs": len(df),
+                "avg_length": int(round(doc_len)),
+                "top_keywords": [w for w, _ in counter.most_common(5)]
+            }
+            st.session_state[f"{name.lower()}_stats"] = stats
 
     st.write("Word Cloud of Text Column")
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
