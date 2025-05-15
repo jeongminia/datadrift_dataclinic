@@ -120,6 +120,8 @@ def generate_html_from_session(dataset_name):
     return html_template
 
 def render():
+    st.write("📦 현재 session_state:")
+    
     if 'dataset_summary' not in st.session_state:
         st.error("No dataset info found.")
         return
