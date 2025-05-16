@@ -1,0 +1,12 @@
+streamlit
+streamlit_chat
+
+langchain
+langchain_community
+pymilvus # for vector database
+
+llama-cpp-python
+sentence-transformers # for embedding
+openai
+
+pypdf
