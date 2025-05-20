@@ -1,7 +1,5 @@
 ## ✔️ **Overview**
 
----
-
 ### Main point.
 
 ```mermaid
@@ -20,7 +18,7 @@ graph TD
 
 ### Main tech.
 
-**LangChain**
+**🦜⛓️ LangChain**
 
 - 문서 로딩 및 분할
     - 텍스트 추출 : `PyPDFLoader`
@@ -35,7 +33,7 @@ graph TD
 로컬에서 실행되는 GGUF 포맷 모델 사용해 `llama-cpp-python`을 통해 LangChain과 연결
 
 - 오픈소스 모델 기반으로 GPU 없이도 로컬 추론 가능
-    - 🚀 [ggml-model-Q4_K_M.gguf](https://huggingface.co/heegyu/EEVE-Korean-Instruct-10.8B-v1.0-GGUF/blob/main/ggml-model-Q4_K_M.gguf) ; 로컬에 모델 다운로드 후, 경로 지정 필요
+    - 🚀 [ggml-model-Q4_K_M.gguf](https://huggingface.co/heegyu/EEVE-Korean-Instruct-10.8B-v1.0-GGUF/blob/main/ggml-model-Q4_K_M.gguf)
 - LLM 추론을 커스터마이징 가능
 
 **Streamlit**
@@ -50,13 +48,13 @@ graph TD
 ### **Project Goals.**
 
 - [x]  pdf 업로드 후, 탐색해 원하는 답변을 이끌어낼 수 있는지
-- [ ]  (예정) [multiturn chatbot](https://flyduckdev.tistory.com/entry/Rag-OpenAI-RAG-%EA%B8%B0%EB%B0%98-%EC%98%A4%EB%A7%8C%EA%B3%BC-%ED%8E%B8%EA%B2%AC-%EC%B1%97%EB%B4%87-%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0-LangChain-OpenAI-Streamlit) 구현
+- [x]  [multiturn chatbot](https://flyduckdev.tistory.com/entry/Rag-OpenAI-RAG-%EA%B8%B0%EB%B0%98-%EC%98%A4%EB%A7%8C%EA%B3%BC-%ED%8E%B8%EA%B2%AC-%EC%B1%97%EB%B4%87-%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0-LangChain-OpenAI-Streamlit) 구현
+- [ ]  (진행중) Ollama + FAISS
+- [ ]  (예정) [LangGraph](https://data-newbie.tistory.com/997)
 - [ ]  (예정) option으로 여러 모델 선택할 수 있도록 도입
-- [ ]  (예정) RAG 적용 및 구현
 
 ## ✔️ Installation
 
----
 
 1. Clone thie Repository
     
@@ -106,7 +104,6 @@ graph TD
 
 ## ✔️ **Usage**
 
----
 
 1. Streamlit 실행
     
@@ -121,8 +118,6 @@ graph TD
     - (mac) `pkill -f streamlit`
 
 ## ✔️ References
-
----
 
 https://wikidocs.net/231360
 
