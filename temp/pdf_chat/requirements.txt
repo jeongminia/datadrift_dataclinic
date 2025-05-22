@@ -3,9 +3,11 @@ streamlit_chat
 
 langchain
 langchain_community
-pymilvus # for vector database
+#pymilvus # for vector database
+faiss-gpu
 
-llama-cpp-python
+#llama-cpp-python
+ollama
 sentence-transformers # for embedding
 openai
 
