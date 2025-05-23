@@ -1,4 +1,4 @@
-## ✔️ **Overview**
+## 👀 **Overview**
 
 ### Main point.
 
@@ -6,9 +6,9 @@
 graph TD
     A["PDF 업로드"] --> B["텍스트 추출 및 분할"]
     B --> C["임베딩<br>(HuggingFace)"]
-    C --> D["Milvus 벡터 저장"]
-    D --> E["RetrievalQA 체인"]
-    E --> F["로컬 LLM <br> (LlamaCpp)"]
+    C --> D["FAISS 저장"]
+    D --> E["ConversationalRetrievalChain"]
+    E --> F["OLlamma"]
     F --> H["응답 생성"]
     F --> G["Streamlit UI로 출력 <br> 및 히스토리 저장"]
 
@@ -25,36 +25,31 @@ graph TD
     - 청크 단위 분할 : `RecursiveCharacterTextSplitter`
 - 임베딩 및 벡터 저장
     - Embedding Model : Hugging Face 임베딩 모델 `sentence-transformers/all-MiniLM-L6-v2`
-    - Vector DB : Milvus
+    - Vector DB : FAISS
     - RAG : `vectorstore.as_retriever()`
 
-**Llama cpp**
+🐑 **OLLAMA**
 
-로컬에서 실행되는 GGUF 포맷 모델 사용해 `llama-cpp-python`을 통해 LangChain과 연결
+로컬에서 실행되는 `OLLAMA`을 통해 LangChain과 연결
 
-- 오픈소스 모델 기반으로 GPU 없이도 로컬 추론 가능
-    - 🚀 [ggml-model-Q4_K_M.gguf](https://huggingface.co/heegyu/EEVE-Korean-Instruct-10.8B-v1.0-GGUF/blob/main/ggml-model-Q4_K_M.gguf)
-- LLM 추론을 커스터마이징 가능
+- 🚀 Yi 34B-Chat
 
 **Streamlit**
 
 사용자 친화적인 Chatbot 형태 인터페이스로 `streamlit_chat` 으로 대화형 UI 구성
 
-- Full Flow
-    1. 파일 업로드 및 자동 처리 (PDF → 텍스트 → 임베딩)
-    2. 질문 입력 → 응답 생성 (LangChain QA 체인 활용)
-    3. 이전 대화 내용은 `st.session_state`를 통해 히스토리 관리
-
 ### **Project Goals.**
 
 - [x]  pdf 업로드 후, 탐색해 원하는 답변을 이끌어낼 수 있는지
 - [x]  [multiturn chatbot](https://flyduckdev.tistory.com/entry/Rag-OpenAI-RAG-%EA%B8%B0%EB%B0%98-%EC%98%A4%EB%A7%8C%EA%B3%BC-%ED%8E%B8%EA%B2%AC-%EC%B1%97%EB%B4%87-%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0-LangChain-OpenAI-Streamlit) 구현
-- [ ]  (진행중) Ollama + FAISS
+- [x]  Ollama + FAISS
+- [x]  답변 형식 고도화
+- [ ]  (진행 중) 모델 재선택 (시간단축)
+- [ ]  (진행 중) option으로 여러 모델 선택할 수 있도록 도입
 - [ ]  (예정) [LangGraph](https://data-newbie.tistory.com/997)
-- [ ]  (예정) option으로 여러 모델 선택할 수 있도록 도입
+
 
 ## ✔️ Installation
-
 
 1. Clone thie Repository
     
@@ -81,29 +76,81 @@ graph TD
     pip install -r requirements.txt
     ```
     
-    - llama-cpp-python(cuda)
-        - 추가 설치를 진행하지 않으면 model이 cpu에서만 돌아가서 많은 시간이 소요
-        - CUDA 옵션을 활성화해서 직접 빌드
-        1. 의존 패키지 설치
+    - Install OLLAMA
+        1. Ubuntu에서 Ollama 설치
             
             ```bash
-            sudo apt update
-            sudo apt install build-essential cmake
-            pip install setuptools wheel ninja
+            curl -fsSL https://ollama.com/install.sh | sh
             ```
             
-        2. install llama-cpp-python 
-            
-            ```bash
-            CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install llama-cpp-python --no-binary llama-cpp-python
-            ```
-            
-            - `-DLLAMA_CUBLAS=on` : GPU용 CUDA CUBLAS 백엔드 활성화
-            - `FORCE_CMAKE=1` : 항상 새로 빌드
-            - `-no-binary` : PyPI wheel 무시하고 소스에서 직접 컴파일
+        2. (GPU) 설치
+            1. NVIDIA GPU 드라이버 설치
+                
+                ```bash
+                nvidia-smi  # 드라이버가 설치되어 있어야 함
+                ```
+                
+            2. CUDA Toolkit 설치
+                
+                ```bash
+                sudo apt install -y nvidia-cuda-toolkit
+                ```
+                
+            3. nvidia-container-toolkit 설치
+                
+                ```bash
+                distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+                curl -s -L https://nvidia.github.io/libnvidia-container/gpgkey | sudo apt-key add -
+                curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+                sudo apt update
+                sudo apt install -y nvidia-container-toolkit
+                ```
+                
+            4. Docker 데몬에 설정 적용
+                
+                ```bash
+                sudo systemctl restart docker
+                ```
+                
+            5. Ollama GPU 실행 (자동으로 감지)
+                
+                ```bash
+                ollama run llama3  # 실행 시 GPU 자동 사용
+                ```
+                
+                실행 중 GPU 사용 확인은:
+                
+                ```bash
+                nvidia-smi
+                ```
+                
+        3. initial settings
+            1. Ollama 서비스 시작
+                
+                ```bash
+                sudo systemctl start ollama
+                ```
+                
+            2. 서비스 상태 확인
+                
+                ```bash
+                systemctl status ollama # active (running) 상태여야 함
+                ```
+                
+            3. 서버가 실행 중인지 확인
+                
+                ```bash
+                ollama list
+                ```
+                
+            4. 모델이 없다면 pull로 설치
+                
+                ```bash
+                ollama pull [--모델명--]
+                ```
+                
 
 ## ✔️ **Usage**
-
 
 1. Streamlit 실행
     
@@ -112,11 +159,12 @@ graph TD
     ```
     
 2. UI 통해서 PDF 업로드
-    - Limit 200MB per file • PDF, TXT, DOCX
+    - Limit 1024MB per file • PDF, TXT, DOCX
 3. 벡터 DB 구축 완료 시, 사용자가 원하는 질문 챗에 입력
 4. Streamlit 중단
     - (mac) `pkill -f streamlit`
 
+---
 ## ✔️ References
 
 https://wikidocs.net/231360
