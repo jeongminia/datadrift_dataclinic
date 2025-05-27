@@ -14,7 +14,7 @@ from langchain.prompts import PromptTemplate
 #from langchain_community.chat_models import ChatOllama
 from langchain.chains import ConversationalRetrievalChain
 
-def process_pdf(pdf_path: str, milvus_host="localhost", milvus_port="19530"):
+def process_pdf(pdf_path: str, model_name):
     # 1. PDF → 문서 추출
     loader = PyPDFLoader(pdf_path)
     documents = loader.load()
@@ -26,12 +26,12 @@ def process_pdf(pdf_path: str, milvus_host="localhost", milvus_port="19530"):
 
     # 3. 임베딩 및 벡터 DB 저장
     embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-    vectorstore = FAISS.from_documents(chunks, embedding)
+    vectorstore = FAISS.from_documents(chunks, embedding) # 변환된 벡터들을 FAISS 인덱스에 저장해 유사도 검색이 가능하게 함
     retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
 
     # 4. LLM 구성
     llm = Ollama(
-        model="yi:34b-chat",
+        model=model_name,
         temperature=0.7,
         top_p=0.9,
         verbose=True
