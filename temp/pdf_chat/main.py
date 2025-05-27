@@ -11,7 +11,16 @@ if 'history' not in st.session_state:
 
 uploaded_file = st.file_uploader(" ", type=["pdf", "txt", "docx"])
 
-if uploaded_file is not None:
+model_options = ["모델을 선택하세요", "yi:34b-chat", "llama3", "mistral", "phi3"]
+selected_model = st.radio(
+    "⏩ 답변에 사용할 LLM 모델을 선택하세요.",
+    model_options,
+    key="model_select",
+    horizontal=True
+)
+
+# 실제 모델 선택 시에만 동작하도록 분기
+if uploaded_file is not None and selected_model != "모델을 선택하세요":
     max_size_mb = 1024
     if uploaded_file.size > max_size_mb * 1024 * 1024:
         st.error(f"File size exceeds {max_size_mb}MB limit.")
@@ -27,23 +36,26 @@ if uploaded_file is not None:
 
     st.info("💾 File saved to temp directory.")
 
+    # 모델 또는 파일이 바뀌면 QA 체인 새로 생성
     if (
-    "last_uploaded_file" not in st.session_state or
-    st.session_state["last_uploaded_file"] != safe_filename
+        "last_uploaded_file" not in st.session_state or
+        st.session_state["last_uploaded_file"] != safe_filename or
+        st.session_state.get("selected_model") != selected_model
     ):
         with st.spinner("📚 Loading PDF and initializing QA..."):
-            qa_chain, n_chunks = process_pdf(temp_file_path)
+            qa_chain, n_chunks = process_pdf(temp_file_path, model_name=selected_model)
             st.session_state.qa = qa_chain
             st.session_state["last_uploaded_file"] = safe_filename
+            st.session_state["selected_model"] = selected_model
             st.session_state['text_processed'] = True
 
             # 최초 1회 인사말 설정
             if 'initialized' not in st.session_state:
                 st.session_state['history'] = [
-                {"role": "user", "content": "PDF Ready!"},
-                {"role": "assistant", "content": "안녕하세요! PDF에서 궁금한 내용을 물어보세요 😊"}
+                    {"role": "user", "content": "PDF Ready!"},
+                    {"role": "assistant", "content": "안녕하세요! PDF에서 궁금한 내용을 물어보세요 😊"}
                 ]
-                st.session_state['initialized'] = True  # ✅ rerun 이후 다시 안 들어오게 막음
+                st.session_state['initialized'] = True
                 st.rerun()
 
 # 응답 출력

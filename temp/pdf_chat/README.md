@@ -8,7 +8,7 @@ graph TD
     B --> C["임베딩<br>(HuggingFace)"]
     C --> D["FAISS 저장"]
     D --> E["ConversationalRetrievalChain"]
-    E --> F["OLlamma"]
+    E --> F["Ollama"]
     F --> H["응답 생성"]
     F --> G["Streamlit UI로 출력 <br> 및 히스토리 저장"]
 
@@ -28,9 +28,9 @@ graph TD
     - Vector DB : FAISS
     - RAG : `vectorstore.as_retriever()`
 
-🐑 **OLLAMA**
+🐑 **Ollama**
 
-로컬에서 실행되는 `OLLAMA`을 통해 LangChain과 연결
+로컬에서 실행되는 `Ollama`을 통해 LangChain과 연결
 
 - 🚀 Yi 34B-Chat
 
@@ -76,7 +76,7 @@ graph TD
     pip install -r requirements.txt
     ```
     
-    - Install OLLAMA
+    - Install Ollama
         1. Ubuntu에서 Ollama 설치
             
             ```bash
