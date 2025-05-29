@@ -1,0 +1,19 @@
+# Ollama model files
+*.gguf
+
+# Ollama model folders (예: 직접 저장한 위치)
+models/
+
+# PDF 파일 무시
+*.pdf
+
+# 가상환경 무시
+chatenv/
+
+# 기타 일반적으로 무시할 파일/폴더
+__pycache__/
+*.pyc
+*.pkl
+*.log
+.env
+.DS_Store
