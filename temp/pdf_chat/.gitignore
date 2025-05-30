@@ -1,8 +1,8 @@
 # Ollama model files
 *.gguf
 
-# Ollama model folders (예: 직접 저장한 위치)
-models/
+# Ollama model folders
+# models/
 
 # PDF 파일 무시
 *.pdf
