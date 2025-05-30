@@ -11,23 +11,10 @@ if 'history' not in st.session_state:
 
 uploaded_file = st.file_uploader(" ", type=["pdf", "txt", "docx"])
 
-dir = '../../../models/'
-gguf_models = {
-    "Qwen3": dir + "Qwen3-235B-A22B-Q4_K_M.gguf",
-    "Llama-ko": dir + "Llama-3-Open-Ko-8B-Q8_0.gguf",
-    "EEVE": dir + "ggml-model-Q4_K_M.gguf"
-}
+# Ollama에 등록된 kollama 모델 이름만 사용
+ollama_model_name = "kollama"  # Ollama에 등록한 이름과 동일하게
 
-model_options = ["모델을 선택하세요", "Qwen3", "EEVE", "Llama-ko"]
-selected_model = st.radio(
-    "⏩ 답변에 사용할 LLM 모델을 선택하세요.",
-    model_options,
-    key="model_select",
-    horizontal=True
-)
-
-# 실제 모델 선택 시에만 동작하도록 분기
-if uploaded_file is not None and selected_model != "모델을 선택하세요":
+if uploaded_file is not None:
     max_size_mb = 1024
     if uploaded_file.size > max_size_mb * 1024 * 1024:
         st.error(f"File size exceeds {max_size_mb}MB limit.")
@@ -43,19 +30,15 @@ if uploaded_file is not None and selected_model != "모델을 선택하세요":
 
     st.info("💾 File saved to temp directory.")
 
-    # 모델 또는 파일이 바뀌면 QA 체인 새로 생성
+    # 파일이 바뀌면 QA 체인 새로 생성
     if (
         "last_uploaded_file" not in st.session_state or
-        st.session_state["last_uploaded_file"] != safe_filename or
-        st.session_state.get("selected_model") != selected_model
+        st.session_state["last_uploaded_file"] != safe_filename
     ):
         with st.spinner("📚 Loading PDF and initializing QA..."):
-            # 실제 gguf 파일명으로 전달
-            model_path = os.path.join("models", gguf_models[selected_model])
-            qa_chain, n_chunks = process_pdf(temp_file_path, model_name=model_path)
+            qa_chain, n_chunks = process_pdf(temp_file_path, model_name=ollama_model_name)
             st.session_state.qa = qa_chain
             st.session_state["last_uploaded_file"] = safe_filename
-            st.session_state["selected_model"] = selected_model
             st.session_state['text_processed'] = True
 
             # 최초 1회 인사말 설정
