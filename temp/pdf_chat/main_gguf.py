@@ -12,7 +12,7 @@ if 'history' not in st.session_state:
 uploaded_file = st.file_uploader(" ", type=["pdf", "txt", "docx"])
 
 # Ollama에 등록된 kollama 모델 이름만 사용
-ollama_model_name = "kollama"  # Ollama에 등록한 이름과 동일하게
+ollama_model_name = "ggml"  # Ollama에 등록한 이름과 동일하게
 
 if uploaded_file is not None:
     max_size_mb = 1024
