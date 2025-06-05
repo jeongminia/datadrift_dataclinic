@@ -11,7 +11,10 @@ if 'history' not in st.session_state:
 
 uploaded_file = st.file_uploader(" ", type=["pdf", "txt", "docx"])
 
-model_options = ["모델을 선택하세요", "yi:34b-chat", "llama3", "mistral", "phi3"]
+model_options = ["모델을 선택하세요", 
+                 "yi:34b-chat", "llama3", "mistral", "phi3", "exaone3.5:7.8b",
+                 "bnksys/yanolja-eeve-korean-instruct-10.8b:latest",
+                 "jinbora/deepseek-r1-Bllossom:8b", "granite3.3:8b", "ggml", "kollama"]
 selected_model = st.radio(
     "⏩ 답변에 사용할 LLM 모델을 선택하세요.",
     model_options,
