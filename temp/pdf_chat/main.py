@@ -12,11 +12,12 @@ if 'history' not in st.session_state:
 uploaded_file = st.file_uploader(" ", type=["pdf", "txt", "docx"])
 
 model_options = ["모델을 선택하세요", 
-                 "yi:34b-chat", "llama3.3", "mistral-small:24b", "phi3", "exaone3.5:7.8b",
+                 "yi:34b-chat", "llama3.3:latest", "mistral-small:24b", "phi3", "exaone3.5:7.8b",
                  "bnksys/yanolja-eeve-korean-instruct-10.8b:latest",
                  "jinbora/deepseek-r1-Bllossom:8b", "granite3.3:8b", "ggml", 
                  "kollama", "huihui_ai/exaone3.5-abliterated:7.8b",
-                 "benedict/linkbricks-llama3.1-korean:8b"
+                 "benedict/linkbricks-llama3.1-korean:8b", "joonoh/HyperCLOVAX-SEED-Text-Instruct-1.5B:latest",
+                 "noire/kanana-1.5-8b:latest"
                  ]
 selected_model = st.radio(
     "⏩ 답변에 사용할 LLM 모델을 선택하세요.",
