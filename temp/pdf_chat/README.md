@@ -14,8 +14,6 @@ graph TD
 
 ```
 
-* LLM API 미사용 → 비용 없이 로컬에서 추론 가능
-
 ### Main tech.
 
 **🦜⛓️ LangChain**
@@ -44,8 +42,8 @@ graph TD
 - [x]  [multiturn chatbot](https://flyduckdev.tistory.com/entry/Rag-OpenAI-RAG-%EA%B8%B0%EB%B0%98-%EC%98%A4%EB%A7%8C%EA%B3%BC-%ED%8E%B8%EA%B2%AC-%EC%B1%97%EB%B4%87-%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0-LangChain-OpenAI-Streamlit) 구현
 - [x]  Ollama + FAISS
 - [x]  답변 형식 고도화
-- [ ]  (진행 중) 모델 재선택 (시간단축)
-- [ ]  (진행 중) option으로 여러 모델 선택할 수 있도록 도입
+- [x]  option으로 여러 모델 선택할 수 있도록 도입
+- [ ]  (진행 중) 모델 재선택
 - [ ]  (예정) [LangGraph](https://data-newbie.tistory.com/997)
 
 
@@ -160,8 +158,9 @@ graph TD
     
 2. UI 통해서 PDF 업로드
     - Limit 1024MB per file • PDF, TXT, DOCX
-3. 벡터 DB 구축 완료 시, 사용자가 원하는 질문 챗에 입력
-4. Streamlit 중단
+3. 응답을 원하는 챗봇 모델 선택
+4. 벡터 DB 구축 완료 시, 사용자가 원하는 질문 챗에 입력
+5. Streamlit 중단
     - (mac) `pkill -f streamlit`
 
 

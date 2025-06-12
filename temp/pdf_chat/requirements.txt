@@ -3,6 +3,7 @@ streamlit_chat
 toml
 requests 
 tornado
+accelerate
 
 langchain
 langchain_community
