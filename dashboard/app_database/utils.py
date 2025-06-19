@@ -166,35 +166,36 @@ def extract_top_keywords_from_train(n_top=5):
     # 세션에 저장
     st.session_state['top_keywords'] = top_keywords
 
+# ------- llm expalaination --------------- #
+# LLM을 사용하여 데이터 요약 및 드리프트 추정
+import requests
 
-## --------------- LLM Explainer --------------- ##
-import os
-import tempfile
-import contextlib
-from llama_cpp import Llama
+# ...기존 코드 생략...
 
-@contextlib.contextmanager
-def suppress_stdout_stderr():
-    """C-level stdout/stderr 억제용 context manager"""
-    with tempfile.TemporaryFile() as fnull:
-        fd_stdout = os.dup(1)
-        fd_stderr = os.dup(2)
-        os.dup2(fnull.fileno(), 1)
-        os.dup2(fnull.fileno(), 2)
-        try:
-            yield
-        finally:
-            os.dup2(fd_stdout, 1)
-            os.dup2(fd_stderr, 2)
+# ------- llm expalaination --------------- #
+# Ollama API를 사용하여 데이터 요약 및 드리프트 추정
 
-# --- llama-cpp 모델 로드 (최상단에 1번만)
-with suppress_stdout_stderr():
-    model = Llama(
-        model_path="/home/keti/datadrift_jm/models/gpt4all/ggml-model-Q4_K_M.gguf",
-        n_ctx=2048,
-        n_threads=8,
-        verbose=False
-    )
+OLLAMA_URL = "http://localhost:11434/api/generate"
+OLLAMA_MODEL = "exaone3.5:7.8b"
+
+def ollama_generate(prompt, max_tokens=300, temperature=0.7, top_p=0.9, repeat_penalty=1.1):
+    payload = {
+        "model": OLLAMA_MODEL,
+        "prompt": prompt,
+        "stream": False,
+        "options": {
+            "temperature": temperature,
+            "top_p": top_p,
+            "max_tokens": max_tokens,
+            "repeat_penalty": repeat_penalty
+        }
+    }
+    try:
+        response = requests.post(OLLAMA_URL, json=payload, timeout=60)
+        result = response.json()
+        return result["response"].strip()
+    except Exception as e:
+        return f"Ollama 호출 오류: {e}"
 
 def gen_summarization() -> str:
     """통계 정보를 바탕으로 데이터 특성을 요약 설명"""
@@ -221,14 +222,7 @@ def gen_summarization() -> str:
     {context}
     """
 
-    response = model(
-        prompt,
-        max_tokens=300,
-        temperature=0.7,
-        top_p=0.9,
-        repeat_penalty=1.1
-    )
-    return response["choices"][0]["text"].strip()
+    return ollama_generate(prompt, max_tokens=300, temperature=0.7, top_p=0.9, repeat_penalty=1.1)
 
 def gen_explanation() -> str:
     """드리프트 가능성을 LLM이 추정해 설명"""
@@ -254,11 +248,4 @@ def gen_explanation() -> str:
     {context}
     """
 
-    response = model(
-        prompt,
-        max_tokens=300,
-        temperature=0.7,
-        top_p=0.95,
-        repeat_penalty=1.1
-    )
-    return response["choices"][0]["text"].strip()
+    return ollama_generate(prompt, max_tokens=300, temperature=0.7, top_p=0.95, repeat_penalty=1.1)

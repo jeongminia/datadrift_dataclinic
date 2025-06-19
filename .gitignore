@@ -172,3 +172,6 @@ temp/vector_db_server/rdb_data/
 *.sst
 *.log
 *.part*
+
+# pdf_db for RAG
+dashboard/pdf_db/
