@@ -15,5 +15,20 @@ pecab
 deepchecks
 pyppeteer
 pymilvus
-gpt4all
-llama-cpp-python
+
+streamlit_chat
+toml
+requests 
+tornado
+accelerate
+
+langchain
+langchain_community
+#pymilvus # for vector database
+faiss-gpu # (cpu) faiss-cpu
+#llama-cpp-python
+ollama
+sentence-transformers # for embedding
+openai
+
+pypdf

@@ -2,7 +2,7 @@ import pandas as pd
 import pdfkit
 import streamlit as st
 import os
-from utils import gen_summarization, gen_explanation
+from utils import gen_summarization
 
 
 def generate_html_from_session(dataset_name):
@@ -45,28 +45,20 @@ def generate_html_from_session(dataset_name):
         html_parts.append('<div class="comment-box"><ul>')
         for line in summarization.splitlines():
             line = line.strip()
-            if line:
-                if line[0].isdigit() and line[1] == '.':
-                    line = line[2:].strip()
-                html_parts.append(f"<li>{line}</li>")
+
+            if not line:
+                continue
+
+            if line[0].isdigit() and (line[1] == '.' or line[1] == ')'):
+                line = line[2:].strip()
+            
+            if line.startswith("- ") or line.startswith("– ") or line.startswith("• "):
+                line = line[2:].strip()
+
+            html_parts.append(f"<li>{line}</li>")
         html_parts.append("</ul></div>")
     except Exception as e:
         html_parts.append(f"<p><strong>통계 요약 실패:</strong> {e}</p>")
-
-    # 📌 드리프트 추정
-    try:
-        explanation = gen_explanation()
-        html_parts.append("<h3>📌 드리프트 관련 해석:</h3>")
-        html_parts.append('<div class="comment-box"><ul>')
-        for line in explanation.splitlines():
-            line = line.strip()
-            if line:
-                if line[0].isdigit() and line[1] == '.':
-                    line = line[2:].strip()
-                html_parts.append(f"<li>{line}</li>")
-        html_parts.append("</ul></div>")
-    except Exception as e:
-        html_parts.append(f"<p><strong>드리프트 설명 실패:</strong> {e}</p>")
 
     # ✅ 스타일 포함한 템플릿
     html_template = f"""
@@ -119,14 +111,10 @@ def generate_html_from_session(dataset_name):
     """
     return html_template
 
-def render():
-    st.write("📦 현재 session_state:")
-    
+def render():    
     if 'dataset_summary' not in st.session_state:
         st.error("No dataset info found.")
         return
-
-    dataset_name = st.session_state.get('dataset_name', 'Dataset')
 
     dataset_name = st.session_state.get('dataset_name', 'Dataset')
 

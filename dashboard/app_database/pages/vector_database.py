@@ -23,25 +23,34 @@ def create_collection(collection_name):
          collection = Collection(name=collection_name)
      collection.load()
  
-def insert_vectors(collection_name, vectors, set_type, class_labels):
-     collection = Collection(name=collection_name)
-     class_labels = [str(label) if not isinstance(label, str) else label for label in class_labels]
-     data = [
-         [set_type] * len(vectors),  # set_type을 리스트로 변환
-         class_labels,
-         vectors
-     ]
-     ids = collection.insert(data)
-     collection.flush()
-     return ids
- 
+def insert_vectors(collection_name, vectors, set_type, class_labels, batch_size=500):
+    collection = Collection(name=collection_name)
+    class_labels = [str(label) if not isinstance(label, str) else label for label in class_labels]
+    total = len(vectors)
+    ids = []
+    for i in range(0, total, batch_size):
+        batch_vectors = vectors[i:i+batch_size]
+        batch_labels = class_labels[i:i+batch_size]
+        batch_set_type = [set_type] * len(batch_vectors)
+        data = [
+            batch_set_type,
+            batch_labels,
+            batch_vectors
+            ]
+        fields = ["set_type", "class", "vector"]
+        batch_ids = collection.insert(data, fields=fields)
+        ids.append(batch_ids)
+        collection.flush()
+    return ids
+
 def load_and_save_data(data, collection_name, set_type, class_labels):
-    # st.write(f"🔄 Saving data for set_type: {set_type} with {len(data)} vectors.")
-     create_collection(collection_name)
-     vectors = np.array(data)
-     ids = insert_vectors(collection_name, vectors, set_type, class_labels)
-     st.write(f"✅ Successfully saved {ids.insert_count} records for set_type: {set_type}.")
-     return ids
+    create_collection(collection_name)
+    vectors = np.array(data)
+    ids = insert_vectors(collection_name, vectors, set_type, class_labels)
+    # insert_count 합산
+    total_inserted = sum(batch.insert_count for batch in ids)
+    st.write(f"✅ Successfully saved {total_inserted} records for set_type: {set_type}.")
+    return ids
  
 def render():
      if 'dataset_name' not in st.session_state:
@@ -85,7 +94,7 @@ def render():
          load_and_save_data(test_embeddings, collection_name, "test", test_class_labels)
  
          test_results = collection.query(expr="set_type == 'test'", output_fields=["set_type"], limit=10000)
-         # st.write(f"🔍 Test records in collection: {len(test_results)}")
+         st.write(f"🔍 Test records in collection: {len(test_results)}")
  
          st.success("✅ All datasets (train, validation, test) have been successfully inserted into VectorDB.")
      else:

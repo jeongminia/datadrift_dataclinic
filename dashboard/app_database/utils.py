@@ -167,16 +167,11 @@ def extract_top_keywords_from_train(n_top=5):
     st.session_state['top_keywords'] = top_keywords
 
 # ------- llm expalaination --------------- #
-# LLM을 사용하여 데이터 요약 및 드리프트 추정
+# Ollama API를 사용하여 데이터 요약 및 드리프트 추정
 import requests
 
-# ...기존 코드 생략...
-
-# ------- llm expalaination --------------- #
-# Ollama API를 사용하여 데이터 요약 및 드리프트 추정
-
 OLLAMA_URL = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "exaone3.5:7.8b"
+OLLAMA_MODEL = "joonoh/HyperCLOVAX-SEED-Text-Instruct-1.5B:latest"
 
 def ollama_generate(prompt, max_tokens=300, temperature=0.7, top_p=0.9, repeat_penalty=1.1):
     payload = {
@@ -193,59 +188,81 @@ def ollama_generate(prompt, max_tokens=300, temperature=0.7, top_p=0.9, repeat_p
     try:
         response = requests.post(OLLAMA_URL, json=payload, timeout=60)
         result = response.json()
-        return result["response"].strip()
+        result = result["response"].strip()
+        import re
+        result = re.sub(r"[*_`#>]", "", result)
+        return result
+
     except Exception as e:
         return f"Ollama 호출 오류: {e}"
 
 def gen_summarization() -> str:
-    """통계 정보를 바탕으로 데이터 특성을 요약 설명"""
-    total_docs = st.session_state.get('total_docs', 0)
-    avg_length = st.session_state.get('avg_length', 0)
-    top_keywords = st.session_state.get('top_keywords', [])
+    """Train/Validation/Test 통계를 모두 반영하여 데이터 특성 요약"""
+    # 각 데이터셋에서 통계 추출
+    train_df = st.session_state.get('train_df')
+    valid_df = st.session_state.get('valid_df')
+    test_df = st.session_state.get('test_df')
+
+    def get_stats(df, name):
+        if df is None:
+            return f"{name}: 데이터 없음"
+        # 텍스트 컬럼 자동 탐색
+        text_col_candidates = ['text', 'comments', '본문', '내용', 'comment', 'sentence']
+        text_col = None
+        for col in text_col_candidates:
+            if col in df.columns:
+                text_col = col
+                break
+        if text_col is None:
+            # 가장 긴 문자열 컬럼 자동 선택 (백업)
+            text_col = max(
+                (col for col in df.columns if df[col].dtype == object),
+                key=lambda col: df[col].dropna().astype(str).str.len().max(),
+                default=None
+            )
+        if text_col is None:
+            return f"{name}: 텍스트 컬럼 없음"
+        total_docs = len(df)
+        avg_length = int(df[text_col].astype(str).apply(lambda x: len(x.split())).mean())
+        text = " ".join(df[text_col].astype(str).tolist())
+        tokens = re.findall(r'\w+', text)
+        tokens = [token for token in tokens if len(token) > 1]
+        stopwords = [
+            "이", "가", "은", "는", "을", "를", "에", "의", "와", "과", "도", "로", "에서", "에게", "께", "한테", "부터", "까지",
+            "보다", "처럼", "만큼", "밖에", "마다", "조차", "까지도", "이라도", "라도", "이나", "나", "이며", "이며", "든지", "든가"
+        ]
+        tokens = [token for token in tokens if token not in stopwords]
+        counter = Counter(tokens)
+        top_keywords = [word for word, count in counter.most_common(5)]
+        return (
+            f"{name} - 문서 수: {total_docs}, 평균 문장 길이: {avg_length} 단어, "
+            f"주요 키워드: {', '.join(top_keywords)}"
+        )
+
+    train_stats = get_stats(train_df, "Train")
+    valid_stats = get_stats(valid_df, "Validation")
+    test_stats = get_stats(test_df, "Test")
 
     context = f"""
-    총 문서 수: {total_docs}
-    평균 문장 길이: {avg_length} 단어
-    주요 키워드: {', '.join(top_keywords)}
-    """
+    {train_stats}
+    {valid_stats}
+    {test_stats}
+        """
 
     prompt = f"""
-    당신은 전문 데이터 분석가입니다.
+        당신은 전문적인 데이터 분석가입니다.
 
-    아래 통계를 보고 데이터를 객관적으로 설명하세요.
-    - 총 4~5개의 요약 항목을 작성하세요.
-    - 각 항목은 '1.', '2.'처럼 시작하세요.
-    - 단락 없이 한 줄씩 요약하세요.
-    - "요약 시작" 또는 "끝" 같은 불필요한 문구는 출력하지 마세요.
+        아래는 한 데이터셋에 대한 간단한 통계 정보입니다:
+        {context}
 
-    통계:
-    {context}
-    """
+        이 정보를 바탕으로 다음의 목적에 따라 간결하게 자연어 해석을 작성해 주세요:
+
+        1. 데이터의 전반적인 특성을 요약하고,  
+        2. 키워드와 길이 등으로부터 데이터 성격이나 주제의 변화 가능성을 추론하며,  
+        3. train, validation, test 데이터셋 간의 차이를 분석합니다.
+
+        ※ 단, 반드시 위 구조를 따를 필요는 없으며, 자연스럽고 다양한 문장 구성을 자유롭게 사용해도 됩니다.  
+        ※ 마크다운, 별표, 강조 기호는 사용하지 말고, 설명만 반환해 주세요.
+        """
 
     return ollama_generate(prompt, max_tokens=300, temperature=0.7, top_p=0.9, repeat_penalty=1.1)
-
-def gen_explanation() -> str:
-    """드리프트 가능성을 LLM이 추정해 설명"""
-    total_docs = st.session_state.get('total_docs', 0)
-    avg_length = st.session_state.get('avg_length', 0)
-    top_keywords = st.session_state.get('top_keywords', [])
-
-    context = f"""
-    총 문서 수: {total_docs}
-    평균 문장 길이: {avg_length} 단어
-    주요 키워드: {', '.join(top_keywords)}
-    """
-
-    prompt = f"""
-    당신은 AI 모델 전문가입니다.
-
-    아래 통계를 참고해 데이터 분포 변화(데이터 드리프트) 가능성을 추정하세요.
-    - 총 3~5개의 항목으로 작성하세요.
-    - 각 항목은 숫자로 시작하며, 근거 중심으로 설명하세요.
-    - "시사점" 또는 "요약 끝" 같은 문구는 출력하지 마세요.
-
-    통계 정보:
-    {context}
-    """
-
-    return ollama_generate(prompt, max_tokens=300, temperature=0.7, top_p=0.95, repeat_penalty=1.1)
