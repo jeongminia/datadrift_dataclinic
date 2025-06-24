@@ -3,6 +3,7 @@ import base64
 from bs4 import BeautifulSoup
 import os
 import pdfkit
+from utils import gen_drift_score_explanation
 
 def generate_html_from_session():
     html_parts = []
@@ -39,6 +40,17 @@ def generate_html_from_session():
     if 'drift_score_summary' in st.session_state:
         html_parts.append("<hr><h2>Quantitative Drift Scores</h2>")
         html_parts.append(f"<pre>{st.session_state['drift_score_summary']}</pre>")
+        
+        score_text = st.session_state['drift_score_summary']
+        explanation = gen_drift_score_explanation(score_text)
+        formatted_explanation = explanation.replace('\n', '</p><p>')  # 🔑 먼저 변환
+
+        html_parts.append(f"""
+        <div class="drift-explanation">
+            <h3>📘 Drift Analysis Summary</h3>
+            <p>{formatted_explanation}</p>
+        </div>
+        """)
 
     if 'train_test_drift_report_html' in st.session_state:
         html_parts.append("<hr><h2>Drift Report</h2>")

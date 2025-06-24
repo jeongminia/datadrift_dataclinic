@@ -196,48 +196,59 @@ def ollama_generate(prompt, max_tokens=300, temperature=0.7, top_p=0.9, repeat_p
     except Exception as e:
         return f"Ollama 호출 오류: {e}"
 
+# 전처리 함수
+import re
+from collections import Counter
+
+def get_stats(df, name):
+    if df is None:
+        return f"{name}: 데이터 없음"
+    # 텍스트 컬럼 자동 탐색
+    text_col_candidates = ['text', 'comments', '본문', '내용', 'comment', 'sentence']
+    text_col = None
+    for col in text_col_candidates:
+        if col in df.columns:
+            text_col = col
+            break
+    if text_col is None:
+        # 가장 긴 문자열 컬럼 자동 선택 (백업)
+        text_col = max(
+            (col for col in df.columns if df[col].dtype == object),
+            key=lambda col: df[col].dropna().astype(str).str.len().max(),
+            default=None
+        )
+    if text_col is None:
+        return f"{name}: 텍스트 컬럼 없음"
+    total_docs = len(df)
+    avg_length = int(df[text_col].astype(str).apply(lambda x: len(x.split())).mean())
+    text = " ".join(df[text_col].astype(str).tolist())
+    tokens = re.findall(r'\w+', text)
+    tokens = [token for token in tokens if len(token) > 1]
+
+    # 조사 제거 함수
+    def remove_josa(token):
+        return re.sub(r'(이|가|은|는|을|를|와|과|도|로|에|의|에서|에게|께|한테|부터|까지|보다|처럼|만큼|밖에|마다|조차|까지도|이라도|라도|이나|나|이며|든지|든가)$', '', token)
+
+    tokens = [remove_josa(token) for token in tokens]
+    tokens = [token for token in tokens if len(token) > 1]
+    stopwords = [
+        "이", "가", "은", "는", "을", "를", "에", "의", "와", "과", "도", "로", "에서", "에게", "께", "한테", "부터", "까지",
+        "보다", "처럼", "만큼", "밖에", "마다", "조차", "까지도", "이라도", "라도", "이나", "나", "이며", "든지", "든가"
+    ]
+    tokens = [token for token in tokens if token not in stopwords]
+    counter = Counter(tokens)
+    top_keywords = [word for word, count in counter.most_common(5)]
+    return (
+        f"{name} - 문서 수: {total_docs}, 평균 문장 길이: {avg_length} 단어, "
+        f"주요 키워드: {', '.join(top_keywords)}"
+    )
+
 def gen_summarization() -> str:
     """Train/Validation/Test 통계를 모두 반영하여 데이터 특성 요약"""
     # 각 데이터셋에서 통계 추출
     train_df = st.session_state.get('train_df')
     valid_df = st.session_state.get('valid_df')
     test_df = st.session_state.get('test_df')
-
-    def get_stats(df, name):
-        if df is None:
-            return f"{name}: 데이터 없음"
-        # 텍스트 컬럼 자동 탐색
-        text_col_candidates = ['text', 'comments', '본문', '내용', 'comment', 'sentence']
-        text_col = None
-        for col in text_col_candidates:
-            if col in df.columns:
-                text_col = col
-                break
-        if text_col is None:
-            # 가장 긴 문자열 컬럼 자동 선택 (백업)
-            text_col = max(
-                (col for col in df.columns if df[col].dtype == object),
-                key=lambda col: df[col].dropna().astype(str).str.len().max(),
-                default=None
-            )
-        if text_col is None:
-            return f"{name}: 텍스트 컬럼 없음"
-        total_docs = len(df)
-        avg_length = int(df[text_col].astype(str).apply(lambda x: len(x.split())).mean())
-        text = " ".join(df[text_col].astype(str).tolist())
-        tokens = re.findall(r'\w+', text)
-        tokens = [token for token in tokens if len(token) > 1]
-        stopwords = [
-            "이", "가", "은", "는", "을", "를", "에", "의", "와", "과", "도", "로", "에서", "에게", "께", "한테", "부터", "까지",
-            "보다", "처럼", "만큼", "밖에", "마다", "조차", "까지도", "이라도", "라도", "이나", "나", "이며", "이며", "든지", "든가"
-        ]
-        tokens = [token for token in tokens if token not in stopwords]
-        counter = Counter(tokens)
-        top_keywords = [word for word, count in counter.most_common(5)]
-        return (
-            f"{name} - 문서 수: {total_docs}, 평균 문장 길이: {avg_length} 단어, "
-            f"주요 키워드: {', '.join(top_keywords)}"
-        )
 
     train_stats = get_stats(train_df, "Train")
     valid_stats = get_stats(valid_df, "Validation")
