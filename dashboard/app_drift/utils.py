@@ -175,3 +175,93 @@ class EmbeddingPipeline:
 
         def __getitem__(self, idx):
             return self.texts.iloc[idx]
+
+
+# ------- llm expalaination --------------- #
+# Ollama API를 사용하여 데이터 요약 및 드리프트 추정
+import requests
+
+OLLAMA_URL = "http://localhost:11434/api/generate"
+OLLAMA_MODEL = "joonoh/HyperCLOVAX-SEED-Text-Instruct-1.5B:latest"
+
+def ollama_generate(prompt, max_tokens=300, temperature=0.7, top_p=0.9, repeat_penalty=1.1):
+    payload = {
+        "model": OLLAMA_MODEL,
+        "prompt": prompt,
+        "stream": False,
+        "options": {
+            "temperature": temperature,
+            "top_p": top_p,
+            "max_tokens": max_tokens,
+            "repeat_penalty": repeat_penalty
+        }
+    }
+    try:
+        response = requests.post(OLLAMA_URL, json=payload, timeout=60)
+        result = response.json()
+        result = result["response"].strip()
+        import re
+        result = re.sub(r"[*_`#>]", "", result)
+        return result
+
+    except Exception as e:
+        return f"Ollama 호출 오류: {e}"
+
+def gen_drift_score_explanation(score_text: str) -> str:
+    """
+    드리프트 수치 결과를 해석하는 LLM 프롬프트
+    """
+    
+    prompt = f"""
+            당신은 통계적 데이터 드리프트 해석에 특화된 데이터 분석 전문가입니다.
+
+            아래는 데이터셋 간 분포 차이를 나타내는 수치 기반 드리프트 결과입니다:
+
+            {score_text}
+
+            이 정보를 바탕으로 다음 목적에 맞춰 자연스럽게 서술해 주세요:
+
+            1. 각 지표(MMD, Wasserstein, KL Divergence 등)의 의미와 수치 해석  
+            2. 어떤 지표에서 실제로 drift가 발생했는지 판단 근거  
+            3. drift가 발생했을 경우 모델 성능에 어떤 영향을 줄 수 있는지  
+            4. 전반적으로 데이터셋 간 차이를 어떻게 해석해야 할지 요약
+
+            단, 아래 조건을 지켜 주세요:
+            - 마크다운이나 기호(`•`, `*`, `#`)는 사용하지 말고, 문장으로만 작성해 주세요.
+            - 글머리 기호 없이 하나의 간결한 분석 보고서 형식으로 작성하세요.
+            - 필요한 경우 핵심 수치는 문장 중간에서 다시 언급해 주세요.
+            """
+
+    return ollama_generate(prompt, max_tokens=300, temperature=0.7, top_p=0.9, repeat_penalty=1.1)
+
+
+def gen_summarization() -> str:
+    """Train/Validation/Test 통계를 모두 반영하여 데이터 특성 요약"""
+    # 각 데이터셋에서 통계 추출
+    train_df = st.session_state.get('train_df')
+    valid_df = st.session_state.get('valid_df')
+    test_df = st.session_state.get('test_df')
+
+    context = f"""
+    {train_df}
+    {valid_df}
+    {test_df}
+        """
+
+    prompt = f"""
+        당신은 전문적인 데이터 분석가입니다.
+
+        아래는 한 데이터셋에 대한 간단한 통계 정보입니다:
+        {context}
+
+        이 정보를 바탕으로 다음의 목적에 따라 간결하게 자연어 해석을 작성해 주세요:
+
+        1. 데이터의 전반적인 특성을 요약하고,  
+        2. 키워드와 길이 등으로부터 데이터 성격이나 주제의 변화 가능성을 추론하며,  
+        3. train, validation, test 데이터셋 간의 차이를 분석합니다.
+
+        ※ 단, 반드시 위 구조를 따를 필요는 없으며, 자연스럽고 다양한 문장 구성을 자유롭게 사용해도 됩니다.  
+        ※ 마크다운, 별표, 강조 기호는 사용하지 말고, 설명만 반환해 주세요.
+        """
+
+    return ollama_generate(prompt, max_tokens=300, temperature=0.7, top_p=0.9, repeat_penalty=1.1)
