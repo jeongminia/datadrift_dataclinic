@@ -3,7 +3,15 @@ import base64
 from bs4 import BeautifulSoup
 import os
 import pdfkit
-from utils import gen_drift_score_explanation
+
+# Import utils from parent directory
+try:
+    from ..utils import gen_drift_score_explanation
+except ImportError:
+    # Fallback for standalone execution
+    import sys
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from utils import gen_drift_score_explanation
 
 def generate_html_from_session():
     html_parts = []
@@ -47,13 +55,13 @@ def generate_html_from_session():
 
         html_parts.append(f"""
         <div class="drift-explanation">
-            <h3>📘 Drift Analysis Summary</h3>
+            <h2>📘 Drift Analysis Summary</h2>
             <p>{formatted_explanation}</p>
         </div>
         """)
 
     if 'train_test_drift_report_html' in st.session_state:
-        html_parts.append("<hr><h2>Drift Report</h2>")
+        #html_parts.append("<hr><h2>Drift Report</h2>")
         soup = BeautifulSoup(st.session_state['train_test_drift_report_html'], "html.parser")
         drift_body = soup.body or soup
         html_parts.append(str(drift_body))

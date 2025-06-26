@@ -1,9 +1,18 @@
 import streamlit as st
-from utils import upload_and_store_data
+
+# Import utils from parent directory
+try:
+    from ..utils import upload_and_store_data
+except ImportError:
+    # Fallback for standalone execution
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from utils import upload_and_store_data
 
 def render():
     dataset_name = st.session_state.get('dataset_name', 'Dataset')
-    st.title(f"Upload your datasets : {dataset_name}")
+    st.subheader(f"Upload your datasets : {dataset_name}")
     st.session_state['dataset_name'] = dataset_name
     
     data_type = ['Text', 'Image', 'Tabular']

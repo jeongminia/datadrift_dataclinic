@@ -16,7 +16,16 @@ import streamlit.components.v1 as components
 from evidently.metric_preset import TextEvals
 from evidently.report import Report
 from evidently.metric_preset import DataDriftPreset
-from utils import load_data, split_columns
+
+# Import utils from parent directory
+try:
+    from ..utils import load_data, split_columns
+except ImportError:
+    # Fallback for standalone execution
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from utils import load_data, split_columns
 
 HTML_SAVE_PATH = "./reports"
 font_path = './fonts/NanumGothic.ttf'
@@ -47,7 +56,7 @@ def generate_wordcloud(df, column, font_path):
 
 def render():
     dataset_name = st.session_state.get('dataset_name', 'Dataset')
-    st.title(f"Base Visualization Page of {dataset_name}")
+    st.subheader(f"Base Visualization Page of {dataset_name}")
 
     train_df, valid_df, test_df = load_data()
     if train_df is None or valid_df is None or test_df is None:

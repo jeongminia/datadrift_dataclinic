@@ -1,7 +1,17 @@
 import streamlit as st
 import pandas as pd 
 import warnings
-from utils import load_data, split_columns
+
+# Import utils from parent directory
+try:
+    from ..utils import load_data, split_columns
+except ImportError:
+    # Fallback for standalone execution
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from utils import load_data, split_columns
+
 warnings.filterwarnings(action='ignore')
 
 def get_summary_info(df):
@@ -17,7 +27,7 @@ def get_summary_info(df):
 
 def render():
     dataset_name = st.session_state.get('dataset_name', 'Dataset')
-    st.title(f"{dataset_name} Data Load Page")
+    st.subheader(f"{dataset_name} Data Load Page")
 
     train_df, valid_df, test_df = load_data()
     if train_df is None or valid_df is None or test_df is None:
