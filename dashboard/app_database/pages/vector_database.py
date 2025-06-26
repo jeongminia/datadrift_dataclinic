@@ -1,7 +1,16 @@
 import streamlit as st
 from pymilvus import utility, Collection, CollectionSchema, FieldSchema, DataType, connections
 import numpy as np
-from utils import EmbeddingPipeline, split_columns, get_data_from_session
+
+# Import utils from parent directory
+try:
+    from ..utils import EmbeddingPipeline, split_columns, get_data_from_session
+except ImportError:
+    # Fallback for standalone execution
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from utils import EmbeddingPipeline, split_columns, get_data_from_session
  
 # Milvus 서버에 연결
 connections.connect("default", host="localhost", port="19530")

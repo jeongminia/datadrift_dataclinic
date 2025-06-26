@@ -2,7 +2,16 @@ import pandas as pd
 import pdfkit
 import streamlit as st
 import os
-from utils import gen_summarization
+
+# Import utils from parent directory
+try:
+    from ..utils import gen_summarization
+except ImportError:
+    # Fallback for standalone execution
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from utils import gen_summarization
 
 
 def generate_html_from_session(dataset_name):

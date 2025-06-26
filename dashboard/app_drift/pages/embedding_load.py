@@ -39,6 +39,41 @@ def render():
 
     collection_names = get_collection_names()
     collection_name = st.selectbox("Select the collection name", options=collection_names)
+    
+    # 차원 축소 옵션 선택
+    st.subheader("🔧 Analysis Configuration")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Dimension Reduction**")
+        dimension_options = [10, 50, 100, 200, 300, 400, 500]
+        selected_dimension = st.selectbox(
+            "Select Target Dimension:",
+            options=dimension_options,
+            index=2,  # 기본값: 100
+            key="global_dimension_select"
+        )
+        st.session_state['selected_dimension'] = selected_dimension
+    
+    with col2:
+        st.markdown("**Test Type for Drift Detection**")
+        test_type_options = [
+            "MMD",
+            "Wasserstein Distance", 
+            "KL Divergence",
+            "JensenShannon Divergence",
+            "Energy Distance"
+        ]
+        selected_test_type = st.selectbox(
+            "Select Test Type:",
+            options=test_type_options,
+            index=0,  # 기본값: MMD
+            key="global_test_type_select"
+        )
+        st.session_state['selected_test_type'] = selected_test_type
+    
+    # 선택된 설정 표시
+    st.info(f"🎯 **Selected Configuration:** Dimension={selected_dimension}, Test Type={selected_test_type}")
 
     if st.button("Load Data"):
 

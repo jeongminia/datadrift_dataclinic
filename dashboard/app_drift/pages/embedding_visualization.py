@@ -5,8 +5,16 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.decomposition import PCA
 import warnings
-# data & model load, Embedding & visualization
-from utils import visualize_similarity_distance, plot_reduced
+
+# Import utils from parent directory
+try:
+    from ..utils import visualize_similarity_distance, plot_reduced
+except ImportError:
+    # Fallback for standalone execution
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from utils import visualize_similarity_distance, plot_reduced
 
 warnings.filterwarnings("ignore")
 
@@ -71,7 +79,15 @@ def render():
 
     # 🔷 PCA 시각화
     st.subheader("Dimension Reduction with PCA")
-    dim_option = st.selectbox("Select Size of Dimension", [10, 50, 100, 200, 300, 400, 500])
+    
+    # embedding_load에서 선택된 차원 사용
+    if 'selected_dimension' in st.session_state:
+        dim_option = st.session_state['selected_dimension']
+        st.success(f"✅ Using dimension setting from Load page: **{dim_option}**")
+    else:
+        # 기본값 설정 (Load 페이지에서 설정하지 않은 경우)
+        dim_option = st.selectbox("Select Size of Dimension", [10, 50, 100, 200, 300, 400, 500])
+        st.warning("⚠️ Dimension not set in Load page. Using local selection.")
 
     st.session_state['pca_selected_dim'] = dim_option
 
@@ -82,6 +98,11 @@ def render():
     train_pca = apply_pca(train_embeddings, dim_option)
     valid_pca = apply_pca(valid_embeddings, dim_option)
     test_pca = apply_pca(test_embeddings, dim_option)
+
+    # PCA 적용된 임베딩을 세션에 저장 (detect_datadrift에서 사용)
+    st.session_state['train_embeddings_pca'] = train_pca
+    st.session_state['valid_embeddings_pca'] = valid_pca
+    st.session_state['test_embeddings_pca'] = test_pca
 
     st.write(f"Train PCA shape: {train_pca.shape}")
     st.write(f"Validation PCA shape: {valid_pca.shape}")
