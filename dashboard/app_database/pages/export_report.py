@@ -13,7 +13,6 @@ except ImportError:
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     from utils import gen_summarization
 
-
 def generate_html_from_session(dataset_name):
     html_parts = []
     html_parts.append(f"<h1>{dataset_name} Dataset Report</h1>")
