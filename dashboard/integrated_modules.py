@@ -6,7 +6,8 @@ import os
 st.set_page_config(
     page_title="통합 데이터 드리프트 분석 시스템",
     page_icon="🔄",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # 개별 페이지들에서 st.set_page_config() 호출을 방지
@@ -141,7 +142,7 @@ with tab1:
 
 with tab2:
     st.header("🔍 Drift Analysis & Export")
-    st.caption("벡터DB에서 축적 불러와 시각화해 드리프트 감지 및 리포트 생성")
+    st.caption("벡터DB에서 데이터를 불러와 드리프트 감지 및 리포트 생성")
     
     # 모든 Drift 페이지들을 순서대로 표시
     st.markdown("---")
