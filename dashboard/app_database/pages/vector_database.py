@@ -29,6 +29,7 @@ def create_collection(collection_name):
             # 메타데이터 필드들
             FieldSchema(name="dataset_name", dtype=DataType.VARCHAR, max_length=100),
             FieldSchema(name="summary_dict", dtype=DataType.VARCHAR, max_length=5000),
+            FieldSchema(name="data_previews", dtype=DataType.VARCHAR, max_length=10000),
             FieldSchema(name="class_dist_path", dtype=DataType.VARCHAR, max_length=500),
             FieldSchema(name="doc_len_path", dtype=DataType.VARCHAR, max_length=500),
             FieldSchema(name="doc_len_table", dtype=DataType.VARCHAR, max_length=2000),
@@ -90,22 +91,45 @@ def prepare_metadata():
         wordcloud_path = st.session_state.get("wordcloud_path", "")
         dataset_name = st.session_state.get("dataset_name", "")
         
+        train_df, valid_df, test_df = get_data_from_session()
+        data_previews = {}
+        
+        if train_df is not None and len(train_df) > 0:
+            # 상위 10개 행만 저장 + 전체 shape 정보
+            preview_data = train_df.head(5).to_dict('records')
+            data_previews["train"] = {
+                "data": preview_data,
+                "total_rows": len(train_df),
+                "columns": list(train_df.columns)
+            }
+        
+        if valid_df is not None and len(valid_df) > 0:
+            preview_data = valid_df.head(5).to_dict('records')
+            data_previews["valid"] = {
+                "data": preview_data,
+                "total_rows": len(valid_df),
+                "columns": list(valid_df.columns)
+            }
+            
+        if test_df is not None and len(test_df) > 0:
+            preview_data = test_df.head(5).to_dict('records')
+            data_previews["test"] = {
+                "data": preview_data,
+                "total_rows": len(test_df),
+                "columns": list(test_df.columns)
+            }
+        
         # 경로들을 절대경로로 변환
         paths = {
-            "class_dist_path": class_dist_path,
-            "doc_len_path": doc_len_path,
-            "wordcloud_path": wordcloud_path
+            "class_dist_path": os.path.abspath(class_dist_path) if class_dist_path else "",
+            "doc_len_path": os.path.abspath(doc_len_path) if doc_len_path else "",
+            "wordcloud_path": os.path.abspath(wordcloud_path) if wordcloud_path else ""
         }
-        
-        for key, path in paths.items():
-            if path:
-                paths[key] = os.path.abspath(path)
-            else:
-                paths[key] = ""
         
         # 안전한 JSON 직렬화
         summary_dict_json = ""
         doc_len_table_json = ""
+        data_previews_json = ""
         
         if summary_dict:
             try:
@@ -119,9 +143,17 @@ def prepare_metadata():
             except Exception:
                 doc_len_table_json = ""
         
+        # 🔥 데이터 미리보기 JSON 직렬화 (작은 용량)
+        if data_previews:
+            try:
+                data_previews_json = json.dumps(make_json_serializable(data_previews))
+            except Exception:
+                data_previews_json = ""
+        
         return {
             "dataset_name": dataset_name,
             "summary_dict": summary_dict_json,
+            "data_previews": data_previews_json,  # 🔥 추가
             "class_dist_path": paths["class_dist_path"],
             "doc_len_path": paths["doc_len_path"],
             "doc_len_table": doc_len_table_json,
@@ -129,11 +161,12 @@ def prepare_metadata():
             "timestamp": int(time.time())
         }
         
-    except Exception:
-        # 기본 메타데이터 반환
+    except Exception as e:
+        st.error(f"메타데이터 준비 중 오류: {e}")
         return {
             "dataset_name": st.session_state.get("dataset_name", ""),
             "summary_dict": "",
+            "data_previews": "",  # 🔥 추가
             "class_dist_path": "",
             "doc_len_path": "",
             "doc_len_table": "",
@@ -162,13 +195,14 @@ def save_metadata_to_vectordb(collection_name):
         metadata = prepare_metadata()
         dummy_vector = [0.0] * 768
         
-        # 메타데이터 삽입
+        # 메타데이터 삽입 (data_previews 필드 추가)
         data = [
             ["metadata"],
             ["metadata"],
             [dummy_vector],
             [metadata["dataset_name"]],
             [metadata["summary_dict"]],
+            [metadata["data_previews"]],  # 🔥 추가
             [metadata["class_dist_path"]],
             [metadata["doc_len_path"]],
             [metadata["doc_len_table"]],
@@ -177,7 +211,7 @@ def save_metadata_to_vectordb(collection_name):
         ]
         
         fields = ["set_type", "class", "vector", "dataset_name", "summary_dict", 
-                 "class_dist_path", "doc_len_path", "doc_len_table", "wordcloud_path", "timestamp"]
+                 "data_previews", "class_dist_path", "doc_len_path", "doc_len_table", "wordcloud_path", "timestamp"]
         
         result = collection.insert(data, fields=fields)
         collection.flush()
@@ -198,10 +232,10 @@ def load_metadata_from_vectordb(collection_name):
         collection = Collection(name=collection_name)
         collection.load()
         
-        # 메타데이터 조회
+        # 메타데이터 조회 (data_previews 필드 추가)
         results = collection.query(
             expr="set_type == 'metadata'",
-            output_fields=["dataset_name", "summary_dict", "class_dist_path", 
+            output_fields=["dataset_name", "summary_dict", "data_previews", "class_dist_path", 
                           "doc_len_path", "doc_len_table", "wordcloud_path", "timestamp"],
             limit=1
         )
@@ -223,6 +257,15 @@ def load_metadata_from_vectordb(collection_name):
                 st.session_state["dataset_summary"] = json.loads(result["summary_dict"])
             except:
                 st.session_state["dataset_summary"] = {}
+        
+        # data_previews 파싱 (JSON 형태로 저장됨)
+        if result.get("data_previews"):
+            try:
+                st.session_state["data_previews"] = json.loads(result["data_previews"])
+            except:
+                st.session_state["data_previews"] = {}
+        else:
+            st.session_state["data_previews"] = {}
         
         if result["doc_len_table"]:
             try:
@@ -255,6 +298,7 @@ def insert_vectors(collection_name, vectors, set_type, class_labels, batch_size=
             [dummy_vector],
             [metadata["dataset_name"]],
             [metadata["summary_dict"]],
+            [metadata["data_previews"]],  # 🔥 추가
             [metadata["class_dist_path"]],
             [metadata["doc_len_path"]],
             [metadata["doc_len_table"]],
@@ -263,7 +307,7 @@ def insert_vectors(collection_name, vectors, set_type, class_labels, batch_size=
         ]
         
         fields = ["set_type", "class", "vector", "dataset_name", "summary_dict", 
-                 "class_dist_path", "doc_len_path", "doc_len_table", "wordcloud_path", "timestamp"]
+                 "data_previews", "class_dist_path", "doc_len_path", "doc_len_table", "wordcloud_path", "timestamp"]
         
         metadata_ids = collection.insert(metadata_data, fields=fields)
         ids.append(metadata_ids)
@@ -285,6 +329,7 @@ def insert_vectors(collection_name, vectors, set_type, class_labels, batch_size=
             batch_vectors,
             empty_metadata,  # dataset_name
             empty_metadata,  # summary_dict
+            empty_metadata,  # data_previews 🔥 추가
             empty_metadata,  # class_dist_path
             empty_metadata,  # doc_len_path
             empty_metadata,  # doc_len_table
@@ -293,7 +338,7 @@ def insert_vectors(collection_name, vectors, set_type, class_labels, batch_size=
         ]
         
         fields = ["set_type", "class", "vector", "dataset_name", "summary_dict", 
-                 "class_dist_path", "doc_len_path", "doc_len_table", "wordcloud_path", "timestamp"]
+                 "data_previews", "class_dist_path", "doc_len_path", "doc_len_table", "wordcloud_path", "timestamp"]
         
         batch_ids = collection.insert(data, fields=fields)
         ids.append(batch_ids)
