@@ -56,7 +56,7 @@ def generate_wordcloud(df, column, font_path):
 
 def render():
     dataset_name = st.session_state.get('dataset_name', 'Dataset')
-    st.subheader(f"Base Visualization Page of {dataset_name}")
+    st.subheader(f"Base Visualization of {dataset_name}")
 
     train_df, valid_df, test_df = load_data()
     if train_df is None or valid_df is None or test_df is None:

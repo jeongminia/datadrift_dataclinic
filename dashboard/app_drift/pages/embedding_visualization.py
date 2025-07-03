@@ -25,7 +25,7 @@ def render():
 
     embedding_data = st.session_state['embedding_data']
     dataset_name = st.session_state.get('dataset_name', 'Dataset')
-    st.title(f"Embedding Visualization Page of {dataset_name}")
+    st.title(f"Embedding Visualization of {dataset_name}")
 
     # 데이터셋 분리 함수
     def extract_embeddings(key):
