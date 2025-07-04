@@ -1,5 +1,7 @@
 import streamlit as st
 from pymilvus import connections, Collection, utility
+import json
+import datetime
 
 # Milvus 서버에 연결
 connections.connect("default", host="localhost", port="19530")
@@ -34,11 +36,63 @@ def query_collection(collection_name, expr="", output_fields=None, limit=None):
         results = collection.query(expr="id >= 0", output_fields=output_fields, limit=limit or 100000)  # 충분히 큰 숫자
     return results
 
+# 사용자에게 데이터 설명을 위함
+def get_collection_metadata(collection_name):
+    """컬렉션에서 대표 메타데이터(예: dataset_name, summary_dict, timestamp 등) 추출"""
+    collection = Collection(name=collection_name)
+    # 메타데이터 필드만 추출 (필요시 필드명 수정)
+    meta_fields = ["dataset_name", "summary_dict", "timestamp"]
+    # 실제 존재하는 필드만 사용
+    fields = get_collection_fields(collection_name)
+    valid_meta_fields = [f for f in meta_fields if f in fields]
+    if not valid_meta_fields:
+        return {}
+    # 한 레코드만 조회
+    results = collection.query(expr="id >= 0", output_fields=valid_meta_fields, limit=1)
+    return results[0] if results else {}
+
 def render():
     st.title("Load Embeddings from VectorDB")
 
     collection_names = get_collection_names()
     collection_name = st.selectbox("Select the collection name", options=collection_names)
+
+    if collection_name:
+        meta = get_collection_metadata(collection_name)
+        if meta:
+            # Summary 포맷팅
+            summary = meta.get('summary_dict', 'N/A')
+            if isinstance(summary, dict):
+                summary_str = json.dumps(summary, indent=2, ensure_ascii=False)
+            else:
+                summary_str = str(summary) if summary else 'N/A'
+
+            # timestamp 변환
+            ts = meta.get('timestamp', 'N/A')
+            if isinstance(ts, (int, float, str)) and str(ts).isdigit():
+                try:
+                    ts_dt = datetime.datetime.fromtimestamp(int(ts))
+                    ts_str = ts_dt.strftime("%Y-%m-%d %H:%M:%S")
+                except Exception:
+                    ts_str = str(ts)
+            else:
+                ts_str = str(ts)
+
+            st.markdown("#### ℹ️ **Collection Info**")
+            st.markdown(
+                f"""
+                <div style="background-color:#23272f;padding:18px 20px 18px 20px;border-radius:12px;border:1.5px solid #3a3f4b; margin-bottom:16px;">
+                    <div style="font-size:17px;line-height:1.7;">
+                        <b>📁 Dataset Name:</b> {meta.get('dataset_name', 'N/A')}<br>
+                        <b>📝 Summary:</b><pre style="background:none;padding:0;margin:0 0 0 10px;color:#d1d5db;">{summary_str}</pre>
+                        <b>⏰ Created At:</b> {ts_str}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+        else:
+            st.info("No metadata found for this collection.")
     
     # 차원 축소 옵션 선택
     st.subheader("🔧 Analysis Configuration")
