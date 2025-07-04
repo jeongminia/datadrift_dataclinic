@@ -26,8 +26,8 @@ def get_summary_info(df):
     }
 
 def render():
-    dataset_name = st.session_state.get('dataset_name', 'Dataset')
-    st.subheader(f"{dataset_name} Data Load Page")
+    dataset_name = st.session_state.get('dataset_name')
+    #st.subheader(f"{dataset_name} Data Load Page")
 
     train_df, valid_df, test_df = load_data()
     if train_df is None or valid_df is None or test_df is None:

@@ -2,7 +2,7 @@ import streamlit as st
 import sys
 import os
 
-# 🔥 페이지 설정을 맨 처음에 한 번만!
+# 🔥 페이지 설정
 st.set_page_config(
     page_title="통합 데이터 드리프트 분석 시스템",
     page_icon="🔄",
@@ -65,10 +65,10 @@ def load_modules():
     
     # Integrated report
     try:
-        modules['integrated_report'] = __import__('integrated_report', fromlist=[''])
+        modules['report_view'] = __import__('report_view', fromlist=[''])
     except Exception as e:
-        st.warning(f"⚠️ integrated_report 로드 실패: {e}")
-        modules['integrated_report'] = None
+        st.warning(f"⚠️ report_view 로드 실패: {e}")
+        modules['report_view'] = None
     
     return modules
 
@@ -90,7 +90,7 @@ def render_page(module, page_name):
 TAB_CONFIG = {
     "database": {
         "title": "📊 Database Pipeline",
-        "caption": "텍스트 데이터를 업로드하여 벡터 데이터베이스(Milvus)에 저장하고 분석합니다",
+        "caption": "텍스트 데이터를 업로드하여 벡터 데이터베이스(Milvus)에 저장하고 분석합니다.",
         "progress": ["**1️⃣ Upload**", "**2️⃣ Load**", "**3️⃣ Visualize**", "**4️⃣ Store**"],
         "pages": [
             {"title": "1️⃣ Upload Data", "module_key": "upload_data", "name": "Upload Data"},
@@ -107,30 +107,27 @@ TAB_CONFIG = {
             {"title": "1️⃣ Load Embeddings", "module_key": "embedding_load", "name": "Load Embeddings"},
             {"title": "2️⃣ Embeddings Visualization", "module_key": "embedding_visualization", "name": "Embeddings Visualization"},
             {"title": "3️⃣ Detect Drift", "module_key": "detect_datadrift", "name": "Detect Drift"},
-            {"title": "4️⃣ 📋 통합 리포트 생성", "module_key": "integrated_report", "name": "Integrated Report", "special": True}
+            {"title": "4️⃣ 📋 통합 리포트 생성", "module_key": "report_view", "name": "Integrated Report", "special": True}
         ]
     }
 }
 
+# DB/메타DB에서 dataset_name을 가져옴
 def load_dataset_name_from_db():
-    # 실제 DB/메타DB에서 dataset_name을 읽어오는 코드로 교체
-    # 예시: return "MyDataset"
     return "MyDataset"
 
+# DB에서 임베딩을 읽어옴
 def load_train_embeddings_from_db():
-    # 실제 DB에서 임베딩을 읽어오는 코드로 교체
     return None
-
 def load_test_embeddings_from_db():
-    # 실제 DB에서 임베딩을 읽어오는 코드로 교체
     return None
 
+# DB에서 드리프트 요약을 읽어옴
 def load_drift_score_summary_from_db():
-    # 실제 DB에서 드리프트 요약을 읽어오는 코드로 교체
     return None
 
+# DB에서 드리프트 리포트 HTML을 읽어옴
 def load_drift_report_html_from_db():
-    # 실제 DB에서 드리프트 리포트 HTML을 읽어오는 코드로 교체
     return None
 
 def ensure_session_state():
@@ -147,7 +144,7 @@ def ensure_session_state():
         st.session_state['train_test_drift_report_html'] = load_drift_report_html_from_db()
 
 # 통합 리포트 렌더링 함수
-def render_integrated_report():
+def render_report_view():
     """통합 리포트 특별 렌더링"""
     st.markdown("""
     <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; border-left: 4px solid #3498db; margin-bottom: 20px;">
@@ -158,8 +155,8 @@ def render_integrated_report():
     ensure_session_state()  # 🚨 세션 값 보장
 
     try:
-        if modules.get('integrated_report') and hasattr(modules['integrated_report'], 'render_combined_report'):
-            modules['integrated_report'].render_combined_report(
+        if modules.get('report_view') and hasattr(modules['report_view'], 'render_combined_report'):
+            modules['report_view'].render_combined_report(
                 modules.get('database_export_report'), 
                 modules.get('drift_export_report')
             )
@@ -189,7 +186,7 @@ def render_tab_content(tab_key):
         st.subheader(page["title"])
         
         if page.get("special"):
-            render_integrated_report()
+            render_report_view()
         else:
             render_page(modules.get(page["module_key"]), page["name"])
 
@@ -197,14 +194,13 @@ def render_tab_content(tab_key):
 st.set_page_config = original_set_page_config
 
 st.title("🔄 통합 데이터 드리프트 분석 시스템")
+st.caption("해당 연구는 '분석 모델의 성능저하 극복을 위한 데이터 드리프트 관리 기술 개발'로 2025년 정부(과학기술정보통신부)의 재원으로 정보통신기획평가원의 지원을 받아 수행되었습니다.")
 st.markdown("---")
 st.markdown(
     """
     <div style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
                 padding: 20px; border-radius: 10px; margin-bottom: 30px;">
-        <h3 style="color: white; text-align: center; margin: 0;">
-            Select a Task to Start Your Analysis
-        </h3>
+        <h3 style="color: white; text-align: center; margin: 0;"> Select a Task to Start Your Analysis </h3>
         <div style="color: white; text-align: center; margin-top: 10px;">
             📊 <b>Database Pipeline</b> → 🔍 <b>Drift Analysis</b> → 📋 <b>Integrated Report</b>
         </div>
@@ -225,3 +221,15 @@ if selected_tab == "📊 Database Pipeline":
     render_tab_content("database")
 elif selected_tab == "🔍 Drift Analysis & Export":
     render_tab_content("drift")
+
+st.markdown("---")
+st.markdown("""
+    <div style="text-align:center; margin-top:30px; color:#888;">
+        <strong>
+            <a href="https://github.com/keti-datadrift/datadrift_dataclinic" target="_blank" style="color: #3498db; text-decoration: none;">
+                DataDrift Dataclinic System
+            </a>
+        </strong><br>
+        @KETI Korea Electronics Technology Institute, 2025
+    </div>
+    """, unsafe_allow_html=True)

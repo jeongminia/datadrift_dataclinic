@@ -246,25 +246,6 @@ def generate_html_from_session(dataset_name=None):
         abs_path = os.path.abspath(metadata["wordcloud_path"])
         html_parts.append(f"<h3>Word Cloud</h3><img src='file://{abs_path}' width='900'><br><br>")
 
-    # 통계 기반 요약
-    try:
-        summarization = gen_summarization()
-        html_parts.append("<h3>📌 통계 요약 코멘트:</h3>")
-        html_parts.append('<div class="comment-box"><ul>')
-        for line in summarization.splitlines():
-            line = line.strip()
-            if not line:
-                continue
-            if line[0].isdigit() and (line[1] == '.' or line[1] == ')'):
-                line = line[2:].strip()
-            if line.startswith("- ") or line.startswith("– ") or line.startswith("• "):
-                line = line[2:].strip()
-            html_parts.append(f"<li>{line}</li>")
-        html_parts.append("</ul></div>")
-    except Exception as e:
-        html_parts.append(f"<p><strong>통계 요약 실패:</strong> {e}</p>")
-
-    # HTML 템플릿
     html_template = f"""
     <html>
         <head>

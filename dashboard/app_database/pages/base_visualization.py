@@ -55,8 +55,8 @@ def generate_wordcloud(df, column, font_path):
     return wc.generate_from_frequencies(counter), counter
 
 def render():
-    dataset_name = st.session_state.get('dataset_name', 'Dataset')
-    st.subheader(f"Base Visualization of {dataset_name}")
+    dataset_name = st.session_state.get('dataset_name')
+    # st.subheader(f"Base Visualization of {dataset_name}")
 
     train_df, valid_df, test_df = load_data()
     if train_df is None or valid_df is None or test_df is None:

@@ -9,13 +9,6 @@
     벡터DB에서 즉시 불러와 시각화해 드리프트 감지
 
 
-## Documentation
-데이터 드리프트 탐지와 관련해 아래 문서를 참고
-- [Definition of Data Drift](docs/DataDrift.md)
-- [Open-Sourece Tools for Detecting Data Drfit](docs/DriftDetection-Tools.md)
-- [Test Type for Detecting Data Drift](docs/TestTypes.md)
-- [Dimesionality Reduction for Effective Detecting Drift](docs/Dimensionality-Reduction.md)
-- [Text DataDrift](docs/Text-DataDrift.md)
 
 ## Usage Instructions
 1. streamlit 접속
@@ -67,14 +60,12 @@ dashboard/
 │   ├── main.py               ◀ app_drift 메인 실행 파일
 │   ├── utils.py              
 │
-├── docs/                     ◀ 기술 문서 정리
+├── milvus_db/                ◀ vector database
+│   ├── inspect-collections.py  
+│   ├── rm-collections.py              
 ├── fonts/                   
-├── img_files/               
-├── reports/                 
-├── inspect-collections.py    ◀ Vector DB 저장 확인
 ├── README.md
-├── requirements.txt          ◀ Streamlit 실행에 필요한 패키지 모음
-├── rm-collections.py         ◀ Vector DB 일부 데이터 제거            
+├── requirements.txt          ◀ Streamlit 실행에 필요한 패키지 모음   
 ```
 
 

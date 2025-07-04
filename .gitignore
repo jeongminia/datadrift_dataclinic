@@ -174,7 +174,7 @@ temp/vector_db_server/rdb_data/
 *.part*
 
 # pdf_db for RAG
-dashboard/pdf_db/
+#dashboard/pdf_db/
 
 # reports for dashboard
 dashboard/reports/

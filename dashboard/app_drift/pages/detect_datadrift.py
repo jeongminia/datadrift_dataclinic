@@ -32,8 +32,8 @@ if not os.path.exists(HTML_SAVE_PATH):
 
 ## --------------- main --------------- ##
 def render():
-    dataset_name = st.session_state.get('dataset_name', 'Dataset')
-    st.title(f"Detect {dataset_name} DataDrift Page")
+    dataset_name = st.session_state.get('dataset_name')
+    # st.title(f"Detect {dataset_name} DataDrift Page")
 
     if 'train_embeddings' not in st.session_state or 'valid_embeddings' not in st.session_state or 'test_embeddings' not in st.session_state:
         st.error("Embeddings are not available. Please generate embeddings in the 'Embedding Visualization' tab first.")
@@ -64,7 +64,7 @@ def render():
         st.warning("⚠️ Using original embeddings. Please visit Embedding Visualization page first to apply dimension reduction.")
 
     # evidentlyai - 데이터 드리프트 검사
-    st.subheader("Train(reference)-Test(current) Data Drift Detection")
+    st.write("Train(reference)-Test(current) Data Drift Detection")
     reference_df = pd.DataFrame(train_embeddings, 
                                 columns=[f"dim_{i}" for i in range(train_embeddings.shape[1])])
     current_df = pd.DataFrame(test_embeddings, 
