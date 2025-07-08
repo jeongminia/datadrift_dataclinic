@@ -28,7 +28,7 @@ except ImportError:
     from utils import load_data, split_columns
 
 HTML_SAVE_PATH = "./reports"
-font_path = './fonts/NanumGothic.ttf'
+font_path = './static/NanumGothic.ttf'
 fontprop = font_manager.FontProperties(fname=font_path)
 plt.rcParams['font.family'] = fontprop.get_name()
 
