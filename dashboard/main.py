@@ -38,7 +38,6 @@ def load_modules():
         ('data_load', 'app_database.pages.data_load'),
         ('base_visualization', 'app_database.pages.base_visualization'),
         ('vector_database', 'app_database.pages.vector_database'),
-        ('database_export_report', 'app_database.pages.export_report')
     ]
     
     for module_key, module_path in db_modules:
@@ -53,7 +52,6 @@ def load_modules():
         ('embedding_load', 'app_drift.pages.embedding_load'),
         ('embedding_visualization', 'app_drift.pages.embedding_visualization'),
         ('detect_datadrift', 'app_drift.pages.detect_datadrift'),
-        ('drift_export_report', 'app_drift.pages.export_report')
     ]
     
     for module_key, module_path in drift_modules:
@@ -193,15 +191,18 @@ def render_tab_content(tab_key):
 # set_page_config 복원
 st.set_page_config = original_set_page_config
 
-st.title("🔄 통합 데이터 드리프트 분석 시스템")
 st.markdown(
-    """
-    <div style="position: absolute; top: 30px; right: 40px; z-index: 100;">
-        <img src="static/KETI_logo_dark-background.svg" alt="KETI Logo" height="60">
+    '''
+    <div style="width:100%; display:flex; justify-content:center; align-items:center; margin-bottom:10px; margin-top:10px;">
+        <a href="https://www.keti.re.kr" target="_blank">
+        <img src="https://raw.githubusercontent.com/keti-datadrift/datadrift_dataclinic/c91304849912308f4e95c83ba57f93c3a6989a49/dashboard/static/KETI_logo_dark-background.svg" 
+            alt="KETI Logo" height="50" >
+        </a>
     </div>
-    """,
+    ''',
     unsafe_allow_html=True
 )
+st.title("🔄 통합 데이터 드리프트 분석 시스템")
 st.caption("해당 연구는 '분석 모델의 성능저하 극복을 위한 데이터 드리프트 관리 기술 개발'로 2025년 정부(과학기술정보통신부)의 재원으로 정보통신기획평가원의 지원을 받아 수행되었습니다.")
 st.markdown("---")
 st.markdown(
@@ -232,12 +233,14 @@ elif selected_tab == "🔍 Drift Analysis & Export":
 
 st.markdown("---")
 st.markdown("""
-    <div style="text-align:center; margin-top:30px; color:#888;">
-        <strong>
-            <a href="https://github.com/keti-datadrift/datadrift_dataclinic" target="_blank" style="color: #3498db; text-decoration: none;">
-                DataDrift Dataclinic System
-            </a>
-        </strong><br>
-        © 2025 KETI Korea Electronics Technology Institute. All rights reserved.
-    </div>
-    """, unsafe_allow_html=True)
+            <div class="footer" style="text-align:center; margin-top:30px; color:#888;">
+                <strong>
+                    <a href="https://github.com/keti-datadrift/datadrift_dataclinic" 
+                            target="_blank" style="color: #3498db; text-decoration: none;">
+                        DataDrift Dataclinic System
+                    </a>
+                </strong><br>
+                @KETI Korea Electronics Technology Institute, 2025<br>
+            </div>
+            """,  unsafe_allow_html=True
+            )
