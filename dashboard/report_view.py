@@ -10,12 +10,14 @@ import pdfkit
 def render_combined_report(database_export_report=None, drift_export_report=None):
     """최적화된 통합 리포트 렌더링 - rerun 최소화"""
 
-    # 상태 체크
-    has_database = database_export_report is not None
-    has_drift = check_drift_analysis_complete()
+    # 상태 체크 (numpy array의 모호성 방지)
+    train_embeddings = st.session_state.get('train_embeddings')
+    has_database = bool(st.session_state.get('dataset_name')) and (train_embeddings is not None and hasattr(train_embeddings, 'size') and train_embeddings.size > 0)
+    has_drift = bool(st.session_state.get('train_test_drift_report_html'))
+
     dataset_name = st.session_state.get('dataset_name', 'Dataset')
 
-    # 상태 표시 (컴팩트)
+    # 상태 표시
     col1, col2 = st.columns(2)
     with col1:
         status = "✅ 준비됨" if has_database else "⏳ 대기중"
@@ -24,15 +26,15 @@ def render_combined_report(database_export_report=None, drift_export_report=None
         status = "✅ 완료됨" if has_drift else "⏳ 대기중"
         st.write(f"**Drift Analysis:** {status}")
 
-    # 리포트 생성 가능 여부
-    can_generate = has_database or has_drift
+    # 리포트 생성 가능 여부: 둘 다 있어야 True
+    can_generate = has_database and has_drift
 
     if not can_generate:
-        st.info("💡 Database Pipeline 또는 Drift Analysis를 먼저 완료해주세요.")
+        st.info("💡 Database Pipeline과 Drift Analysis를 모두 완료해주세요.")
         return
 
-    # HTML 콘텐츠 생성
-    html_content = generate_combined_html(database_export_report, drift_export_report)
+    # HTML 콘텐츠 생성 (인자 없이)
+    html_content = generate_combined_html()
 
     # PDF 변환 및 다운로드 버튼
     if pdfkit:
