@@ -194,6 +194,14 @@ def render_tab_content(tab_key):
 st.set_page_config = original_set_page_config
 
 st.title("🔄 통합 데이터 드리프트 분석 시스템")
+st.markdown(
+    """
+    <div style="position: absolute; top: 30px; right: 40px; z-index: 100;">
+        <img src="static/KETI_logo_dark-background.svg" alt="KETI Logo" height="60">
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 st.caption("해당 연구는 '분석 모델의 성능저하 극복을 위한 데이터 드리프트 관리 기술 개발'로 2025년 정부(과학기술정보통신부)의 재원으로 정보통신기획평가원의 지원을 받아 수행되었습니다.")
 st.markdown("---")
 st.markdown(
@@ -230,6 +238,6 @@ st.markdown("""
                 DataDrift Dataclinic System
             </a>
         </strong><br>
-        @KETI Korea Electronics Technology Institute, 2025
+        © 2025 KETI Korea Electronics Technology Institute. All rights reserved.
     </div>
     """, unsafe_allow_html=True)
