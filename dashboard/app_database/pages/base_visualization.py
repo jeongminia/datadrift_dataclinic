@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,17 +12,15 @@ from matplotlib import font_manager
 import warnings
 warnings.filterwarnings(action='ignore')
 import os
-from evidently import ColumnMapping
 import streamlit.components.v1 as components
-from evidently.metric_preset import TextEvals
+# evidently 최신 버전용 import
 from evidently.report import Report
-from evidently.metric_preset import DataDriftPreset
+from evidently.metrics import DataDriftMetric, TextDescriptorsMetric
 
 # Import utils from parent directory
 try:
     from ..utils import load_data, split_columns
 except ImportError:
-    # Fallback for standalone execution
     import sys
     import os
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -80,8 +79,27 @@ def render():
 
     datasets = {"Train": train_df, "Validation": valid_df, "Test": test_df}
 
-    column_mapping = ColumnMapping(categorical_features=train_class_cols, text_features=[train_text_cols])
-    dashboard = Report(metrics=[DataDriftPreset(), TextEvals(column_name=train_text_cols)])
+
+    # evidently 최신 버전용 column_mapping 및 metric 사용
+    column_mapping = {
+        "target": None,
+        "prediction": None,
+        "numerical_features": [],
+        "categorical_features": train_class_cols,
+        "text_features": train_text_cols if isinstance(train_text_cols, list) else ([train_text_cols] if train_text_cols else []),
+    }
+    metrics = [
+        DataDriftMetric(),
+    ]
+    # 텍스트 컬럼이 있으면 TextDescriptorsMetric 추가
+    if train_text_cols:
+        if isinstance(train_text_cols, list):
+            for col in train_text_cols:
+                metrics.append(TextDescriptorsMetric(column_name=col))
+        else:
+            metrics.append(TextDescriptorsMetric(column_name=train_text_cols))
+
+    dashboard = Report(metrics=metrics)
     dashboard.run(reference_data=train_df, current_data=test_df, column_mapping=column_mapping)
 
     visualization_report_path = os.path.join(HTML_SAVE_PATH, f"{dataset_name}_visualization.html")

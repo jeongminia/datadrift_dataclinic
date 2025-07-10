@@ -5,7 +5,7 @@ matplotlib==3.7.2
 seaborn==0.12.2
 wordcloud
 streamlit
-evidently
+evidently>=0.4.15
 alibi-detect
 konlpy
 torch
@@ -13,7 +13,6 @@ transformers
 sentencepiece
 pecab
 deepchecks
-pyppeteer
 pymilvus
 
 streamlit_chat
@@ -21,6 +20,8 @@ toml
 requests 
 tornado
 accelerate
+
+
 
 langchain
 langchain_community
@@ -31,4 +32,4 @@ ollama
 sentence-transformers # for embedding
 openai
 
-pypdf
+pdfkit
