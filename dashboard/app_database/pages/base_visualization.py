@@ -14,8 +14,8 @@ warnings.filterwarnings(action='ignore')
 import os
 import streamlit.components.v1 as components
 # evidently 최신 버전용 import
-from evidently.report import Report
-from evidently.metrics import DataDriftMetric, TextDescriptorsMetric
+from evidently import Report
+from evidently.metrics import *
 
 # Import utils from parent directory
 try:

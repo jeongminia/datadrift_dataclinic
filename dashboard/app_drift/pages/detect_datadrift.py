@@ -13,11 +13,11 @@ except ImportError:
     from utils import load_data, split_columns
 
 # Detect DataDrift
-from evidently.metrics import EmbeddingsDriftMetric
-from evidently.report import Report
-from evidently.metrics.data_drift.embedding_drift_methods import mmd
-from evidently.metrics.data_drift.embedding_drift_methods import ratio
-from evidently import ColumnMapping
+from evidently.metrics import *
+from evidently import Report
+from evidently import Dataset
+from evidently import DataDefinition
+from evidently import ColumnType
 import streamlit.components.v1 as components  # HTML 열론링을 위한 Streamlit 컨퍼런트
 import os
 import matplotlib.pyplot as plt
@@ -65,14 +65,19 @@ def render():
 
     # evidentlyai - 데이터 드리프트 검사
     st.write("Train(reference)-Test(current) Data Drift Detection")
+
     reference_df = pd.DataFrame(train_embeddings, 
                                 columns=[f"dim_{i}" for i in range(train_embeddings.shape[1])])
     current_df = pd.DataFrame(test_embeddings, 
                               columns=[f"dim_{i}" for i in range(test_embeddings.shape[1])])
 
-    column_mapping = ColumnMapping(
-        embeddings={'all_dimensions': reference_df.columns.tolist()}
-    )
+    # DataDefinition 생성 (모든 컬럼을 Numerical로 지정)
+    data_def = DataDefinition()
+    for col in reference_df.columns:
+        data_def.add_column(col, ColumnType.Numerical)
+
+    reference_dataset = Dataset.from_pandas(reference_df, data_definition=data_def)
+    current_dataset = Dataset.from_pandas(current_df, data_definition=data_def)
 
     # embedding_load에서 선택된 테스트 타입 사용
     if 'selected_test_type' in st.session_state:
@@ -87,6 +92,7 @@ def render():
                                     "Energy Distance"])
         st.warning("⚠️ Test type not set in Load page. Using local selection.")
 
+
     test_methods = {
         "MMD": mmd(threshold=0.015),
         "Wasserstein Distance": ratio(component_stattest='wasserstein', component_stattest_threshold=0.1, threshold=0.015),
@@ -95,22 +101,24 @@ def render():
         "Energy Distance": ratio(component_stattest='ed', component_stattest_threshold=0.1, threshold=0.015),
     }
 
-    # 대시보드용 Report 생성 및 저장
+
+    # 대시보드용 Report 생성 및 저장 (DataDefinition/Dataset 기반)
     selected_method = test_methods[test_option]
-    visual_report = Report(metrics=[EmbeddingsDriftMetric('all_dimensions', drift_method=selected_method)])
-    visual_report.run(reference_data=reference_df, current_data=current_df, column_mapping=column_mapping)
+    visual_report = Report(metrics=[EmbeddingsDriftMetric(reference_df.columns.tolist(), drift_method=selected_method)])
+    visual_report.run(reference_dataset, current_dataset)
 
     html_path = os.path.join(HTML_SAVE_PATH, f"{dataset_name}_train_test_drift_report.html")
     visual_report.save_html(html_path)
     with open(html_path, "r") as f:
         st.session_state['train_test_drift_report_html'] = f.read()
 
-    # 모든 방법에 대한 드리프트 점수 요약 저장
+
+    # 모든 방법에 대한 드리프트 점수 요약 저장 (DataDefinition/Dataset 기반)
     drift_summary = []
     for name, method in test_methods.items():
         try:
-            temp_report = Report(metrics=[EmbeddingsDriftMetric('all_dimensions', drift_method=method)])
-            temp_report.run(reference_data=reference_df, current_data=current_df, column_mapping=column_mapping)
+            temp_report = Report(metrics=[EmbeddingsDriftMetric(reference_df.columns.tolist(), drift_method=method)])
+            temp_report.run(reference_dataset, current_dataset)
             result = temp_report.as_dict().get("metrics", [])[0].get("result", {})
             score = result.get("drift_score", "N/A")
             detected = result.get("drift_detected", "N/A")
