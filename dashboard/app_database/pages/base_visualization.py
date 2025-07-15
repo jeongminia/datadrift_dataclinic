@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -14,8 +13,8 @@ warnings.filterwarnings(action='ignore')
 import os
 import streamlit.components.v1 as components
 # evidently 최신 버전용 import
-from evidently import Report
-from evidently.metrics import *
+from evidently.presets import DataDriftPreset, DataSummaryPreset
+from evidently import DataDefinition, ColumnType, Dataset, Report
 
 # Import utils from parent directory
 try:
@@ -79,34 +78,30 @@ def render():
 
     datasets = {"Train": train_df, "Validation": valid_df, "Test": test_df}
 
+    text_features = train_text_cols if isinstance(train_text_cols, list) else ([train_text_cols] if train_text_cols else [])
+    class_features = train_class_cols if isinstance(train_class_cols, list) else ([train_class_cols] if train_class_cols else [])
 
-    # evidently 최신 버전용 column_mapping 및 metric 사용
-    column_mapping = {
-        "target": None,
-        "prediction": None,
-        "numerical_features": [],
-        "categorical_features": train_class_cols,
-        "text_features": train_text_cols if isinstance(train_text_cols, list) else ([train_text_cols] if train_text_cols else []),
-    }
-    metrics = [
-        DataDriftMetric(),
-    ]
-    # 텍스트 컬럼이 있으면 TextDescriptorsMetric 추가
-    if train_text_cols:
-        if isinstance(train_text_cols, list):
-            for col in train_text_cols:
-                metrics.append(TextDescriptorsMetric(column_name=col))
-        else:
-            metrics.append(TextDescriptorsMetric(column_name=train_text_cols))
+    # 텍스트 컬럼이 없으면 리포트 생성을 건너뜀
+    if not text_features:
+        st.warning("No text column found for Evidently Text Analysis.")
+    else:
+        # DataDefinition에 명시적으로 텍스트 컬럼 지정
+        data_def = DataDefinition(
+            text_columns = [i for i in text_features],
+            categorical_columns = [i for i in class_features]
+        )
 
-    dashboard = Report(metrics=metrics)
-    dashboard.run(reference_data=train_df, current_data=test_df, column_mapping=column_mapping)
+        reference_dataset = Dataset.from_pandas(train_df, data_definition=data_def)
+        current_dataset = Dataset.from_pandas(test_df, data_definition=data_def)
 
-    visualization_report_path = os.path.join(HTML_SAVE_PATH, f"{dataset_name}_visualization.html")
-    dashboard.save_html(visualization_report_path)
-    with open(visualization_report_path, "r") as f:
-        html_content = f.read()
-    components.html(html_content, height=800, scrolling=True)
+        dashboard = Report([DataDriftPreset()])
+        result = dashboard.run(reference_dataset, current_dataset)
+
+        visualization_report_path = os.path.join(HTML_SAVE_PATH, f"{dataset_name}_visualization.html")
+        result.save_html(visualization_report_path)
+        with open(visualization_report_path, "r") as f:
+            html_content = f.read()
+        components.html(html_content, height=800, scrolling=True)
 
     if any(df.isnull().values.any() for df in [train_df, valid_df, test_df]):
         st.error("One or more datasets contain missing values. Please handle the missing values and upload the datasets again.")

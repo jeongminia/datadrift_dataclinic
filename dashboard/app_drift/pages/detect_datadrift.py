@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd 
 import numpy as np
+import matplotlib.pyplot as plt
+import os
 
 # Import utils from parent directory
 try:
@@ -13,14 +15,14 @@ except ImportError:
     from utils import load_data, split_columns
 
 # Detect DataDrift
-from evidently.metrics import *
 from evidently import Report
+from evidently.legacy.metrics import EmbeddingsDriftMetric
+from evidently.legacy.metrics.data_drift.embedding_drift_methods import (
+    mmd, model, ratio, distance
+)
 from evidently import Dataset
 from evidently import DataDefinition
 from evidently import ColumnType
-import streamlit.components.v1 as components  # HTML 열론링을 위한 Streamlit 컨퍼런트
-import os
-import matplotlib.pyplot as plt
 
 # HTML 저장 경로 설정
 HTML_SAVE_PATH = "reports"
@@ -28,7 +30,6 @@ HTML_SAVE_PATH = "reports"
 # reports 디렉토리가 없으면 생성
 if not os.path.exists(HTML_SAVE_PATH):
     os.makedirs(HTML_SAVE_PATH)
-
 
 ## --------------- main --------------- ##
 def render():
@@ -72,10 +73,10 @@ def render():
                               columns=[f"dim_{i}" for i in range(test_embeddings.shape[1])])
 
     # DataDefinition 생성 (모든 컬럼을 Numerical로 지정)
-    data_def = DataDefinition()
-    for col in reference_df.columns:
-        data_def.add_column(col, ColumnType.Numerical)
-
+    data_def = DataDefinition({
+        col: {"type": ColumnType.Numerical}
+        for col in reference_df.columns
+    })
     reference_dataset = Dataset.from_pandas(reference_df, data_definition=data_def)
     current_dataset = Dataset.from_pandas(current_df, data_definition=data_def)
 
