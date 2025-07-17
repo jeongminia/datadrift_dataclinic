@@ -5,7 +5,7 @@ matplotlib==3.7.2
 seaborn==0.12.2
 wordcloud
 streamlit
-evidently>=0.4.15
+evidently==v0.5.1
 alibi-detect
 konlpy
 torch
