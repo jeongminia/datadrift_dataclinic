@@ -11,15 +11,17 @@ from matplotlib import font_manager
 import warnings
 warnings.filterwarnings(action='ignore')
 import os
+from evidently import ColumnMapping
 import streamlit.components.v1 as components
-# evidently 최신 버전용 import
-from evidently.presets import DataDriftPreset, DataSummaryPreset
-from evidently import DataDefinition, ColumnType, Dataset, Report
+from evidently.metric_preset import TextEvals
+from evidently.report import Report
+from evidently.metric_preset import DataDriftPreset
 
 # Import utils from parent directory
 try:
     from ..utils import load_data, split_columns
 except ImportError:
+    # Fallback for standalone execution
     import sys
     import os
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -78,30 +80,15 @@ def render():
 
     datasets = {"Train": train_df, "Validation": valid_df, "Test": test_df}
 
-    text_features = train_text_cols if isinstance(train_text_cols, list) else ([train_text_cols] if train_text_cols else [])
-    class_features = train_class_cols if isinstance(train_class_cols, list) else ([train_class_cols] if train_class_cols else [])
+    column_mapping = ColumnMapping(categorical_features=train_class_cols, text_features=[train_text_cols])
+    dashboard = Report(metrics=[DataDriftPreset(), TextEvals(column_name=train_text_cols)])
+    dashboard.run(reference_data=train_df, current_data=test_df, column_mapping=column_mapping)
 
-    # 텍스트 컬럼이 없으면 리포트 생성을 건너뜀
-    if not text_features:
-        st.warning("No text column found for Evidently Text Analysis.")
-    else:
-        # DataDefinition에 명시적으로 텍스트 컬럼 지정
-        data_def = DataDefinition(
-            text_columns = [i for i in text_features],
-            categorical_columns = [i for i in class_features]
-        )
-
-        reference_dataset = Dataset.from_pandas(train_df, data_definition=data_def)
-        current_dataset = Dataset.from_pandas(test_df, data_definition=data_def)
-
-        dashboard = Report([DataDriftPreset()])
-        result = dashboard.run(reference_dataset, current_dataset)
-
-        visualization_report_path = os.path.join(HTML_SAVE_PATH, f"{dataset_name}_visualization.html")
-        result.save_html(visualization_report_path)
-        with open(visualization_report_path, "r") as f:
-            html_content = f.read()
-        components.html(html_content, height=800, scrolling=True)
+    visualization_report_path = os.path.join(HTML_SAVE_PATH, f"{dataset_name}_visualization.html")
+    dashboard.save_html(visualization_report_path)
+    with open(visualization_report_path, "r") as f:
+        html_content = f.read()
+    components.html(html_content, height=800, scrolling=True)
 
     if any(df.isnull().values.any() for df in [train_df, valid_df, test_df]):
         st.error("One or more datasets contain missing values. Please handle the missing values and upload the datasets again.")
