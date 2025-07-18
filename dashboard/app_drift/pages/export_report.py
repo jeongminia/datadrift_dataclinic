@@ -7,11 +7,23 @@ import pdfkit
 # Import utils from parent directory
 try:
     from ..utils import gen_drift_score_explanation
+    # RAG 기능을 위해 build_RAG_docs.py에서 함수 import
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+    from build_RAG_docs import generate_llm_drift_explanation
 except ImportError:
     # Fallback for standalone execution
     import sys
+    import os
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     from utils import gen_drift_score_explanation
+    # RAG 기능을 위해 build_RAG_docs.py에서 함수 import
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+    try:
+        from build_RAG_docs import generate_llm_drift_explanation
+    except ImportError:
+        generate_llm_drift_explanation = None
 
 def generate_html_from_session():
     html_parts = []
@@ -50,15 +62,44 @@ def generate_html_from_session():
         html_parts.append(f"<pre>{st.session_state['drift_score_summary']}</pre>")
         
         score_text = st.session_state['drift_score_summary']
-        explanation = gen_drift_score_explanation(score_text)
-        formatted_explanation = explanation.replace('\n', '</p><p>')  # 🔑 먼저 변환
-
-        html_parts.append(f"""
-        <div class="drift-explanation">
-            <h2>📘 Drift Analysis Summary</h2>
-            <p>{formatted_explanation}</p>
-        </div>
-        """)
+        dataset_name = st.session_state.get("dataset_name", "Dataset")
+        
+        # RAG 기능 사용 시도, 실패시 기존 방식 사용
+        if generate_llm_drift_explanation is not None:
+            try:
+                explanation = generate_llm_drift_explanation(dataset_name)
+                if explanation:  # RAG 해설이 성공적으로 생성된 경우
+                    html_parts.append(explanation)
+                else:  # RAG 해설 생성 실패시 기존 방식 사용
+                    explanation = gen_drift_score_explanation(score_text)
+                    formatted_explanation = explanation.replace('\n', '</p><p>')
+                    html_parts.append(f"""
+                    <div class="drift-explanation">
+                        <h2>📘 Drift Analysis Summary</h2>
+                        <p>{formatted_explanation}</p>
+                    </div>
+                    """)
+            except Exception as e:
+                # RAG 실행 중 에러 발생시 기존 방식 사용
+                st.warning(f"RAG 해설 생성 실패, 기존 방식 사용: {e}")
+                explanation = gen_drift_score_explanation(score_text)
+                formatted_explanation = explanation.replace('\n', '</p><p>')
+                html_parts.append(f"""
+                <div class="drift-explanation">
+                    <h2>� Drift Analysis Summary</h2>
+                    <p>{formatted_explanation}</p>
+                </div>
+                """)
+        else:
+            # RAG 함수를 import하지 못한 경우 기존 방식 사용
+            explanation = gen_drift_score_explanation(score_text)
+            formatted_explanation = explanation.replace('\n', '</p><p>')
+            html_parts.append(f"""
+            <div class="drift-explanation">
+                <h2>📘 Drift Analysis Summary</h2>
+                <p>{formatted_explanation}</p>
+            </div>
+            """)
 
     if 'train_test_drift_report_html' in st.session_state:
         #html_parts.append("<hr><h2>Drift Report</h2>")
