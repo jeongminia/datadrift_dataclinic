@@ -5,13 +5,11 @@ import streamlit as st
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 # docs embedding and vectorstore
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-# retriever
-# LLM 연결, QA chain 구성
-from langchain_community.llms import Ollama
+# retriever, LLM 연결, QA chain 구성
+from langchain_ollama import OllamaLLM
 from langchain.prompts import PromptTemplate
-from langchain.chains import RetrievalQA
 
 # ========== RAG 관련 유틸리티 ==========
 @st.cache_resource
@@ -45,8 +43,8 @@ def load_drift_knowledge_base():
         vectorstore = FAISS.from_documents(chunks, embeddings)
         
         # 5. Ollama LLM 설정
-        llm = Ollama(
-            model="hyperclovax-seed-text-instruct-1.5B",
+        llm = OllamaLLM(
+            model="joonoh/hyperclovax-seed-text-instruct-1.5b:latest",
             temperature=0.7
         )
         
@@ -84,21 +82,67 @@ def generate_llm_drift_explanation(dataset_name: str) -> str:
     # 1. 현재 드리프트 결과 수집
     drift_summary = st.session_state.get('drift_score_summary', '')
     
-    # 임베딩 정보 수집 (utils.py 의존성 제거)
+    # 2. 강화된 임베딩 정보 수집
     embedding_info = {}
+    pca_analysis = {}
+    
+    # 기본 임베딩 정보
     for key in ['train_embeddings', 'valid_embeddings', 'test_embeddings']:
         embeddings = st.session_state.get(key)
         if embeddings is not None:
-            embedding_info[key] = embeddings.shape
+            embedding_info[key] = {
+                'shape': embeddings.shape,
+                'mean': float(embeddings.mean()) if hasattr(embeddings, 'mean') else 'N/A',
+                'std': float(embeddings.std()) if hasattr(embeddings, 'std') else 'N/A'
+            }
     
+    # PCA 분석 정보 강화
     pca_dim = st.session_state.get('pca_selected_dim')
     if pca_dim:
-        embedding_info['pca_selected_dim'] = pca_dim
+        pca_analysis['selected_dimension'] = pca_dim
+        
+        # PCA 좌표 분석 (가능한 경우)
+        train_pca = st.session_state.get('train_embeddings_pca')
+        test_pca = st.session_state.get('test_embeddings_pca')
+        
+        if train_pca is not None and test_pca is not None:
+            import numpy as np
+            train_center = np.mean(train_pca, axis=0)
+            test_center = np.mean(test_pca, axis=0)
+            center_distance = np.linalg.norm(train_center - test_center)
+            
+            pca_analysis.update({
+                'train_center': f"({train_center[0]:.3f}, {train_center[1]:.3f})",
+                'test_center': f"({test_center[0]:.3f}, {test_center[1]:.3f})",
+                'center_distance': f"{center_distance:.3f}"
+            })
     
     if not drift_summary:
         return ''
+    # 3. 드리프트 메트릭 상세 분석
+    drift_metrics_analysis = {}
+    if drift_summary:
+        lines = drift_summary.split('\n')
+        for line in lines:
+            if 'score =' in line and 'drift =' in line:
+                # 메트릭별 점수 추출
+                parts = line.split(':')
+                if len(parts) >= 2:
+                    metric_name = parts[0].strip('- ')
+                    score_part = parts[1].split(',')[0].replace('score =', '').strip()
+                    drift_part = parts[1].split(',')[1].replace('drift =', '').strip()
+                    
+                    try:
+                        score_value = float(score_part)
+                        drift_metrics_analysis[metric_name] = {
+                            'score': score_value,
+                            'drift_detected': drift_part,
+                            'threshold_level': 'low' if score_value < 0.01 else 'medium' if score_value < 0.05 else 'high'
+                        }
+                    except:
+                        pass
     
-    # 2. 검색 쿼리 구성
+    # 4. 검색 쿼리 구성
     search_queries = [
         f"MMD Wasserstein KL divergence interpretation",
         f"data drift analysis embedding",
@@ -106,7 +150,7 @@ def generate_llm_drift_explanation(dataset_name: str) -> str:
         f"PCA dimension reduction drift analysis"
     ]
     
-    # 3. 관련 지식 검색
+    # 5. 관련 지식 검색
     knowledge_context = []
     for query in search_queries:
         relevant_chunks = search_drift_knowledge(query, top_k=2)
@@ -115,40 +159,59 @@ def generate_llm_drift_explanation(dataset_name: str) -> str:
     # 중복 제거 및 길이 제한
     knowledge_context = list(set(knowledge_context))[:3]  # 상위 3개만 사용
     
-    # 4. LLM 프롬프트 구성
+    # 6. 구조화된 정보 구성
     context_text = "\n\n".join(knowledge_context)
     
+    # 임베딩 정보 텍스트 구성
     embedding_info_text = ""
-    for key, shape in embedding_info.items():
-        if key == 'pca_selected_dim':
-            embedding_info_text += f"PCA 차원: {shape}\n"
+    for key, info in embedding_info.items():
+        if isinstance(info, dict):
+            embedding_info_text += f"{key}: shape={info['shape']}, mean={info['mean']}, std={info['std']}\n"
         else:
-            embedding_info_text += f"{key}: {shape}\n"
+            embedding_info_text += f"{key}: {info}\n"
     
-    # 5. Ollama용 프롬프트 템플릿
+    # PCA 분석 텍스트 구성
+    pca_info_text = ""
+    if pca_analysis:
+        for key, value in pca_analysis.items():
+            pca_info_text += f"{key}: {value}\n"
+    
+    # 메트릭 분석 텍스트 구성
+    metrics_info_text = ""
+    for metric, analysis in drift_metrics_analysis.items():
+        metrics_info_text += f"{metric}: score={analysis['score']}, level={analysis['threshold_level']}, drift={analysis['drift_detected']}\n"
+    
+    # 7. 개선된 프롬프트 템플릿 (4단계 구조)
     prompt_template = PromptTemplate(
-        input_variables=["dataset_name", "embedding_info", "drift_summary", "context"],
-        template="""당신은 데이터 드리프트 분석 전문가입니다. 다음 정보를 바탕으로 드리프트 분석 결과를 이해하기 쉽게 해설해주세요.
+        input_variables=["dataset_name", "embedding_info", "pca_info", "metrics_info", "drift_summary", "context"],
+        template="""당신은 데이터 드리프트 분석 전문가입니다. 다음 정보를 바탕으로 4단계 구조화된 드리프트 분석 해설을 작성해주세요.
 
-                    데이터셋 정보:
-                    - 이름: {dataset_name}
-                    - {embedding_info}
+데이터셋 정보:
+- 이름: {dataset_name}
+- 임베딩 정보: {embedding_info}
+- PCA 분석: {pca_info}
+- 메트릭 분석: {metrics_info}
 
-                    드리프트 분석 결과:
-                    {drift_summary}
+드리프트 분석 결과:
+{drift_summary}
 
-                    참고 지식:
-                    {context}
+참고 지식:
+{context}
 
-                    다음 순서로 한국어로 설명해주세요:
-                    1. 각 드리프트 메트릭의 의미와 현재 수치 해석
-                    2. 전체적인 드리프트 상황 평가
-                    3. 권장사항
+다음 4단계 구조로 한국어로 작성해주세요. 각 단계는 반드시 대괄호로 시작하세요:
 
-                    500자 내외로 간결하게 작성해주세요."""
+[기술적 분석] 각 드리프트 메트릭의 수치적 의미와 임계값 대비 해석을 제시합니다. MMD, Wasserstein, KL Divergence 등의 점수를 구체적으로 분석하세요.
+
+[현 상황 분석] 현재 드리프트 상황이 모델 성능과 서비스 안정성에 미칠 영향을 평가합니다. 재학습 필요성과 위험도를 판단하세요.
+
+[시각적 분석] PCA 시각화 결과와 연계하여 데이터 분포 변화를 해석합니다. 가능하다면 중심점 이동과 분포 겹침 정도를 언급하세요.
+
+[권장사항] 즉시 조치사항과 모니터링 방안을 제시합니다. 구체적인 임계값과 실행 계획을 포함하세요.
+
+각 단계는 2-3문장으로 간결하게 작성하고, 전체 500자 내외로 제한하세요."""
     )
     
-    # 6. Ollama LLM 호출
+    # 8. Ollama LLM 호출
     try:
         vectorstore, llm = load_drift_knowledge_base()
         
@@ -159,6 +222,8 @@ def generate_llm_drift_explanation(dataset_name: str) -> str:
         formatted_prompt = prompt_template.format(
             dataset_name=dataset_name,
             embedding_info=embedding_info_text,
+            pca_info=pca_info_text,
+            metrics_info=metrics_info_text,
             drift_summary=drift_summary,
             context=context_text
         )
@@ -166,12 +231,16 @@ def generate_llm_drift_explanation(dataset_name: str) -> str:
         # LLM 호출
         explanation = llm.invoke(formatted_prompt)
         
-        # HTML 형식으로 포맷팅
+        # HTML 형식으로 포맷팅 (구조화된 스타일링)
+        formatted_explanation = format_structured_explanation(explanation)
+        
         return f"""
-        <div class="comment-box" style="background-color: #e8f5e8; border-left: 4px solid #28a745;">
-            <h4>🤖 AI 드리프트 분석 해설</h4>
-            <p style="margin-top: 10px; line-height: 1.6;">{explanation}</p>
-            <small style="color: #6c757d; font-style: italic;">
+        <div class="comment-box" style="background-color: #e8f5e8; border-left: 4px solid #28a745; padding: 20px; margin: 10px 0;">
+            <h4 style="margin-top: 0; color: #28a745;">🤖 AI 데이터 드리프트 분석 해설</h4>
+            <div style="line-height: 1.8; font-size: 14px;">
+                {formatted_explanation}
+            </div>
+            <small style="color: #6c757d; font-style: italic; margin-top: 15px; display: block;">
                 * 이 해설은 로컬 AI(Ollama)가 기술 문서를 바탕으로 생성한 것입니다.
             </small>
         </div>
@@ -179,19 +248,42 @@ def generate_llm_drift_explanation(dataset_name: str) -> str:
         
     except Exception as e:
         st.warning(f"AI 해설 생성 중 오류: {e}")
-        return generate_fallback_explanation()
+        return 
 
-def generate_fallback_explanation() -> str:
-    """LLM 호출 실패 시 기본 해설 제공"""
-    return f"""
-    <div class="comment-box" style="background-color: #fff3cd; border-left: 4px solid #ffc107;">
-        <h4>⚠️ AI 해설 생성 불가</h4>
-        <p>현재 AI 해설 서비스(Ollama)를 이용할 수 없습니다. 다음 기본 가이드를 참고해주세요:</p>
-        <ul>
-            <li><strong>MMD, Wasserstein Distance</strong>: 낮을수록 두 데이터셋이 유사함</li>
-            <li><strong>KL Divergence, JensenShannon</strong>: 0에 가까울수록 분포가 유사함</li>
-            <li><strong>drift = False</strong>: 데이터 분포가 안정적</li>
-            <li><strong>drift = True</strong>: 데이터 분포 변화 감지됨</li>
-        </ul>
-    </div>
-    """
+def format_structured_explanation(explanation: str) -> str:
+    """LLM 응답을 구조화된 HTML로 변환"""
+    
+    # 4단계 섹션 스타일 정의
+    section_styles = {
+        '기술적 분석': 'background-color: #f8f9fa; border-left: 3px solid #007bff; color: #0056b3;',
+        '비즈니스 임팩트': 'background-color: #fff3cd; border-left: 3px solid #ffc107; color: #856404;',
+        '시각적 분석': 'background-color: #d1ecf1; border-left: 3px solid #17a2b8; color: #0c5460;',
+        '권장사항': 'background-color: #d4edda; border-left: 3px solid #28a745; color: #155724;'
+    }
+    
+    # 대괄호로 시작하는 섹션 찾기
+    import re
+    pattern = r'\[([^\]]+)\]\s*(.*?)(?=\[|$)'
+    matches = re.findall(pattern, explanation, re.DOTALL)
+    
+    if not matches:
+        # 구조화되지 않은 응답인 경우 기본 포맷팅
+        return explanation.replace('\n', '<br>')
+    
+    formatted_html = ""
+    for section_title, content in matches:
+        section_title = section_title.strip()
+        content = content.strip()
+        
+        # 해당 섹션 스타일 가져오기
+        style = section_styles.get(section_title, 'background-color: #f8f9fa; border-left: 3px solid #6c757d; color: #495057;')
+        
+        # HTML 섹션 구성
+        formatted_html += f"""
+        <div style="margin: 15px 0; padding: 15px; border-radius: 5px; {style}">
+            <h5 style="margin: 0 0 10px 0; font-weight: bold;">📋 {section_title}</h5>
+            <p style="margin: 0; line-height: 1.6;">{content}</p>
+        </div>
+        """
+    
+    return formatted_html
