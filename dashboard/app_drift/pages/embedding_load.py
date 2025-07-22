@@ -83,7 +83,7 @@ def render():
                 f"""
                 <div style="background-color:#23272f;padding:18px 20px 18px 20px;border-radius:12px;border:1.5px solid #3a3f4b; margin-bottom:16px;">
                     <div style="font-size:17px;line-height:1.7;">
-                        <b>📁 Dataset Name:</b> {meta.get('dataset_name', 'N/A')}<br>
+                        <b>📁 Dataset Name:</b> {meta.get('dataset_name')}<br>
                         <b>📝 Summary:</b><pre style="background:none;padding:0;margin:0 0 0 10px;color:#d1d5db;">{summary_str}</pre>
                         <b>⏰ Created At:</b> {ts_str}
                     </div>

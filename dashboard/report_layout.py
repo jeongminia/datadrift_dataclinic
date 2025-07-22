@@ -7,7 +7,7 @@ from pymilvus import connections, Collection, utility
 # utils.py에서 함수들 import
 from utils import (
     get_cached_html, get_dataset_name, generate_html_template,
-    generate_drift_content, check_drift_analysis_complete
+    generate_drift_content
 )
 
 # Milvus 관련 함수
@@ -224,9 +224,8 @@ def generate_db_html_from_milvus(dataset_name=None):
     """
     return html_template
 
-# 기존 generate_combined_html 대체: 간소화된 메인 함수
+# --------- main ----------
 def generate_combined_html(*args, **kwargs):
-    """통합 HTML 리포트 생성 - 메인 함수 (대폭 간소화)"""
     dataset_name = get_dataset_name(*args, **kwargs)
     
     # 1. 데이터베이스 정보 가져오기

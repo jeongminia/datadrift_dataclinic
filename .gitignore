@@ -162,19 +162,22 @@ cython_debug/
 #.idea/
 
 # Vector DB ; Milvus 자동 생성 데이터 무시
-temp/vector_db_server/volumes/etcd/member/
 temp/vector_db_server/volumes/
+temp/vector_db_server/rdb_data/
 temp/vector_db_server/volumes/milvus/
 temp/vector_db_server/volumes/minio/
-temp/vector_db_server/rdb_data/
 *.bin
 *.meta
 *.sst
 *.log
 *.part*
+dashboard/milvus_db/volumes/
+dashboard/milvus_db/volumes/milvus/
+dashboard/milvus_db/volumes/minio/
+dashboard/milvus_db/rdb_data/
 
 # pdf_db for RAG
-# dashboard/pdf_db/
+dashboard/pdf_db/
 
 # reports for dashboard
 # dashboard/reports/

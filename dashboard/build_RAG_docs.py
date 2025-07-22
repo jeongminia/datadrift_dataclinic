@@ -1,5 +1,5 @@
-# rag_engine.py
 import os
+import re
 import streamlit as st
 # pdf loader + split
 from langchain_community.document_loaders import PyPDFLoader
@@ -44,7 +44,7 @@ def load_drift_knowledge_base():
         
         # 5. Ollama LLM 설정
         llm = OllamaLLM(
-            model="joonoh/hyperclovax-seed-text-instruct-1.5b:latest",
+            model="huihui_ai/exaone3.5-abliterated:7.8b",
             temperature=0.7
         )
         
@@ -183,40 +183,56 @@ def generate_llm_drift_explanation(dataset_name: str) -> str:
     
     # 7. 개선된 프롬프트 템플릿 (4단계 구조)
     prompt_template = PromptTemplate(
-        input_variables=["dataset_name", "embedding_info", "pca_info", "metrics_info", "drift_summary", "context"],
+        input_variables=["dataset_name", "embedding_info", "drift_summary", "context"],
         template="""당신은 데이터 드리프트 분석 전문가입니다. 다음 정보를 바탕으로 4단계 구조화된 드리프트 분석 해설을 작성해주세요.
 
-데이터셋 정보:
-- 이름: {dataset_name}
-- 임베딩 정보: {embedding_info}
-- PCA 분석: {pca_info}
-- 메트릭 분석: {metrics_info}
+            데이터셋 정보:
+            - 이름: {dataset_name}
+            - 임베딩 정보: {embedding_info}
+            - 드리프트 분석 결과: {drift_summary}
 
-드리프트 분석 결과:
-{drift_summary}
+            참고 지식:
+            {context}
 
-참고 지식:
-{context}
+            아래와 같이 4단계 구조로 한국어로 작성해주세요:
 
-다음 4단계 구조로 한국어로 작성해주세요. 각 단계는 반드시 대괄호로 시작하세요:
+            [기술적 분석] 각 드리프트 메트릭의 수치적 의미와 임계값 대비 해석을 제시합니다. MMD, Wasserstein, KL Divergence 등의 점수를 구체적으로 분석하세요.
 
-[기술적 분석] 각 드리프트 메트릭의 수치적 의미와 임계값 대비 해석을 제시합니다. MMD, Wasserstein, KL Divergence 등의 점수를 구체적으로 분석하세요.
+            [현 상황 분석] 현재 드리프트 상황이 모델 성능과 서비스 안정성에 미칠 영향을 평가합니다. 재학습 필요성과 위험도를 판단하세요.
 
-[현 상황 분석] 현재 드리프트 상황이 모델 성능과 서비스 안정성에 미칠 영향을 평가합니다. 재학습 필요성과 위험도를 판단하세요.
+            [시각적 분석] PCA 시각화 결과와 연계하여 데이터 분포 변화를 해석합니다. 가능하다면 중심점 이동과 분포 겹침 정도를 언급하세요.
 
-[시각적 분석] PCA 시각화 결과와 연계하여 데이터 분포 변화를 해석합니다. 가능하다면 중심점 이동과 분포 겹침 정도를 언급하세요.
+            [권장사항] 즉시 조치사항과 모니터링 방안을 제시합니다. 구체적인 임계값과 실행 계획을 포함하세요.
 
-[권장사항] 즉시 조치사항과 모니터링 방안을 제시합니다. 구체적인 임계값과 실행 계획을 포함하세요.
-
-각 단계는 2-3문장으로 간결하게 작성하고, 전체 500자 내외로 제한하세요."""
+            각 단계는 반드시 대괄호로 시작하며, 2-3문장으로 간결하게 작성하고, 전체 500자 내외로 제한하세요.
+    """
     )
+    
+    # RAG Input Variables를 HTML로 포맷팅
+    input_variables_html = f"""
+    <div class="rag-input-variables" style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin: 20px 0;">
+        <h4 style="color: #495057; margin-bottom: 15px;">🔍 RAG 분석 입력 변수</h4>
+        
+        <div style="margin-bottom: 15px;">
+            <h5 style="color: #007bff; margin-bottom: 8px;">📊 Dataset Information</h5>
+            <pre style="background-color: white; padding: 10px; border-radius: 4px; border: 1px solid #dee2e6; margin: 0;">{dataset_name}</pre>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <h5 style="color: #28a745; margin-bottom: 8px;">🎯 Embedding Information</h5>
+            <pre style="background-color: white; padding: 10px; border-radius: 4px; border: 1px solid #dee2e6; margin: 0; max-height: 150px; overflow-y: auto;">{embedding_info_text}</pre>
+        </div>
+              
+        <div style="margin-bottom: 15px;">
+            <h5 style="color: #6f42c1; margin-bottom: 8px;">📋 Drift Summary</h5>
+            <pre style="background-color: white; padding: 10px; border-radius: 4px; border: 1px solid #dee2e6; margin: 0; max-height: 120px; overflow-y: auto;">{drift_summary}</pre>
+        </div>
+    </div>
+    """
     
     # 8. Ollama LLM 호출
     try:
         vectorstore, llm = load_drift_knowledge_base()
-        
-        if not llm:
-            return generate_fallback_explanation()
         
         # 프롬프트 생성
         formatted_prompt = prompt_template.format(
@@ -235,6 +251,7 @@ def generate_llm_drift_explanation(dataset_name: str) -> str:
         formatted_explanation = format_structured_explanation(explanation)
         
         return f"""
+        {input_variables_html}
         <div class="comment-box" style="background-color: #e8f5e8; border-left: 4px solid #28a745; padding: 20px; margin: 10px 0;">
             <h4 style="margin-top: 0; color: #28a745;">🤖 AI 데이터 드리프트 분석 해설</h4>
             <div style="line-height: 1.8; font-size: 14px;">
@@ -262,7 +279,6 @@ def format_structured_explanation(explanation: str) -> str:
     }
     
     # 대괄호로 시작하는 섹션 찾기
-    import re
     pattern = r'\[([^\]]+)\]\s*(.*?)(?=\[|$)'
     matches = re.findall(pattern, explanation, re.DOTALL)
     

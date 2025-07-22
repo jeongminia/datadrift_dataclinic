@@ -298,7 +298,7 @@ def generate_html_from_session(dataset_name=None):
 
 def render():
     # dataset_name을 session_state나 기본값에서 가져오기
-    dataset_name = st.session_state.get('dataset_name', 'Dataset')
+    dataset_name = st.session_state.get('dataset_name')
     
     # Milvus에서 메타데이터 확인
     metadata = get_metadata_from_milvus(dataset_name)

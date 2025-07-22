@@ -298,7 +298,7 @@ def insert_vectors(collection_name, vectors, set_type, class_labels, batch_size=
             [dummy_vector],
             [metadata["dataset_name"]],
             [metadata["summary_dict"]],
-            [metadata["data_previews"]],  # 🔥 추가
+            [metadata["data_previews"]], 
             [metadata["class_dist_path"]],
             [metadata["doc_len_path"]],
             [metadata["doc_len_table"]],
@@ -329,7 +329,7 @@ def insert_vectors(collection_name, vectors, set_type, class_labels, batch_size=
             batch_vectors,
             empty_metadata,  # dataset_name
             empty_metadata,  # summary_dict
-            empty_metadata,  # data_previews 🔥 추가
+            empty_metadata,  # data_previews
             empty_metadata,  # class_dist_path
             empty_metadata,  # doc_len_path
             empty_metadata,  # doc_len_table
