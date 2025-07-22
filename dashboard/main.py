@@ -110,37 +110,6 @@ TAB_CONFIG = {
     }
 }
 
-# DB/메타DB에서 dataset_name을 가져옴
-def load_dataset_name_from_db():
-    return "MyDataset"
-
-# DB에서 임베딩을 읽어옴
-def load_train_embeddings_from_db():
-    return None
-def load_test_embeddings_from_db():
-    return None
-
-# DB에서 드리프트 요약을 읽어옴
-def load_drift_score_summary_from_db():
-    return None
-
-# DB에서 드리프트 리포트 HTML을 읽어옴
-def load_drift_report_html_from_db():
-    return None
-
-def ensure_session_state():
-    """session_state에 필요한 값이 없으면 DB에서 불러와 저장"""
-    if 'dataset_name' not in st.session_state or not st.session_state['dataset_name']:
-        st.session_state['dataset_name'] = load_dataset_name_from_db()
-    if 'train_embeddings' not in st.session_state or st.session_state['train_embeddings'] is None:
-        st.session_state['train_embeddings'] = load_train_embeddings_from_db()
-    if 'test_embeddings' not in st.session_state or st.session_state['test_embeddings'] is None:
-        st.session_state['test_embeddings'] = load_test_embeddings_from_db()
-    if 'drift_score_summary' not in st.session_state or st.session_state['drift_score_summary'] is None:
-        st.session_state['drift_score_summary'] = load_drift_score_summary_from_db()
-    if 'train_test_drift_report_html' not in st.session_state or st.session_state['train_test_drift_report_html'] is None:
-        st.session_state['train_test_drift_report_html'] = load_drift_report_html_from_db()
-
 # 통합 리포트 렌더링 함수
 def render_report_view():
     """통합 리포트 특별 렌더링"""
@@ -150,8 +119,7 @@ def render_report_view():
         데이터베이스 정보와 드리프트 분석 결과를 통합한 전체 리포트를 생성합니다.
     </div>
     """, unsafe_allow_html=True)
-    ensure_session_state()  # 🚨 세션 값 보장
-
+    
     try:
         if modules.get('report_view') and hasattr(modules['report_view'], 'render_combined_report'):
             modules['report_view'].render_combined_report(

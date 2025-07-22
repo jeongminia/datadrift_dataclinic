@@ -4,7 +4,7 @@ import base64
 import pandas as pd
 import os
 from datetime import datetime
-from report_layout import check_drift_analysis_complete, generate_combined_html
+from report_layout import generate_combined_html
 import pdfkit
 
 def render_combined_report(database_export_report=None, drift_export_report=None):
@@ -15,7 +15,7 @@ def render_combined_report(database_export_report=None, drift_export_report=None
     has_database = bool(st.session_state.get('dataset_name')) and (train_embeddings is not None and hasattr(train_embeddings, 'size') and train_embeddings.size > 0)
     has_drift = bool(st.session_state.get('train_test_drift_report_html'))
 
-    dataset_name = st.session_state.get('dataset_name', 'Dataset')
+    dataset_name = st.session_state.get('dataset_name')
 
     # 상태 표시
     col1, col2 = st.columns(2)

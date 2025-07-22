@@ -57,12 +57,13 @@ def generate_html_from_session():
         html_parts.append("<hr><h2>Embedding Visualization after PCA</h2>")
         html_parts.append(f'<img src="data:image/png;base64,{img_base64}" width="800"/>')
     
+
     if 'drift_score_summary' in st.session_state:
         html_parts.append("<hr><h2>Quantitative Drift Scores</h2>")
         html_parts.append(f"<pre>{st.session_state['drift_score_summary']}</pre>")
         
         score_text = st.session_state['drift_score_summary']
-        dataset_name = st.session_state.get("dataset_name", "Dataset")
+        dataset_name = st.session_state.get("dataset_name")
         
         # RAG 기능 사용 시도, 실패시 기존 방식 사용
         if generate_llm_drift_explanation is not None:
@@ -130,7 +131,7 @@ def render():
         st.error("No dataset info found.")
         return
 
-    dataset_name = st.session_state.get('dataset_name', 'Dataset')
+    dataset_name = st.session_state.get('dataset_name')
 
     root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     reports_dir = os.path.join(root_dir, "reports")
