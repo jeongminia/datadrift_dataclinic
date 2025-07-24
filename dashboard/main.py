@@ -25,8 +25,6 @@ sys.path.append(os.path.join(current_dir, 'app_database'))
 sys.path.append(os.path.join(current_dir, 'app_database/pages'))
 sys.path.append(os.path.join(current_dir, 'app_drift'))
 sys.path.append(os.path.join(current_dir, 'app_drift/pages'))
-sys.path.append(os.path.join(current_dir, 'app_report'))
-sys.path.append(os.path.join(current_dir, 'app_report/pages'))
 
 # 모듈 로드 함수
 @st.cache_resource
@@ -62,21 +60,7 @@ def load_modules():
         except Exception as e:
             st.warning(f"⚠️ {module_key} 로드 실패: {e}")
             modules[module_key] = None
-
-    report_modules = [
-        ('load_results', 'app_report.pages.load_results'),
-        ('custom_llm', 'app_report.pages.custom_llm'),
-        ('report_view', 'app_report.pages.report_view'),
-    ]
-
-    for module_key, module_path in report_modules:
-        try:
-            modules[module_key] = __import__(module_path, fromlist=[''])
-        except Exception as e:
-            st.warning(f"⚠️ {module_key} 로드 실패: {e}")
-            modules[module_key] = None
     
-
     # Integrated report
     try:
         modules['report_view'] = __import__('report_view', fromlist=[''])
@@ -114,23 +98,14 @@ TAB_CONFIG = {
         ]
     },
     "drift": {
-        "title": "🔍 Drift Analysis",
-        "caption": "벡터 데이터베이스에서 임베딩을 불러와 드리프트를 감지합니다.",
-        "progress": ["**1️⃣ Load**", "**2️⃣ Visualize**", "**3️⃣ Detect**"],
+        "title": "🔍 Drift Analysis & Export",
+        "caption": "벡터 데이터베이스에서 임베딩을 불러와 드리프트를 감지하고 통합 리포트를 생성합니다",
+        "progress": ["**1️⃣ Load**", "**2️⃣ Visualize**", "**3️⃣ Detect**", "**4️⃣ Report**"],
         "pages": [
             {"title": "1️⃣ Load Embeddings", "module_key": "embedding_load", "name": "Load Embeddings"},
             {"title": "2️⃣ Embeddings Visualization", "module_key": "embedding_visualization", "name": "Embeddings Visualization"},
-            {"title": "3️⃣ Detect Drift", "module_key": "detect_datadrift", "name": "Detect Drift"}
-        ]
-    },
-    "export": {
-        "title": "📄 Export Report",
-        "caption": "데이터 분석 결과와 드리프트 탐지 결과를 기반으로 Custom LLM을 통하여 통합 리포트를 생성합니다",
-        "progress": ["**1️⃣ Load Results**", "**2️⃣ Build Custom LLM**", "**3️⃣ Generate Report**"],
-        "pages": [
-            {"title": "1️⃣ Load Results", "module_key": "load_results", "name": "Load Results"},
-            {"title": "2️⃣ Build Custom LLM", "module_key": "custom_llm", "name": "Custom LLM"},
-            {"title": "3️⃣ 📋 Generate Report", "module_key": "report_view", "name": "Integrated Report", "special": True}
+            {"title": "3️⃣ Detect Drift", "module_key": "detect_datadrift", "name": "Detect Drift"},
+            {"title": "4️⃣ 📋 통합 리포트 생성", "module_key": "report_view", "name": "Integrated Report", "special": True}
         ]
     }
 }
@@ -213,7 +188,7 @@ st.markdown(
 
 selected_tab = st.selectbox(
     "아래에서 원하는 작업을 선택하면, 해당 파이프라인 UI가 자동으로 바뀝니다.", 
-    ["📊 Database Pipeline", "🔍 Drift Analysis", "📄 Export Report"],
+    ["📊 Database Pipeline", "🔍 Drift Analysis & Export"],
     index=0
 )
 st.markdown("---")
@@ -221,10 +196,8 @@ st.markdown("---")
 # 선택된 탭에 따라 콘텐츠 렌더링
 if selected_tab == "📊 Database Pipeline":
     render_tab_content("database")
-elif selected_tab == "🔍 Drift Analysis":
+elif selected_tab == "🔍 Drift Analysis & Export":
     render_tab_content("drift")
-elif selected_tab == "📄 Export Report":
-    render_tab_content("export")
 
 st.markdown("---")
 st.markdown("""

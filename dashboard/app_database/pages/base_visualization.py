@@ -108,7 +108,7 @@ def render():
             else:
                 ax.set_title(f'{name} Set')
                 ax.text(0.5, 0.5, 'No class column found', ha='center', va='center')
-        save_path = os.path.join("reports", f"{dataset_name}_class_dist.png")
+        save_path = os.path.join("reports", f"class_dist.png")
         fig.savefig(save_path, bbox_inches="tight")
         st.session_state["class_dist_path"] = save_path
         st.pyplot(fig)
@@ -143,7 +143,7 @@ def render():
             ax.set_xlabel('Length')
             ax.set_ylabel('Frequency')
             ax.legend()
-    save_path = os.path.join("reports", f"{dataset_name}_doc_len.png")
+    save_path = os.path.join("reports", f"doc_len.png")
     fig.savefig(save_path, bbox_inches="tight")
     st.session_state["doc_len_path"] = save_path
     st.pyplot(fig)
@@ -198,7 +198,7 @@ def render():
         else:
             ax.axis("off")
             ax.set_title(f"{name} (No Text Column)")
-    save_path = os.path.join("reports", f"{dataset_name}_wordcloud.png")
+    save_path = os.path.join("reports", f"wordcloud.png")
     fig.savefig(save_path, bbox_inches="tight")
     st.session_state["wordcloud_path"] = save_path
     st.pyplot(fig)
