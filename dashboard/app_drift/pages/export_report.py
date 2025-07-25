@@ -11,7 +11,7 @@ try:
     import sys
     import os
     sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-    from build_RAG_docs import generate_llm_drift_explanation
+    from datadrift_dataclinic.dashboard.app_report.utills.build_RAG_docs import generate_llm_drift_explanation
 except ImportError:
     # Fallback for standalone execution
     import sys
@@ -21,7 +21,7 @@ except ImportError:
     # RAG 기능을 위해 build_RAG_docs.py에서 함수 import
     sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
     try:
-        from build_RAG_docs import generate_llm_drift_explanation
+        from datadrift_dataclinic.dashboard.app_report.utills.build_RAG_docs import generate_llm_drift_explanation
     except ImportError:
         generate_llm_drift_explanation = None
 

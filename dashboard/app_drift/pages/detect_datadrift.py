@@ -33,8 +33,6 @@ if not os.path.exists(HTML_SAVE_PATH):
 ## --------------- main --------------- ##
 def render():
     dataset_name = st.session_state.get('dataset_name')
-    st.title(f"Detect {dataset_name} DataDrift Page")
-    dataset_name = st.session_state.get('dataset_name')
     # st.title(f"Detect {dataset_name} DataDrift Page")
 
     if 'train_embeddings' not in st.session_state or 'valid_embeddings' not in st.session_state or 'test_embeddings' not in st.session_state:

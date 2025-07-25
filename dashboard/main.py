@@ -28,162 +28,218 @@ sys.path.append(os.path.join(current_dir, 'app_drift/pages'))
 sys.path.append(os.path.join(current_dir, 'app_report'))
 sys.path.append(os.path.join(current_dir, 'app_report/pages'))
 
-# 모듈 로드 함수
-@st.cache_resource
-def load_modules():
-    """모든 모듈을 한 번만 로드하고 캐시"""
-    modules = {}
-    
-    # Database 모듈들
-    db_modules = [
-        ('upload_data', 'app_database.pages.upload_data'),
-        ('data_load', 'app_database.pages.data_load'),
-        ('base_visualization', 'app_database.pages.base_visualization'),
-        ('vector_database', 'app_database.pages.vector_database'),
-    ]
-    
-    for module_key, module_path in db_modules:
-        try:
-            modules[module_key] = __import__(module_path, fromlist=[''])
-        except Exception as e:
-            st.warning(f"⚠️ {module_key} 로드 실패: {e}")
-            modules[module_key] = None
-    
-    # Drift 모듈들
-    drift_modules = [
-        ('embedding_load', 'app_drift.pages.embedding_load'),
-        ('embedding_visualization', 'app_drift.pages.embedding_visualization'),
-        ('detect_datadrift', 'app_drift.pages.detect_datadrift'),
-    ]
-    
-    for module_key, module_path in drift_modules:
-        try:
-            modules[module_key] = __import__(module_path, fromlist=[''])
-        except Exception as e:
-            st.warning(f"⚠️ {module_key} 로드 실패: {e}")
-            modules[module_key] = None
-
-    report_modules = [
-        ('load_results', 'app_report.pages.load_results'),
-        ('custom_llm', 'app_report.pages.custom_llm'),
-        ('report_view', 'app_report.pages.report_view'),
-    ]
-
-    for module_key, module_path in report_modules:
-        try:
-            modules[module_key] = __import__(module_path, fromlist=[''])
-        except Exception as e:
-            st.warning(f"⚠️ {module_key} 로드 실패: {e}")
-            modules[module_key] = None
-    
-
-    # Integrated report
-    try:
-        modules['report_view'] = __import__('report_view', fromlist=[''])
-    except Exception as e:
-        st.warning(f"⚠️ report_view 로드 실패: {e}")
-        modules['report_view'] = None
-    
-    return modules
-
-# 모듈 로드
-modules = load_modules()
-
-# 페이지 렌더링 함수
-def render_page(module, page_name):
-    """안전한 페이지 렌더링"""
-    try:
-        if module and hasattr(module, 'render'):
-            module.render()
-        else:
-            st.error(f"{page_name} 모듈을 불러올 수 없습니다.")
-    except Exception as e:
-        st.error(f"{page_name} 페이지 오류: {e}")
-
-# 탭 구성 정의
-TAB_CONFIG = {
+# 페이지 구성 정의 (사이드바 네비게이션용)
+PAGE_CONFIG = {
+    "home": {
+        "title": "🏠 Home"
+    },
     "database": {
-        "title": "📊 Database Pipeline",
-        "caption": "텍스트 데이터를 업로드하여 벡터 데이터베이스(Milvus)에 저장하고 분석합니다.",
-        "progress": ["**1️⃣ Upload**", "**2️⃣ Load**", "**3️⃣ Visualize**", "**4️⃣ Store**"],
-        "pages": [
-            {"title": "1️⃣ Upload Data", "module_key": "upload_data", "name": "Upload Data"},
-            {"title": "2️⃣ Load Data", "module_key": "data_load", "name": "Load Data"},
-            {"title": "3️⃣ Visualization", "module_key": "base_visualization", "name": "Visualization"},
-            {"title": "4️⃣ Vector Database", "module_key": "vector_database", "name": "Vector Database"}
-        ]
+        "title": "📊 Database Pipeline"
     },
     "drift": {
-        "title": "🔍 Drift Analysis",
-        "caption": "벡터 데이터베이스에서 임베딩을 불러와 드리프트를 감지합니다.",
-        "progress": ["**1️⃣ Load**", "**2️⃣ Visualize**", "**3️⃣ Detect**"],
-        "pages": [
-            {"title": "1️⃣ Load Embeddings", "module_key": "embedding_load", "name": "Load Embeddings"},
-            {"title": "2️⃣ Embeddings Visualization", "module_key": "embedding_visualization", "name": "Embeddings Visualization"},
-            {"title": "3️⃣ Detect Drift", "module_key": "detect_datadrift", "name": "Detect Drift"}
-        ]
+        "title": "🔍 Drift Analysis"
     },
     "export": {
-        "title": "📄 Export Report",
-        "caption": "데이터 분석 결과와 드리프트 탐지 결과를 기반으로 Custom LLM을 통하여 통합 리포트를 생성합니다",
-        "progress": ["**1️⃣ Load Results**", "**2️⃣ Build Custom LLM**", "**3️⃣ Generate Report**"],
-        "pages": [
-            {"title": "1️⃣ Load Results", "module_key": "load_results", "name": "Load Results"},
-            {"title": "2️⃣ Build Custom LLM", "module_key": "custom_llm", "name": "Custom LLM"},
-            {"title": "3️⃣ 📋 Generate Report", "module_key": "report_view", "name": "Integrated Report", "special": True}
-        ]
+        "title": "📄 Export Report"
     }
 }
 
-# 통합 리포트 렌더링 함수
-def render_report_view():
-    """통합 리포트 특별 렌더링"""
-    st.markdown("""
-    <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; border-left: 4px solid #3498db; margin-bottom: 20px;">
-        <strong>💡 Complete Analysis Report</strong><br>
-        데이터베이스 정보와 드리프트 분석 결과를 통합한 전체 리포트를 생성합니다.
-    </div>
-    """, unsafe_allow_html=True)
-    
-    try:
-        if modules.get('report_view') and hasattr(modules['report_view'], 'render_combined_report'):
-            modules['report_view'].render_combined_report(
-                modules.get('database_export_report'), 
-                modules.get('drift_export_report')
-            )
-        else:
-            st.error("통합 리포트 모듈을 불러올 수 없습니다.")
-    except Exception as e:
-        st.error(f"통합 리포트 생성 중 오류 발생: {e}")
-
-# 탭 렌더링 함수
-def render_tab_content(tab_key):
-    """효율적인 탭 콘텐츠 렌더링"""
-    config = TAB_CONFIG[tab_key]
-    
-    # 헤더 및 설명
-    st.header(config["title"])
-    st.caption(config["caption"])
-    
-    # 진행 상태 표시
-    progress_cols = st.columns(len(config["progress"]))
-    for i, progress_text in enumerate(config["progress"]):
-        with progress_cols[i]:
-            st.markdown(progress_text)
-    
-    # 페이지들 렌더링
-    for page in config["pages"]:
+def render_sidebar():
+    """사이드바 네비게이션 렌더링"""
+    with st.sidebar:
+        st.title("📋 Navigation")
         st.markdown("---")
-        st.subheader(page["title"])
         
-        if page.get("special"):
-            render_report_view()
-        else:
-            render_page(modules.get(page["module_key"]), page["name"])
+        # 메인 페이지 선택
+        main_pages = list(PAGE_CONFIG.keys())
+        selected_main = st.selectbox(
+            "Select Category",
+            main_pages,
+            index=0,
+            format_func=lambda x: PAGE_CONFIG[x]["title"]
+        )
+            
+        st.markdown("---")
+        
+        # 진행 상황 표시
+        st.markdown("### 🚀 Progress Tracker")
+        
+        # 세션 상태 확인
+        database_complete = st.session_state.get('database_processed', False)
+        drift_complete = st.session_state.get('drift_analysis_complete', False)
+        report_complete = st.session_state.get('report_generated', False)
+        
+        # 진행 상황 시각화
+        progress_items = [
+            ("Database Setup", database_complete),
+            ("Drift Analysis", drift_complete),
+            ("Report Export", report_complete)
+        ]
+        
+        for item, complete in progress_items:
+            if complete:
+                st.success(f"✅ {item}")
+            else:
+                st.info(f"⏳ {item}")
+                
+        return selected_main
+
+def render_selected_page(main_page):
+    """선택된 페이지 렌더링"""
+    try:
+        if main_page == "home":
+            render_home_page()
+        elif main_page == "database":
+            render_database_page()
+        elif main_page == "drift":
+            render_drift_page()
+        elif main_page == "export":
+            render_export_page()
+    except ImportError as e:
+        st.error(f"모듈을 불러올 수 없습니다: {e}")
+        st.info("해당 기능은 아직 구현되지 않았습니다.")
+    except Exception as e:
+        st.error(f"페이지 렌더링 중 오류가 발생했습니다: {e}")
+
+def render_database_page():
+    """데이터베이스 파이프라인 페이지"""
+    st.markdown("## 📊 Database Pipeline")
+    st.markdown("데이터 업로드부터 벡터 데이터베이스 저장까지의 전체 과정")
+    
+    # 단계별 진행
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("### 📤 Data Upload")
+        try:
+            from app_database.pages.upload_data import render
+            render()
+        except ImportError:
+            st.info("Upload 모듈을 불러올 수 없습니다.")
+    
+    with col2:
+        st.markdown("### ⚙️ Data Processing")
+        try:
+            from app_database.pages.data_load import render
+            render()
+        except ImportError:
+            st.info("Processing 모듈을 불러올 수 없습니다.")
+
+def render_drift_page():
+    """드리프트 분석 페이지"""
+    st.markdown("## 🔍 Drift Analysis")
+    st.markdown("임베딩 로드부터 드리프트 탐지 및 AI 인사이트까지")
+    
+    # 탭으로 구성
+    tab1, tab2, tab3 = st.tabs(["⚙️ Configuration", "📊 Analysis", "🤖 LLM Insights"])
+    
+    with tab1:
+        try:
+            from app_drift.pages.embedding_load import render
+            render()
+        except ImportError:
+            st.info("Configuration 모듈을 불러올 수 없습니다.")
+    
+    with tab2:
+        try:
+            from app_drift.pages.detect_datadrift import render
+            render()
+        except ImportError:
+            st.info("Analysis 모듈을 불러올 수 없습니다.")
+    
+    with tab3:
+        try:
+            from app_report.pages.build_llm import render
+            render()
+        except ImportError:
+            st.info("LLM 모듈을 불러올 수 없습니다.")
+
+def render_export_page():
+    """리포트 내보내기 페이지"""
+    st.markdown("## 📄 Export Report")
+    st.markdown("분석 결과 조회 및 통합 보고서 생성")
+    
+    # 두 개 섹션으로 구성
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("### 📋 View Reports")
+        try:
+            from app_report.pages.load_results import render
+            render()
+        except ImportError:
+            st.info("Reports 모듈을 불러올 수 없습니다.")
+    
+    with col2:
+        st.markdown("### 🔄 Generate Report")
+        try:
+            from app_report.pages.generate_report import render
+            render()
+        except ImportError:
+            st.info("Generate 모듈을 불러올 수 없습니다.")
+
+def render_home_page():
+    """홈 페이지 렌더링"""
+    st.markdown(
+        """
+        <div style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+                    padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+            <h3 style="color: white; text-align: center; margin: 0;">Welcome to Data Drift Analysis System</h3>
+            <div style="color: white; text-align: center; margin-top: 10px;">
+                📊 <b>Database Pipeline</b> → 🔍 <b>Drift Analysis</b> → 📄 <b>Export Report</b>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("""
+        ### 📊 Database Pipeline
+        - **Upload**: 데이터셋 업로드 및 검증
+        - **Processing**: 데이터 전처리 및 준비
+        """)
+        
+    with col2:
+        st.markdown("""
+        ### 🔍 Drift Analysis
+        - **Config**: 드리프트 분석 설정
+        - **Analysis**: 드리프트 탐지 실행
+        - **LLM**: AI 기반 인사이트 생성
+        """)
+        
+    with col3:
+        st.markdown("""
+        ### 📄 Export Report
+        - **Reports**: 생성된 보고서 조회
+        - **Generate**: 통합 보고서 생성
+        """)
+    
+    st.markdown("---")
+    
+    # 시작하기 가이드
+    st.markdown("### 🚀 시작하기")
+    st.info("""
+    1. **왼쪽 사이드바**에서 원하는 기능을 선택하세요
+    2. **Database Pipeline**부터 시작하여 순차적으로 진행하는 것을 권장합니다
+    3. **Progress Tracker**에서 현재 진행 상황을 확인할 수 있습니다
+    """)
+    
+    # 최근 활동 표시
+    if st.session_state.get('recent_activity'):
+        st.markdown("### 📈 Recent Activity")
+        for activity in st.session_state.recent_activity[-3:]:  # 최근 3개 활동
+            st.success(activity)
 
 # set_page_config 복원
 st.set_page_config = original_set_page_config
 
+# 사이드바 네비게이션 렌더링
+main_page = render_sidebar()
+
+# 메인 헤더
 st.markdown(
     '''
     <div style="width:100%; display:flex; justify-content:center; align-items:center; margin-bottom:10px; margin-top:10px;">
@@ -198,33 +254,9 @@ st.markdown(
 st.title("🔄 통합 데이터 드리프트 분석 시스템")
 st.caption("해당 연구는 '분석 모델의 성능저하 극복을 위한 데이터 드리프트 관리 기술 개발'로 2025년 정부(과학기술정보통신부)의 재원으로 정보통신기획평가원의 지원을 받아 수행되었습니다.")
 st.markdown("---")
-st.markdown(
-    """
-    <div style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-                padding: 20px; border-radius: 10px; margin-bottom: 30px;">
-        <h3 style="color: white; text-align: center; margin: 0;"> Select a Task to Start Your Analysis </h3>
-        <div style="color: white; text-align: center; margin-top: 10px;">
-            📊 <b>Database Pipeline</b> → 🔍 <b>Drift Analysis</b> → 📋 <b>Integrated Report</b>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
 
-selected_tab = st.selectbox(
-    "아래에서 원하는 작업을 선택하면, 해당 파이프라인 UI가 자동으로 바뀝니다.", 
-    ["📊 Database Pipeline", "🔍 Drift Analysis", "📄 Export Report"],
-    index=0
-)
-st.markdown("---")
-
-# 선택된 탭에 따라 콘텐츠 렌더링
-if selected_tab == "📊 Database Pipeline":
-    render_tab_content("database")
-elif selected_tab == "🔍 Drift Analysis":
-    render_tab_content("drift")
-elif selected_tab == "📄 Export Report":
-    render_tab_content("export")
+# 선택된 페이지 렌더링
+render_selected_page(main_page)
 
 st.markdown("---")
 st.markdown("""
