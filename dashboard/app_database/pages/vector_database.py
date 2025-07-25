@@ -382,7 +382,6 @@ def render():
         return
 
     # 데이터 임베딩 및 저장
-    st.subheader("Data Embedding")
     text_col, class_col = split_columns(train_df)
     
     if not text_col or not class_col:

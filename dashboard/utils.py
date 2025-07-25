@@ -3,7 +3,7 @@ import streamlit as st
 import base64
 import os
 from datetime import datetime
-from build_RAG_docs import generate_llm_drift_explanation
+from datadrift_dataclinic.dashboard.app_report.utills.build_RAG_docs import generate_llm_drift_explanation
 
 # ========== HTML 관련 유틸리티 ==========
 def get_html_body(html):

@@ -51,14 +51,16 @@ def get_collection_metadata(collection_name):
     results = collection.query(expr="id >= 0", output_fields=valid_meta_fields, limit=1)
     return results[0] if results else {}
 
-def render():
-    st.title("Load Embeddings from VectorDB")
+# ----------------- main ------------------
 
+def render():
     collection_names = get_collection_names()
     collection_name = st.selectbox("Select the collection name", options=collection_names)
 
     if collection_name:
         meta = get_collection_metadata(collection_name)
+        st.session_state['dataset_name'] = meta.get('dataset_name')
+        
         if meta:
             # Summary 포맷팅
             summary = meta.get('summary_dict', 'N/A')
@@ -77,8 +79,8 @@ def render():
                     ts_str = str(ts)
             else:
                 ts_str = str(ts)
-
-            st.markdown("#### ℹ️ **Collection Info**")
+            
+            st.subheader(f"Collection Info")
             st.markdown(
                 f"""
                 <div style="background-color:#23272f;padding:18px 20px 18px 20px;border-radius:12px;border:1.5px solid #3a3f4b; margin-bottom:16px;">
