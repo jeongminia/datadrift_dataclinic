@@ -100,10 +100,10 @@ def render():
     visual_report = Report(metrics=[EmbeddingsDriftMetric('all_dimensions', drift_method=selected_method)])
     visual_report.run(reference_data=reference_df, current_data=current_df, column_mapping=column_mapping)
 
-    html_path = os.path.join(HTML_SAVE_PATH, f"{dataset_name}_train_test_drift_report.html")
+    html_path = os.path.join(HTML_SAVE_PATH, f"{dataset_name}_drift_report.html")
     visual_report.save_html(html_path)
     with open(html_path, "r") as f:
-        st.session_state['train_test_drift_report_html'] = f.read()
+        st.session_state['drift_report_html'] = f.read()
 
     # 모든 방법에 대한 드리프트 점수 요약 저장
     drift_summary = []
@@ -122,5 +122,5 @@ def render():
     st.session_state['drift_score_summary'] = summary_text
 
     # Streamlit 내 HTML 시각화
-    components.html(st.session_state['train_test_drift_report_html'], height=800, scrolling=True)
+    components.html(st.session_state['drift_report_html'], height=800, scrolling=True)
     st.success("✅ Drift report & all scores saved in session_state.")

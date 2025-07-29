@@ -3,7 +3,6 @@ import streamlit as st
 import base64
 import os
 from datetime import datetime
-from datadrift_dataclinic.dashboard.app_report.utills.build_RAG_docs import generate_llm_drift_explanation
 
 # ========== HTML 관련 유틸리티 ==========
 def get_html_body(html):
@@ -51,7 +50,7 @@ def check_drift_analysis_complete():
     """드리프트 분석 완료 여부 확인"""
     required_keys = [
         'train_embeddings', 'test_embeddings', 
-        'drift_score_summary', 'train_test_drift_report_html'
+        'drift_score_summary', 'drift_report_html'
     ]
     return all(key in st.session_state for key in required_keys)
 
