@@ -4,7 +4,7 @@ import base64
 import pandas as pd
 import os
 from datetime import datetime
-from datadrift_dataclinic.dashboard.app_report.utills.report_layout import generate_combined_html
+from ..assets.report_layout import generate_combined_html
 import pdfkit
 
 def render_combined_report(database_export_report=None, drift_export_report=None):

@@ -18,7 +18,7 @@ def get_available_datasets():
         # drift_report.html 파일에서 데이터셋 이름 추출
         drift_files = glob.glob(f"{reports_path}/*drift_report.html")
         for file in drift_files:
-            name = os.path.basename(file).replace("_train_test_drift_report.html", "")
+            name = os.path.basename(file).replace("_drift_report.html", "")
             if name and name != "None":  # None 값 제외
                 datasets.add(name)
         
@@ -38,7 +38,7 @@ def check_drift_results(dataset_name):
     """특정 데이터셋의 Drift Analysis 결과 확인"""
     reports_path = "reports"
     if os.path.exists(reports_path):
-        drift_file = f"{reports_path}/{dataset_name}_train_test_drift_report.html"
+        drift_file = f"{reports_path}/{dataset_name}_drift_report.html"
         return os.path.exists(drift_file)
     return False
 
@@ -49,7 +49,7 @@ def load_html_result(result_type, dataset_name):
     if result_type == "visualization":
         file_pattern = f"{reports_path}/{dataset_name}_visualization.html"
     elif result_type == "drift_report":
-        file_pattern = f"{reports_path}/{dataset_name}_train_test_drift_report.html"
+        file_pattern = f"{reports_path}/{dataset_name}_drift_report.html"
     else:
         return None
     
@@ -92,19 +92,19 @@ def render():
             status = "✅ 완료됨" if has_drift else "⏳ 대기중"
             st.write(f"**🔍 Drift Analysis:** {status}")
         
-        
-        # 둘 다 완료되지 않았으면 경고
-        if not has_database or not has_drift:
-            st.warning(f"⚠️ **{selected_dataset}** 데이터셋에 대한 Database Pipeline과 Drift Analysis를 먼저 실행해주세요.")
-            return
-        
-        # HTML 결과 로드
-        db_html = load_html_result("visualization", selected_dataset)
-        drift_html = load_html_result("drift_report", selected_dataset)
-        
-        # 세션에 저장
-        st.session_state.selected_dataset = selected_dataset
-        st.session_state.database_html = db_html
-        st.session_state.drift_html = drift_html
-        
-        st.success(f"✅ **{selected_dataset}** 데이터셋 결과를 로드했습니다.")
+        # 로드 버튼 추가
+        if st.button("📥 결과 데이터 로드", key="load_results_button"):
+            
+            if not has_database or not has_drift:
+                st.error(f"⚠️ **{selected_dataset}** 데이터셋에 대한 Database Pipeline과 Drift Analysis를 먼저 실행해주세요.")
+                return
+            else:
+                # HTML 결과 로드
+                db_html = load_html_result("visualization", selected_dataset)
+                drift_html = load_html_result("drift_report", selected_dataset)
+                
+                # 세션에 저장
+                st.session_state.selected_dataset = selected_dataset
+                st.session_state.database_html = db_html
+                st.session_state.drift_html = drift_html
+                st.success(f"✅ **{selected_dataset}** 데이터셋 결과를 로드했습니다.")
