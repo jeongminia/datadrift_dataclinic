@@ -32,3 +32,4 @@ openai
 # for pdf generation
 pdfkit
 wkhtmltopdf 
+beautifulsoup4

@@ -34,7 +34,15 @@ def create_collection(collection_name):
             FieldSchema(name="doc_len_path", dtype=DataType.VARCHAR, max_length=500),
             FieldSchema(name="doc_len_table", dtype=DataType.VARCHAR, max_length=2000),
             FieldSchema(name="wordcloud_path", dtype=DataType.VARCHAR, max_length=500),
-            FieldSchema(name="timestamp", dtype=DataType.INT64)
+            FieldSchema(name="timestamp", dtype=DataType.INT64),
+            # 데이터 드리프트 필드
+            FieldSchema(name="dimension", dtype=DataType.FLOAT),
+            FieldSchema(name="embedding_size", dtype=DataType.VARCHAR, max_length=5000),
+            FieldSchema(name="original_distance_path", dtype=DataType.VARCHAR, max_length=500),
+            FieldSchema(name="PCA_distance_path", dtype=DataType.VARCHAR, max_length=500),
+            FieldSchema(name="PCA_visualization_path", dtype=DataType.VARCHAR, max_length=500),
+            FieldSchema(name="drift_score_summary", dtype=DataType.VARCHAR, max_length=10000),
+
         ]
         schema = CollectionSchema(fields=fields, description="Text Embeddings with Metadata")
         collection = Collection(name=collection_name, schema=schema)
@@ -82,95 +90,66 @@ def make_json_serializable(obj):
 
 def prepare_metadata():
     """세션 스테이트에서 메타데이터를 안전하게 추출하고 직렬화"""
-    try:
-        # 메타데이터 추출
-        summary_dict = st.session_state.get("dataset_summary", {})
-        class_dist_path = st.session_state.get("class_dist_path", "")
-        doc_len_path = st.session_state.get("doc_len_path", "")
-        doc_len_table = st.session_state.get("doc_len_table", "")
-        wordcloud_path = st.session_state.get("wordcloud_path", "")
-        dataset_name = st.session_state.get("dataset_name", "")
+
+    summary_dict = st.session_state.get("dataset_summary", {})
+    class_dist_path = st.session_state.get("class_dist_path", "")
+    doc_len_path = st.session_state.get("doc_len_path", "")
+    doc_len_table = st.session_state.get("doc_len_table", "")
+    wordcloud_path = st.session_state.get("wordcloud_path", "")
+    dataset_name = st.session_state.get("dataset_name", "")
         
-        train_df, valid_df, test_df = get_data_from_session()
-        data_previews = {}
+    train_df, valid_df, test_df = get_data_from_session()
+    data_previews = {}
         
-        if train_df is not None and len(train_df) > 0:
+    if train_df is not None and len(train_df) > 0:
             # 상위 10개 행만 저장 + 전체 shape 정보
-            preview_data = train_df.head(5).to_dict('records')
-            data_previews["train"] = {
-                "data": preview_data,
-                "total_rows": len(train_df),
-                "columns": list(train_df.columns)
-            }
+        preview_data = train_df.head(5).to_dict('records')
+        data_previews["train"] = {"data": preview_data,
+                                "total_rows": len(train_df),
+                                "columns": list(train_df.columns)
+                                }
         
-        if valid_df is not None and len(valid_df) > 0:
-            preview_data = valid_df.head(5).to_dict('records')
-            data_previews["valid"] = {
-                "data": preview_data,
-                "total_rows": len(valid_df),
-                "columns": list(valid_df.columns)
-            }
+    if valid_df is not None and len(valid_df) > 0:
+        preview_data = valid_df.head(5).to_dict('records')
+        data_previews["valid"] = {"data": preview_data,
+                                "total_rows": len(train_df),
+                                "columns": list(train_df.columns)
+                                }
             
-        if test_df is not None and len(test_df) > 0:
-            preview_data = test_df.head(5).to_dict('records')
-            data_previews["test"] = {
-                "data": preview_data,
-                "total_rows": len(test_df),
-                "columns": list(test_df.columns)
-            }
-        
-        # 경로들을 절대경로로 변환
-        paths = {
-            "class_dist_path": os.path.abspath(class_dist_path) if class_dist_path else "",
+    if test_df is not None and len(test_df) > 0:
+        preview_data = test_df.head(5).to_dict('records')
+        data_previews["test"] = {"data": preview_data,
+                                "total_rows": len(train_df),
+                                "columns": list(train_df.columns)
+                                }
+
+    paths = {"class_dist_path": os.path.abspath(class_dist_path) if class_dist_path else "",
             "doc_len_path": os.path.abspath(doc_len_path) if doc_len_path else "",
             "wordcloud_path": os.path.abspath(wordcloud_path) if wordcloud_path else ""
-        }
+            }
         
-        # 안전한 JSON 직렬화
-        summary_dict_json = ""
-        doc_len_table_json = ""
-        data_previews_json = ""
+    # 안전한 JSON 직렬화
+    summary_dict_json = ""
+    doc_len_table_json = ""
+    data_previews_json = ""
         
-        if summary_dict:
-            try:
-                summary_dict_json = json.dumps(make_json_serializable(summary_dict))
-            except Exception:
-                summary_dict_json = ""
+    if summary_dict:
+        summary_dict_json = json.dumps(make_json_serializable(summary_dict))
         
-        if doc_len_table:
-            try:
-                doc_len_table_json = json.dumps(make_json_serializable(doc_len_table))
-            except Exception:
-                doc_len_table_json = ""
+    if doc_len_table:
+        doc_len_table_json = json.dumps(make_json_serializable(doc_len_table))
         
-        # 🔥 데이터 미리보기 JSON 직렬화 (작은 용량)
-        if data_previews:
-            try:
-                data_previews_json = json.dumps(make_json_serializable(data_previews))
-            except Exception:
-                data_previews_json = ""
+    if data_previews:
+        data_previews_json = json.dumps(make_json_serializable(data_previews))
         
-        return {
+    return {
             "dataset_name": dataset_name,
             "summary_dict": summary_dict_json,
-            "data_previews": data_previews_json,  # 🔥 추가
+            "data_previews": data_previews_json,
             "class_dist_path": paths["class_dist_path"],
             "doc_len_path": paths["doc_len_path"],
             "doc_len_table": doc_len_table_json,
             "wordcloud_path": paths["wordcloud_path"],
-            "timestamp": int(time.time())
-        }
-        
-    except Exception as e:
-        st.error(f"메타데이터 준비 중 오류: {e}")
-        return {
-            "dataset_name": st.session_state.get("dataset_name", ""),
-            "summary_dict": "",
-            "data_previews": "",  # 🔥 추가
-            "class_dist_path": "",
-            "doc_len_path": "",
-            "doc_len_table": "",
-            "wordcloud_path": "",
             "timestamp": int(time.time())
         }
 
@@ -202,7 +181,7 @@ def save_metadata_to_vectordb(collection_name):
             [dummy_vector],
             [metadata["dataset_name"]],
             [metadata["summary_dict"]],
-            [metadata["data_previews"]],  # 🔥 추가
+            [metadata["data_previews"]],
             [metadata["class_dist_path"]],
             [metadata["doc_len_path"]],
             [metadata["doc_len_table"]],
@@ -303,11 +282,21 @@ def insert_vectors(collection_name, vectors, set_type, class_labels, batch_size=
             [metadata["doc_len_path"]],
             [metadata["doc_len_table"]],
             [metadata["wordcloud_path"]],
-            [metadata["timestamp"]]
+            [metadata["timestamp"]],
+            # Drift 관련 필드들을 빈 값으로 초기화
+            [0.0],  # dimension
+            [""],   # embedding_size
+            [""],   # original_distance_path
+            [""],   # PCA_distance_path
+            [""],   # PCA_visualization_path
+            [""],   # drift_score_summary
         ]
         
         fields = ["set_type", "class", "vector", "dataset_name", "summary_dict", 
-                 "data_previews", "class_dist_path", "doc_len_path", "doc_len_table", "wordcloud_path", "timestamp"]
+                 "data_previews", "class_dist_path", "doc_len_path", "doc_len_table", "wordcloud_path", "timestamp",
+                 # Drift 관련 필드들 추가
+                 "dimension", "embedding_size", "original_distance_path", 
+                 "PCA_distance_path", "PCA_visualization_path", "drift_score_summary"]
         
         metadata_ids = collection.insert(metadata_data, fields=fields)
         ids.append(metadata_ids)
@@ -322,6 +311,7 @@ def insert_vectors(collection_name, vectors, set_type, class_labels, batch_size=
         # 메타데이터 필드들은 빈 값으로 설정
         empty_metadata = [""] * len(batch_vectors)
         zero_timestamp = [0] * len(batch_vectors)
+        zero_dimension = [0.0] * len(batch_vectors)  # Drift 필드용
         
         data = [
             batch_set_type,
@@ -334,11 +324,21 @@ def insert_vectors(collection_name, vectors, set_type, class_labels, batch_size=
             empty_metadata,  # doc_len_path
             empty_metadata,  # doc_len_table
             empty_metadata,  # wordcloud_path
-            zero_timestamp   # timestamp
+            zero_timestamp,  # timestamp
+            # Drift 관련 필드들을 빈 값으로 초기화
+            zero_dimension,  # dimension
+            empty_metadata,  # embedding_size
+            empty_metadata,  # original_distance_path
+            empty_metadata,  # PCA_distance_path
+            empty_metadata,  # PCA_visualization_path
+            empty_metadata,  # drift_score_summary
         ]
         
         fields = ["set_type", "class", "vector", "dataset_name", "summary_dict", 
-                 "data_previews", "class_dist_path", "doc_len_path", "doc_len_table", "wordcloud_path", "timestamp"]
+                 "data_previews", "class_dist_path", "doc_len_path", "doc_len_table", "wordcloud_path", "timestamp",
+                 # Drift 관련 필드들 추가
+                 "dimension", "embedding_size", "original_distance_path", 
+                 "PCA_distance_path", "PCA_visualization_path", "drift_score_summary"]
         
         batch_ids = collection.insert(data, fields=fields)
         ids.append(batch_ids)
