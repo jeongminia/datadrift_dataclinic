@@ -74,17 +74,23 @@ PAGE_CONFIG = {
 
 def render_sidebar():
     with st.sidebar:
-        st.title("📋 Navigation")
+        st.title("Navigation")
         st.markdown("---")
-        st.markdown("### Select Pages")
-        # 메인 페이지 선택
+        st.markdown("### Select Pages", help="원하는 페이지를 선택하세요.")
+
         main_pages = list(PAGE_CONFIG.keys())
-        selected_main = st.selectbox(
-            " ",
-            main_pages,
-            index=0,
-            format_func=lambda x: PAGE_CONFIG[x]["title"]
-        )
+        selected_main = None
+        
+        for page in main_pages:
+            if st.button(
+                PAGE_CONFIG[page]["title"], 
+                key=f"nav_{page}",
+                use_container_width=True
+            ):
+                st.session_state.selected_page = page
+
+        # 세션 상태에서 현재 선택된 페이지 가져오기
+        selected_main = st.session_state.get('selected_page', main_pages[0])
             
         st.markdown("---")
         st.markdown("### Milvus Tracker", 

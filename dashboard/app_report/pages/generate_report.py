@@ -1,11 +1,56 @@
-import streamlit as st
-import base64
-import pandas as pd
 import os
-from datetime import datetime
+import re
 import pdfkit
-from app_report.assets.report_layout import integrated_report
+import pandas as pd
+from bs4 import BeautifulSoup
+import streamlit as st
+from datetime import datetime
+from ..assets.make_html import database_html, drift_html # report_database
+from ..assets.design_html import head_footer_html # report_html
+#from ..assets.llm_report import llm_html # report_llm
 
+# ------------------------------------- HTML 관련 유틸리티 -------------------------------------
+def get_html_body(html):
+    # HTML에서 <body> 태그만 추출하고 h1 태그 제거
+    if not html:
+        return ''
+    if BeautifulSoup:
+        soup = BeautifulSoup(html, "html.parser")
+        body = soup.find('body')
+        if body:
+            for h1 in body.find_all('h1'):
+                h1.decompose()
+            return str(body)
+        else:
+            return str(soup)
+    else:
+        return re.sub(r'<h1[^>]*>.*?</h1>', '', html, flags=re.DOTALL)
+
+def get_cached_html(cache_key, generator_func, *args, **kwargs):
+    # 캐시된 HTML 가져오기 또는 생성하기
+    if cache_key in st.session_state:
+        return st.session_state[cache_key]
+    
+    html = generator_func(*args, **kwargs)
+    body = get_html_body(html)
+    st.session_state[cache_key] = body
+    return body
+
+# ----------------------------------- integrate ----------------------------------
+def final_report(dataset_name): 
+    # 통합 리포트 생성
+    db_cache_key = f"db_html_{dataset_name}"
+    drift_cache_key = f"drift_html_{dataset_name}" 
+    llm_cache_key = f"llm_html_{dataset_name}"
+
+    database_content = get_cached_html(db_cache_key, database_html, dataset_name)    
+    drift_content = get_cached_html(drift_cache_key, drift_html, dataset_name)
+    #llm_content = get_cached_html(llm_cache_key, llm_html, dataset_name)
+    llm_content = "<p>LLM content is not available.</p>" 
+    
+    return head_footer_html(dataset_name, database_content, drift_content, llm_content)
+
+# ------------------------------------- main -------------------------------------
 def render():
     """통합 리포트 생성 페이지"""
     st.markdown("""
@@ -41,9 +86,20 @@ def render():
     
     st.success(f"📊 선택된 데이터셋: **{selected_dataset}**")
     st.success(f"🤖 AI 모델: **{st.session_state.get('model_name', 'N/A')}**")
-    
-    # 리포트 생성
-    html_content = integrated_report()
+
+    dataset_name = st.session_state.get('dataset_name')
+
+    db_html = st.session_state.database_html
+    drift_html = st.session_state.drift_html
+
+    selected_model = st.session_state.get('selected_model')
+    temperature = st.session_state.get('model_temperature')
+    max_tokens = st.session_state.get('max_tokens')
+    top_p = st.session_state.get('top_p')
+    custom_prompt = st.session_state.get('custom_prompt')
+
+
+    html_content = final_report(dataset_name)
 
     pdf_bytes = pdfkit.from_string(html_content, False, options={
         'page-size': 'A4',
@@ -54,21 +110,6 @@ def render():
         'encoding': "UTF-8",
         'enable-local-file-access': ''
     })
-
-    dataset_name = st.session_state.get('dataset_name')
-    db_html = st.session_state.database_html
-    drift_html = st.session_state.drift_html
-
-    selected_model = st.session_state.get('selected_model')
-    temperature = st.session_state.get('model_temperature')
-    max_tokens = st.session_state.get('max_tokens')
-    top_p = st.session_state.get('top_p')
-    custom_prompt = st.session_state.get('custom_prompt')
-    '''
-    1. LLM 설정에 집어넣은 후, 호출해 답변을 임시 저장하기
-    2. HTML 두가지 가져오기
-    3. 세가지 병합하여 리포트 반환하기
-    '''
 
     st.download_button(
         label="📄 PDF 다운로드",
