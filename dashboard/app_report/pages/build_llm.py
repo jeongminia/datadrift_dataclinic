@@ -1,7 +1,7 @@
 import streamlit as st
 import subprocess
 import json
-from langchain_ollama import OllamaLLM
+from langchain_community.llms import Ollama
 
 # --------------------- Ollama base LLM 설정 - llm ---------------------
 def get_model():
@@ -9,7 +9,7 @@ def get_model():
         return None
     
     try:
-        llm = OllamaLLM(
+        llm = Ollama(
             model=st.session_state.get('model_name'),
             temperature=st.session_state.get('model_temperature', 0.7)
         )
@@ -199,7 +199,7 @@ def render():
             
         try:    
             # LLM 객체 생성 및 테스트
-            llm = OllamaLLM(
+            llm = Ollama(
                 model=selected_model,
                 temperature=temperature
             )

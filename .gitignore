@@ -177,7 +177,7 @@ dashboard/milvus_db/volumes/minio/
 dashboard/milvus_db/rdb_data/
 
 # pdf_db for RAG
-dashboard/pdf_db/
+#dashboard/pdf_db/
 
 # reports for dashboard
 # dashboard/reports/
