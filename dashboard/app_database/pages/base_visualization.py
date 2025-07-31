@@ -28,8 +28,9 @@ except ImportError:
     from utils import load_data, split_columns
 
 HTML_SAVE_PATH = "./reports"
-font_path = './static/NanumGothic.ttf'
-fontprop = font_manager.FontProperties(fname=font_path)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FONT_PATH = os.path.join(BASE_DIR, "..", "..", "static", "NanumGothic.ttf")
+fontprop = font_manager.FontProperties(fname=FONT_PATH)
 plt.rcParams['font.family'] = fontprop.get_name()
 
 stopwords = ['아니', '근데', '진짜', '너무', 'ㅋㅋ', '이게', '그런데', '정말', '그리고', 'ㅠ', 'ㅠㅠ', 'ㅋ', 'ㅎㅎ', '왜', '좀', '이거',
@@ -185,7 +186,7 @@ def render():
     for ax, (name, df) in zip(axes, datasets.items()):
         text_col = train_text_cols if train_text_cols else None
         if text_col and text_col in df.columns:
-            cloud, counter = generate_wordcloud(df, text_col, font_path)
+            cloud, counter = generate_wordcloud(df, text_col, FONT_PATH)
             
             if name == "Train":
                 top_keywords = [word for word, count in counter.most_common(5)]
