@@ -3,7 +3,6 @@ from typing import Optional
 from pymilvus import connections, utility
 
 def milvus_rm(target: Optional[str] = None, host: str = "localhost", port: str = "19530") -> None:
-
     # Milvus 서버 연결
     connections.connect("default", host=host, port=port)
 
@@ -21,6 +20,7 @@ def milvus_rm(target: Optional[str] = None, host: str = "localhost", port: str =
         print("📦 삭제할 컬렉션 목록:")
         for name in all_collections:
             print(f" - {name}")
+        print()
         for name in all_collections:
             utility.drop_collection(name)
             print(f"✅ Deleted collection: {name}")

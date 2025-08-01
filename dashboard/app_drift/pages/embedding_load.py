@@ -38,10 +38,9 @@ def query_collection(collection_name, expr="", output_fields=None, limit=None):
 
 # 사용자에게 데이터 설명을 위함
 def get_collection_metadata(collection_name):
-    """컬렉션에서 대표 메타데이터(예: dataset_name, summary_dict, timestamp 등) 추출"""
     collection = Collection(name=collection_name)
     # 메타데이터 필드만 추출 (필요시 필드명 수정)
-    meta_fields = ["dataset_name", "summary_dict", "timestamp"]
+    meta_fields = ["dataset_name", "timestamp"]
     # 실제 존재하는 필드만 사용
     fields = get_collection_fields(collection_name)
     valid_meta_fields = [f for f in meta_fields if f in fields]
@@ -62,13 +61,6 @@ def render():
         st.session_state['dataset_name'] = meta.get('dataset_name')
         
         if meta:
-            # Summary 포맷팅
-            summary = meta.get('summary_dict', 'N/A')
-            if isinstance(summary, dict):
-                summary_str = json.dumps(summary, indent=2, ensure_ascii=False)
-            else:
-                summary_str = str(summary) if summary else 'N/A'
-
             # timestamp 변환
             ts = meta.get('timestamp', 'N/A')
             if isinstance(ts, (int, float, str)) and str(ts).isdigit():
@@ -86,7 +78,6 @@ def render():
                 <div style="background-color:#23272f;padding:18px 20px 18px 20px;border-radius:12px;border:1.5px solid #3a3f4b; margin-bottom:16px;">
                     <div style="font-size:17px;line-height:1.7;">
                         <b>📁 Dataset Name:</b> {meta.get('dataset_name')}<br>
-                        <b>📝 Summary:</b><pre style="background:none;padding:0;margin:0 0 0 10px;color:#d1d5db;">{summary_str}</pre>
                         <b>⏰ Created At:</b> {ts_str}
                     </div>
                 </div>
