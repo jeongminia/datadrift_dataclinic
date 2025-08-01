@@ -1,16 +1,10 @@
-import streamlit as st
-import pandas as pd 
+import os
 import numpy as np
-
-# Import utils from parent directory
-try:
-    from ..utils import load_data, split_columns
-except ImportError:
-    # Fallback for standalone execution
-    import sys
-    import os
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from utils import load_data, split_columns
+import pandas as pd 
+import streamlit as st
+import matplotlib.pyplot as plt
+import json
+from pymilvus import Collection, utility
 
 # Detect DataDrift
 from evidently.metrics import EmbeddingsDriftMetric
@@ -19,8 +13,6 @@ from evidently.metrics.data_drift.embedding_drift_methods import mmd
 from evidently.metrics.data_drift.embedding_drift_methods import ratio
 from evidently import ColumnMapping
 import streamlit.components.v1 as components  # HTML 열론링을 위한 Streamlit 컨퍼런트
-import os
-import matplotlib.pyplot as plt
 
 # HTML 저장 경로 설정
 HTML_SAVE_PATH = "reports"
@@ -29,8 +21,86 @@ HTML_SAVE_PATH = "reports"
 if not os.path.exists(HTML_SAVE_PATH):
     os.makedirs(HTML_SAVE_PATH)
 
+#  --------------------------------------------- Update Drift Metadata ---------------------------------------------
+def update_metadata_to_vectordb(dataset_name):
+    """드리프트 관련 메타데이터를 Milvus Collection에 업데이트"""
+    try:
+        if not utility.has_collection(dataset_name):
+            st.error(f"Collection '{dataset_name}'이 존재하지 않습니다.")
+            return None
+            
+        collection = Collection(name=dataset_name)
+        collection.load()
+        
+        # 기존 메타데이터 조회
+        metadata_results = collection.query(
+            expr="set_type == 'metadata'",
+            output_fields=["id", "dataset_name", "summary_dict", "data_previews", "class_dist_path",
+                          "doc_len_path", "doc_len_table", "wordcloud_path", "timestamp"],
+            limit=1
+        )
+        
+        if not metadata_results:
+            st.error("기존 메타데이터를 찾을 수 없습니다.")
+            return None
+            
+        existing_metadata = metadata_results[0]
+        metadata_id = existing_metadata["id"]
+        
+        # 기존 메타데이터 삭제
+        collection.delete(f"id == {metadata_id}")
+        collection.flush()
+        
+        # 세션에서 드리프트 관련 데이터 가져오기
+        embedding_size = st.session_state.get("embedding_overview_text", "")
+        dimension = float(st.session_state.get("selected_dimension", 0))  # selected_dimension 사용
+        drift_score_summary = st.session_state.get("drift_score_summary", "")
+        original_distance_path = st.session_state.get("original_distance_path", "")
+        pca_distance_path = st.session_state.get("PCA_distance_path", "")
+        pca_visualization_path = st.session_state.get("PCA_visualization_path", "")
+        
+        # 새 메타데이터 삽입 (기존 데이터 + 드리프트 데이터)
+        dummy_vector = [0.0] * 768
+        
+        data = [
+            ["metadata"],                                    # set_type
+            ["metadata"],                                    # class
+            [dummy_vector],                                  # vector
+            [existing_metadata["dataset_name"]],            # dataset_name
+            [existing_metadata["summary_dict"]],            # summary_dict
+            [existing_metadata["data_previews"]],           # data_previews
+            [existing_metadata["class_dist_path"]],         # class_dist_path
+            [existing_metadata["doc_len_path"]],            # doc_len_path
+            [existing_metadata["doc_len_table"]],           # doc_len_table
+            [existing_metadata["wordcloud_path"]],          # wordcloud_path
+            [existing_metadata["timestamp"]],               # timestamp
+            # 데이터 드리프트 필드들 업데이트
+            [dimension],                                     # dimension
+            [embedding_size],                                # embedding_size
+            [original_distance_path],                        # original_distance_path
+            [pca_distance_path],                            # PCA_distance_path
+            [pca_visualization_path],                       # PCA_visualization_path
+            [drift_score_summary],                          # drift_score_summary
+        ]
+        
+        fields = ["set_type", "class", "vector", "dataset_name", "summary_dict", 
+                 "data_previews", "class_dist_path", "doc_len_path", "doc_len_table", 
+                 "wordcloud_path", "timestamp", "dimension", "embedding_size", 
+                 "original_distance_path", "PCA_distance_path", "PCA_visualization_path", 
+                 "drift_score_summary"]
+        
+        result = collection.insert(data, fields=fields)
+        collection.flush()
+        
+        st.success("✅ 데이터 드리프트 메타데이터가 벡터DB에 저장되었습니다.")
+        return result.primary_keys[0]
+        
+    except Exception as e:
+        st.error(f"❌ 드리프트 메타데이터 업데이트 실패: {e}")
+        return None
 
-## --------------- main --------------- ##
+
+#  --------------------------------------------- Main ---------------------------------------------
 def render():
     dataset_name = st.session_state.get('dataset_name')
     # st.title(f"Detect {dataset_name} DataDrift Page")
@@ -124,3 +194,11 @@ def render():
     # Streamlit 내 HTML 시각화
     components.html(st.session_state['drift_report_html'], height=800, scrolling=True)
     st.success("✅ Drift report & all scores saved in session_state.")
+    
+    # 드리프트 메타데이터를 벡터DB에 업데이트
+    with st.spinner("💾 Saving drift results to database..."):
+        result = update_metadata_to_vectordb(dataset_name)
+        if result:
+            st.info("🔍 Drift analysis results have been automatically saved to the vector database.")
+        else:
+            st.warning("⚠️ Failed to save drift results to database.")

@@ -7,7 +7,7 @@ import streamlit as st
 from datetime import datetime
 from ..assets.make_html import database_html, drift_html # report_database
 from ..assets.design_html import head_footer_html # report_html
-#from ..assets.llm_report import llm_html # report_llm
+from ..assets.llms_settings import llm_html # report_llm
 
 # ------------------------------------- HTML 관련 유틸리티 -------------------------------------
 def get_html_body(html):
@@ -45,8 +45,7 @@ def final_report(dataset_name):
 
     database_content = get_cached_html(db_cache_key, database_html, dataset_name)    
     drift_content = get_cached_html(drift_cache_key, drift_html, dataset_name)
-    #llm_content = get_cached_html(llm_cache_key, llm_html, dataset_name)
-    llm_content = "<p>LLM content is not available.</p>" 
+    llm_content = get_cached_html(llm_cache_key, llm_html, dataset_name) 
     
     return head_footer_html(dataset_name, database_content, drift_content, llm_content)
 
@@ -89,9 +88,7 @@ def render():
 
     dataset_name = st.session_state.get('dataset_name')
 
-    db_html = st.session_state.database_html
-    drift_html = st.session_state.drift_html
-
+    # LLM 설정 변수들 (사용하지 않지만 유지)
     selected_model = st.session_state.get('selected_model')
     temperature = st.session_state.get('model_temperature')
     max_tokens = st.session_state.get('max_tokens')

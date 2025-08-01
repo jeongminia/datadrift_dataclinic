@@ -13,8 +13,24 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+PAGE_CONFIG = {
+    "home": {
+        "title": "🏠 Home"
+    },
+    "database": {
+        "title": "📊 Database Pipeline"
+    },
+    "drift": {
+        "title": "🔍 Drift Analysis"
+    },
+    "export": {
+        "title": "📄 Export Report"
+    }
+}
+
 def mock_set_page_config(*args, **kwargs):
     pass
+
 original_set_page_config = st.set_page_config
 st.set_page_config = mock_set_page_config
 
@@ -57,21 +73,6 @@ def capture_function_output(func, *args, **kwargs):
     return f.getvalue()
 
 # ------------------------------------- Side Bar Navigation -------------------------------------
-PAGE_CONFIG = {
-    "home": {
-        "title": "🏠 Home"
-    },
-    "database": {
-        "title": "📊 Database Pipeline"
-    },
-    "drift": {
-        "title": "🔍 Drift Analysis"
-    },
-    "export": {
-        "title": "📄 Export Report"
-    }
-}
-
 def render_sidebar():
     with st.sidebar:
         st.title("Navigation")
@@ -180,7 +181,7 @@ PAGE_CONFIG = {
             "pages": [
                 {"title": "1️⃣ Load Results", "module_key": "load_results", "name": "Load Results"},
                 {"title": "2️⃣ Build Custom LLM", "module_key": "build_llm", "name": "Custom LLM"},
-                {"title": "3️⃣ 📋 Generate Report", "module_key": "generate_report", "name": "Integrated Report"}
+                {"title": "3️⃣ Generate Report", "module_key": "generate_report", "name": "Integrated Report"}
             ]
         }
     }

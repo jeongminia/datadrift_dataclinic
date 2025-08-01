@@ -5,22 +5,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.decomposition import PCA
 import warnings
-
-# Import utils from parent directory
-try:
-    from ..utils import visualize_similarity_distance, plot_reduced
-except ImportError:
-    # Fallback for standalone execution
-    import sys
-    import os
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from utils import visualize_similarity_distance, plot_reduced
+import os
+from ..utils import visualize_similarity_distance, plot_reduced
 
 warnings.filterwarnings("ignore")
 
 def render():
     if 'embedding_data' not in st.session_state or not st.session_state['embedding_data']:
-        st.error("❌ 'embedding_data' is not initialized or empty. Please load it from VectorDB.")
+        st.error("'embedding_data' is not initialized or empty. Please load it from VectorDB.")
         return
 
     embedding_data = st.session_state['embedding_data']
@@ -46,7 +38,7 @@ def render():
         f"Valid: {valid_embeddings.shape}, "
         f"Test: {test_embeddings.shape}"
     )
-    st.session_state['dataset_summary'] = (
+    st.session_state['embedding_size'] = (
         f"Train: {train_embeddings.shape}, "
         f"Valid: {valid_embeddings.shape}, "
         f"Test: {test_embeddings.shape}"
@@ -65,6 +57,16 @@ def render():
         fig_dist = visualize_similarity_distance(valid_embeddings, test_embeddings, train_embeddings)
         if fig_dist is not None:
             st.session_state['embedding_distance_fig'] = fig_dist
+
+            # reports 디렉토리 생성
+            dataset_name = st.session_state.get('dataset_name', 'dataset')
+            reports_dir = os.path.join('dashboard', 'reports')
+            os.makedirs(reports_dir, exist_ok=True)
+            
+            # 파일 경로 설정 및 저장
+            original_distance_path = os.path.join(reports_dir, f'{dataset_name}_embedding_distance_img.png')
+            fig_dist.savefig(original_distance_path, format="png", dpi=300, bbox_inches='tight')
+            st.session_state['original_distance_path'] = original_distance_path
 
             buf_dist = io.BytesIO()
             fig_dist.savefig(buf_dist, format="png")
@@ -114,6 +116,12 @@ def render():
         fig_pca_dist = visualize_similarity_distance(valid_pca, test_pca, train_pca)
         if fig_pca_dist is not None:
             st.session_state['embedding_pca_distance_fig'] = fig_pca_dist
+            
+            # PCA distance 이미지 파일 저장
+            pca_distance_path = os.path.join(reports_dir, f'{dataset_name}_embedding_pca_distance_img.png')
+            fig_pca_dist.savefig(pca_distance_path, format="png", dpi=300, bbox_inches='tight')
+            st.session_state['PCA_distance_path'] = pca_distance_path
+            
             st.pyplot(fig_pca_dist)
 
             buf_pca_dist = io.BytesIO()
@@ -127,6 +135,11 @@ def render():
         fig_pca_plot = plot_reduced(valid_pca, test_pca, train_pca)
         st.session_state['embedding_pca_fig'] = fig_pca_plot
 
+        # PCA visualization 이미지 파일 저장
+        pca_visualization_path = os.path.join(reports_dir, f'{dataset_name}_embedding_pca_img.png')
+        fig_pca_plot.savefig(pca_visualization_path, format="png", dpi=300, bbox_inches='tight')
+        st.session_state['PCA_visualization_path'] = pca_visualization_path
+
         buf_pca = io.BytesIO()
         fig_pca_plot.savefig(buf_pca, format="png")
         buf_pca.seek(0)
@@ -135,5 +148,3 @@ def render():
         st.pyplot(fig_pca_plot)
     except Exception as e:
         st.error(f"Error in PCA-based visualization: {e}")
-
-#    st.write("Debug Info: ", st.session_state)
