@@ -8,7 +8,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 # retriever, LLM 연결, QA chain 구성
-from langchain_ollama import OllamaLLM
+from langchain_community.llms.ollama import Ollama
 # Milvus 메타데이터 가져오기
 from .make_html import search_metadata
 
@@ -55,7 +55,7 @@ def custom_llm(model_name: str = None,
     if model_top_p is None:
         model_top_p = st.session_state.get('top_p', 0.9)
     
-    llm = OllamaLLM(
+    llm = Ollama(
         model=model_name,
         temperature=model_temperature,
         max_tokens=model_max_tokens,

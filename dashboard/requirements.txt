@@ -26,7 +26,9 @@ langchain-community    ==  0.3.12
 langchain-core      ==     0.3.72
 langchain-ollama   ==      0.3.6
 langchain-text-splitters == 0.3.9
-faiss-gpu # (cpu) faiss-cpu
+faiss-gpu => 1.7.2 
+# faiss-cpu
+
 # ollama
 sentence-transformers # for embedding
 openai
