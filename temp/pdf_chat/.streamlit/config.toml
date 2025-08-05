@@ -1,4 +1,0 @@
-[server]
-maxUploadSize = 1024
-enableCORS = false
-enableXsrfProtection = false
