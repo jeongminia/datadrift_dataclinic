@@ -1,4 +1,6 @@
 from pymilvus import connections, utility, Collection
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
 
 def milvus_inpect(host: str = "localhost", port: str = "19530") -> None:
     # Milvus 서버 연결

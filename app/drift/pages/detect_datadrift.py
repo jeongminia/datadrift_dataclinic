@@ -192,7 +192,7 @@ def render():
     st.session_state['drift_score_summary'] = summary_text
 
     # Streamlit 내 HTML 시각화
-    components.html(st.session_state['drift_report_html'], height=800, scrolling=True)
+    components.html(st.session_state['drift_report_html'], height=800, scrolling=True, width=1600)
     st.success("✅ Drift report & all scores saved in session_state.")
     
     # 드리프트 메타데이터를 벡터DB에 업데이트

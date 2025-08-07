@@ -54,7 +54,8 @@ def generate_drift_explanation_preview():
             return None
         
         # 프롬프트 템플릿 가져오기
-        prompt_template = st.session_state.get('custom_prompt_template', get_default_drift_prompt())
+        prompt_template = st.session_state.get('custom_prompt_template', 
+                                               get_default_drift_prompt())
         
         # 프롬프트 포맷팅
         formatted_prompt = prompt_template.format(

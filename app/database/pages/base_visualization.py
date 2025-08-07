@@ -1,35 +1,35 @@
-import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
 import re
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import streamlit as st
 from pecab import PeCab
-from collections import Counter
 from wordcloud import WordCloud
+from collections import Counter
+import matplotlib.pyplot as plt
 from matplotlib import font_manager
-import warnings
-warnings.filterwarnings(action='ignore')
-import os
+
 from evidently import ColumnMapping
 import streamlit.components.v1 as components
 from evidently.metric_preset import TextEvals
 from evidently.report import Report
 from evidently.metric_preset import DataDriftPreset
 
-# Import utils from parent directory
 try:
-    from ..utils import load_data, split_columns
-except ImportError:
-    # Fallback for standalone execution
-    import sys
-    import os
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from utils import load_data, split_columns
+    from app.database.utils import load_data, split_columns
+except ImportError as e:
+    import sys, os
+    sys.path.append(os.path.abspath(os.path.join(__file__, "../../../..")))
+    from app.database.utils import load_data, split_columns
 
-HTML_SAVE_PATH = "./reports"
+
+import warnings
+warnings.filterwarnings(action='ignore')
+
+import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-FONT_PATH = os.path.join(BASE_DIR, "..", "..", "static", "NanumGothic.ttf")
+HTML_SAVE_PATH = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "..", "reports"))
+FONT_PATH = os.path.abspath(os.path.join(BASE_DIR,"..", "..", "..", "static", "NanumGothic.ttf"))
 fontprop = font_manager.FontProperties(fname=FONT_PATH)
 plt.rcParams['font.family'] = fontprop.get_name()
 
@@ -89,7 +89,7 @@ def render():
     dashboard.save_html(visualization_report_path)
     with open(visualization_report_path, "r") as f:
         html_content = f.read()
-    components.html(html_content, height=800, scrolling=True)
+    components.html(html_content, height=800, scrolling=True, width=1600)
 
     if any(df.isnull().values.any() for df in [train_df, valid_df, test_df]):
         st.error("One or more datasets contain missing values. Please handle the missing values and upload the datasets again.")
