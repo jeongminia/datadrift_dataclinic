@@ -83,8 +83,8 @@ def render():
         st.warning("⚠️ 먼저 Build Custom LLM에서 AI 모델을 설정해주세요.")
         return
     
-    st.success(f"📊 선택된 데이터셋: **{selected_dataset}**")
-    st.success(f"🤖 AI 모델: **{st.session_state.get('model_name', 'N/A')}**")
+    st.success(f"📊 Dataset: **{selected_dataset}**")
+    st.success(f"🤖 LLM: **{st.session_state.get('model_name', 'N/A')}**")
 
     dataset_name = st.session_state.get('dataset_name')
 

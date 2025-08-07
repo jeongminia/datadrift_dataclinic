@@ -37,19 +37,19 @@ st.set_page_config = mock_set_page_config
 # 경로 추가
 current_dir = os.path.dirname(__file__)
 sys.path.append(current_dir)
-sys.path.append(os.path.join(current_dir, 'app_database'))
-sys.path.append(os.path.join(current_dir, 'app_database/pages'))
-sys.path.append(os.path.join(current_dir, 'app_drift'))
-sys.path.append(os.path.join(current_dir, 'app_drift/pages'))
-sys.path.append(os.path.join(current_dir, 'app_report'))
-sys.path.append(os.path.join(current_dir, 'app_report/pages'))
+sys.path.append(os.path.join(current_dir, 'app/database'))
+sys.path.append(os.path.join(current_dir, 'app/database/pages'))
+sys.path.append(os.path.join(current_dir, 'app/drift'))
+sys.path.append(os.path.join(current_dir, 'app/drift/pages'))
+sys.path.append(os.path.join(current_dir, 'app/report'))
+sys.path.append(os.path.join(current_dir, 'app/report/pages'))
 
 # ------------------------------------- Milvus -------------------------------------
 def load_milvus_inspect_function():
     """Milvus inspect 함수 로드"""
     spec = importlib.util.spec_from_file_location(
         "inspect_collections", 
-        os.path.join(current_dir, "milvus_db", "inspect-collections.py")
+        os.path.join(current_dir, "db/milvus_db", "inspect-collections.py")
     )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -59,7 +59,7 @@ def load_milvus_remove_function():
     """Milvus remove 함수 로드"""
     spec = importlib.util.spec_from_file_location(
         "remove_collections", 
-        os.path.join(current_dir, "milvus_db", "rm-collections.py")
+        os.path.join(current_dir, "db/milvus_db", "rm-collections.py")
     )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -215,11 +215,12 @@ def render_database_page():
     for page in config["pages"]:
         st.markdown(f"### {page['title']}")
         try:
-            module_path = f"app_database.pages.{page['module_key']}"
+            module_path = f"app.database.pages.{page['module_key']}"
             module = __import__(module_path, fromlist=['render'])
             module.render()
         except ImportError:
-            st.info(f"{page['name']} 모듈을 불러올 수 없습니다.")
+            st.error(f"{page['name']} 모듈을 불러올 수 없습니다.")
+
         except Exception as e:
             st.error(f"{page['name']} 렌더링 중 오류: {e}")
         
@@ -244,7 +245,7 @@ def render_drift_page():
     for page in config["pages"]:
         st.markdown(f"### {page['title']}")
         try:
-            module_path = f"app_drift.pages.{page['module_key']}"
+            module_path = f"app.drift.pages.{page['module_key']}"
             module = __import__(module_path, fromlist=['render'])
             module.render()
         except ImportError:
@@ -273,7 +274,7 @@ def render_report_page():
     for page in config["pages"]:
         st.markdown(f"### {page['title']}")
         try:
-            module_path = f"app_report.pages.{page['module_key']}"
+            module_path = f"app.report.pages.{page['module_key']}"
             module = __import__(module_path, fromlist=['render'])
             module.render()
         except ImportError as e:

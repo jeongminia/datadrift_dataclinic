@@ -9,23 +9,24 @@
 - 최종 검토 기관 : __한국전자기술연구원(KETI)__
 
 ### Full Flow
+--------
 ```mermaid
 flowchart TD
-    subgraph app_database["app_database/"]
-        A1[Upload Data] --> A2[Load Data]
-        A2 --> A3[Text Visualization]
-        A3 --> A4[Embedding]
-        A4 --> A5[Store in DB]
+    subgraph app_report["app/report/"]
+        A1[Load Results] --> A2[Build LLM]
+        A2 --> A3[Generate Report]
     end
 
-    subgraph app_drift["app_drift/"]
+    subgraph app_drift["app/drift/"]
         B1[Load Embeddings] --> B2[Embeddings Visualization]
         B2 --> B3[Detect Drift]
     end
 
-    subgraph app_report["app_report/"]
-        C1[Load Results] --> C2[Build LLM]
-        C2 --> C3[Generate Report]
+    subgraph app_database["app/database/"]
+        C1[Upload Data] --> C2[Load Data]
+        C2 --> C3[Text Visualization]
+        C3 --> C4[Embedding]
+        C4 --> C5[Store in DB]
     end
 ```
 
@@ -37,23 +38,25 @@ flowchart TD
     ```
 2. change dir
     ```
-    cd datadrift_dataclinic/dashboard
+    cd datadrift_dataclinic
     ```
 3. make virtual environment
     ```
     python3 -m venv venv
+    source venv/bin/activate
+
     pip install -r requirements.txt
     ```
 4. (option) build Milvus DB
     ```
-    cd milvus_db       # cd datadrift_dataclinic/dashboard/milvus_db
+    cd milvus_db                   # cd datadrift_dataclinic/dashboard/milvus_db
     docker compose up -d
     ```
 
 #### [2] Usage Instructions
 1. check pwd
     ```
-    pwd # datadrift_dataclinic/dashboard
+    pwd                           # datadrift_dataclinic/dashboard
     ```
 2. start Streamlit !
     ```
@@ -65,7 +68,15 @@ flowchart TD
     - (mac) `pkill -f streamlit`
 
 ### Stacks
-<img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white"> <img src="https://img.shields.io/badge/Pytorch-EE4C2C?style=for-the-badge&logo=Pytorch&logoColor=white"> <img src="https://img.shields.io/badge/HuggingFace-FFD21E?style=for-the-badge&logo=HuggingFace&logoColor=white"> <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white"> <img src="https://img.shields.io/badge/Milvus-00A1EA?style=for-the-badge&logo=Milvus&logoColor=white">
+<img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white" height="22">
+<img src="https://img.shields.io/badge/Pytorch-EE4C2C?style=for-the-badge&logo=Pytorch&logoColor=white" height="22">
+<img src="https://img.shields.io/badge/HuggingFace-FFD21E?style=for-the-badge&logo=HuggingFace&logoColor=white" height="22">
+<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white" height="22">
+<img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=HTML5&logoColor=white" height="22">
+<img src="https://img.shields.io/badge/Milvus-00A1EA?style=for-the-badge&logo=Milvus&logoColor=white" height="22">
+<img src="https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logo=Ollama&logoColor=white" height="22">
+<img src="https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=LangChain&logoColor=white" height="22">
+
 
 
 ## Acknowledgements (사사)

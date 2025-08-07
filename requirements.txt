@@ -14,11 +14,13 @@ konlpy
 torch
 transformers
 sentencepiece
+pecab
 
 # for data drift analysis
 streamlit
 pymilvus
-evidently==v0.5.1
+evidently==0.5.1
+protobuf==5.27.2
 
 # for LLM
 langchain             ==   0.3.26
@@ -37,3 +39,4 @@ openai
 pdfkit
 wkhtmltopdf 
 beautifulsoup4
+pypdf

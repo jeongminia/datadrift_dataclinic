@@ -17,8 +17,9 @@ from .make_html import search_metadata
 # ========== ollama base LLM 설정 - llm ==========
 def custom_llm(model_name: str = "huihui_ai/exaone3.5-abliterated:7.8b",
                 model_temperature: float = 0.7):
-
-    pdf_path = "pdf_db/datadrift_tech_docs.pdf"
+    
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    pdf_path = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "..", "db", "pdf_db", "datadrift_tech_docs.pdf"))
     
     if not os.path.exists(pdf_path):
         st.warning(f"드리프트 기술 문서가 없습니다: {pdf_path}")

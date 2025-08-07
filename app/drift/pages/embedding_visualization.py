@@ -60,7 +60,7 @@ def render():
 
             # reports 디렉토리 생성
             dataset_name = st.session_state.get('dataset_name', 'dataset')
-            reports_dir = os.path.join('dashboard', 'reports')
+            reports_dir = os.path.join('reports')
             os.makedirs(reports_dir, exist_ok=True)
             
             # 파일 경로 설정 및 저장

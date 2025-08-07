@@ -104,7 +104,7 @@ def head_footer_html(dataset_name, database_content, drift_content, llm_content)
                             DataDrift Dataclinic System
                             </a>
                         </strong><br>
-                        @2025 KETI, Korea Electronics Technology Institute<br>
+                        @KETI Korea Electronics Technology Institute, 2025<br>
                     </div>
                 </div>
             </body>
