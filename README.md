@@ -47,35 +47,41 @@ flowchart TD
 
     pip install -r requirements.txt
     ```
-4. (option) build Milvus DB
+
+#### [2] Setup environments
+
+1. build Milvus DB
     ```
-    cd milvus_db                   # cd datadrift_dataclinic/dashboard/milvus_db
+    cd milvus_db                   # cd datadrift_dataclinic/db/milvus_db
     docker compose up -d
     ```
+2. build Ollama
+    - [initial settings](docs/build_ollama.md)
+    - pull models
+        ```
+        cat ollama-models.txt | xargs -n 1 ollama pull
+        ```
+    - (optional) To check the installed models:
+        ```
+        ollama list
+        ```
 
-#### [2] Usage Instructions
+#### [3] Usage Instructions
 1. check pwd
     ```
-    pwd                           # datadrift_dataclinic/dashboard
+    pwd                           # datadrift_dataclinic
     ```
-2. start Streamlit !
+2. Start Streamlit !
     ```
     streamlit run main.py
     ```
-3. streamlit 중단
+3. END streamlit 
 
     - (window) `ctrl` + `c`
     - (mac) `pkill -f streamlit`
 
 ### Stacks
-<img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white" height="22">
-<img src="https://img.shields.io/badge/Pytorch-EE4C2C?style=for-the-badge&logo=Pytorch&logoColor=white" height="22">
-<img src="https://img.shields.io/badge/HuggingFace-FFD21E?style=for-the-badge&logo=HuggingFace&logoColor=white" height="22">
-<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white" height="22">
-<img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=HTML5&logoColor=white" height="22">
-<img src="https://img.shields.io/badge/Milvus-00A1EA?style=for-the-badge&logo=Milvus&logoColor=white" height="22">
-<img src="https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logo=Ollama&logoColor=white" height="22">
-<img src="https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=LangChain&logoColor=white" height="22">
+<img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white" height="22"> <img src="https://img.shields.io/badge/Pytorch-EE4C2C?style=for-the-badge&logo=Pytorch&logoColor=white" height="22"> <img src="https://img.shields.io/badge/HuggingFace-FFD21E?style=for-the-badge&logo=HuggingFace&logoColor=white" height="22"> <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white" height="22"> <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=HTML5&logoColor=white" height="22"> <img src="https://img.shields.io/badge/Milvus-00A1EA?style=for-the-badge&logo=Milvus&logoColor=white" height="22"> <img src="https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logo=Ollama&logoColor=white" height="22"> <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=LangChain&logoColor=white" height="22">
 
 
 
