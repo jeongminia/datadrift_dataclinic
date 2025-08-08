@@ -1,26 +1,27 @@
 numpy==1.24.4
-pandas==1.5.3
+pandas==2.0.3
+pyarrow==12.0.1
 scikit-learn==1.1.3
 matplotlib==3.7.2
 seaborn==0.12.2
-toml
-requests 
-tornado
-accelerate
+toml==0.10.2
+requests==2.32.4
+tornado==6.5.1
+accelerate==1.10.0
 
 # for data processing
-wordcloud
-konlpy
-torch
-transformers
-sentencepiece
-pecab
+wordcloud==1.9.4
+konlpy==0.6.0
+torch==2.8.0
+transformers==4.55.0
+sentencepiece==0.2.0
+pecab==1.0.8
 
 # for data drift analysis
-streamlit
-pymilvus
+streamlit==1.48.0
+pymilvus==2.5.14
 evidently==0.5.1
-protobuf==5.27.2
+protobuf==4.24.4
 
 # for LLM
 langchain==0.3.26
@@ -28,15 +29,11 @@ langchain-community==  0.3.16
 langchain-ollama==0.3.6
 langchain-text-splitters==0.3.8
 langsmith==0.3.45
-# faiss-gpu
-# faiss-cpu
-
-# ollama
-sentence-transformers # for embedding
-openai
+faiss-gpu==1.7.2
+sentence-transformers == 5.1.0 # for embedding
 
 # for pdf generation
-pdfkit
-wkhtmltopdf 
-beautifulsoup4
-pypdf
+pdfkit==1.0.0
+wkhtmltopdf==0.2
+beautifulsoup4==4.13.4
+pypdf==5.9.0
