@@ -2,53 +2,64 @@
 
 ---
 
-Ubuntu에서 Ollama 설치
+#### Install Ollama on Ubuntu
 
 ```bash
 curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-- (option) GPU 설치
-    1. NVIDIA GPU 드라이버 설치
+#### (option) GPU Setup
+Run these steps only if the installation output does not show
+NVIDIA GPU installed.
+
+1. Check NVIDIA GPU driver
+    ```
+    nvidia-smi                           # Driver must be installed
+    ```
+    - If the driver version is displayed → skip the following steps.
+    - If not, install the driver before proceeding.
+
+2. Install CUDA Toolkit
+    ```
+    sudo apt install -y nvidia-cuda-toolkit
+    ```
         
-        ```bash
-        nvidia-smi  # 드라이버가 설치되어 있어야 함
-        ```
+3. Install NVIDIA Container Toolkit
+    ```
+    distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+    curl -s -L https://nvidia.github.io/libnvidia-container/gpgkey | sudo apt-key add -
+    curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+    sudo apt update
+    sudo apt install -y nvidia-container-toolkit
+    ```
         
-    2. CUDA Toolkit 설치
-        
-        ```bash
-        sudo apt install -y nvidia-cuda-toolkit
-        ```
-        
-    3. nividia-container-toolkit 설치
-        
-        ```bash
-        distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-        curl -s -L https://nvidia.github.io/libnvidia-container/gpgkey | sudo apt-key add -
-        curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-        sudo apt update
-        sudo apt install -y nvidia-container-toolkit
-        ```
-        
-    4. Docker 데몬에 설정 적용
-        
-        ```bash
-        sudo systemctl restart docker
-        ```
+4. Restart Docker daemon
+    ```
+    sudo systemctl restart docker
+    ```
 
 ### ▪️ Initial Settings
 
 ---
 
-- Ollama 서비스 시작
-    
-    ```bash
+1. Start the Ollama
+    ```
     sudo systemctl start ollama
     ```
-    
-- 서비스 상태 확인
-    
-    ```bash
-    systemctl status ollama # active (running) 상태여야 함
+
+2. make dir for storing models
+    ```
+    sudo mkdir -p /usr/share/ollama
+    sudo chown -R ollama:ollama /usr/share/ollama
+    ```
+
+3. write down
+    ```
+    sudo -u ollama bash -lc 'touch /usr/share/ollama/.w && rm /usr/share/ollama/.w'
+    ```
+
+4. restart and Check service status 
+    ```
+    sudo systemctl restart ollama
+    systemctl status ollama                # Should be active (running)
     ```

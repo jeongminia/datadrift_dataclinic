@@ -10,7 +10,8 @@
 
 ### Full Flow
 --------
-![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white) [![EvidentlyAI](https://img.shields.io/badge/EvidentlyAI-0.5.1-red?logo=EvidentlyAI&logoColor=white)](https://github.com/evidentlyai/evidently/tree/v0.5.1)
+![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python&logoColor=white) ![Streamlit](https://img.shields.io/badge/Streamlit-1.48.0-ff4b4b?logo=streamlit&logoColor=white) [![EvidentlyAI](https://img.shields.io/badge/EvidentlyAI-0.5.1-ed0302?logo=EvidentlyAI&logoColor=white)](https://github.com/evidentlyai/evidently/tree/v0.5.1)
+
 
 ```mermaid
 flowchart TD
@@ -44,40 +45,48 @@ flowchart TD
     ```
     cd datadrift_dataclinic
     ```
-3. make virtual environment
+3. (Linux) make virtual environment
     ```
-    brew install python@3.11
+    # python version 3.10
+    sudo apt install python3.10 python3.10-venv python3.10-dev
+    sudo apt install python3.10-distutils
+    curl https://bootstrap.pypa.io/get-pip.py | python3.10
+    
+    # mk virtual env
     python3.10 -m venv venv
     source venv/bin/activate
 
+    # install libraries
     pip install -r requirements.txt
     ```
-4. intall faiss
-    - (only Available GPU) `pip install faiss-gpu`
 
 #### [2] Setup environments
 
-1. build Milvus DB
+1. [🔗 build Milvus DB](docs/build_milvusdb)
     ```
-    cd milvus_db                   # cd datadrift_dataclinic/db/milvus_db
+    cd db/milvus_db                   # cd datadrift_dataclinic/db/milvus_db
     docker compose up -d
     ```
 
 2. build Ollama
     
-    2.1 [initial settings](docs/build_ollama.md)
+    2.1 [🔗 initial setup](docs/build_ollama.md)
     
+    2.2 (optional) check space
+
+        bash models/check_space.sh
+
     2.2 pull models
         
-        ```
-        cat ollama-models.txt | xargs -n 1 ollama pull
-        ```
+        
+        cat models/ollama-models.txt | xargs -n 1 ollama pull
+        
     
     2.3 (optional) To check the installed models:
         
-        ```
+        
         ollama list
-        ```
+        
 
 #### [3] Usage Instructions
 1. check pwd
