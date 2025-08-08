@@ -10,6 +10,8 @@
 
 ### Full Flow
 --------
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white) [![EvidentlyAI](https://img.shields.io/badge/EvidentlyAI-0.5.1-red?logo=EvidentlyAI&logoColor=white)](https://github.com/evidentlyai/evidently/tree/v0.5.1)
+
 ```mermaid
 flowchart TD
     subgraph app_report["app/report/"]
@@ -32,6 +34,8 @@ flowchart TD
 
 
 #### [1] How to Start DataDrift_Dataclinic 
+- This project works properly only in environments where CUDA is available.
+
 1. pull this repository
     ```
     git clone https://github.com/keti-datadrift/datadrift_dataclinic.git
@@ -42,11 +46,14 @@ flowchart TD
     ```
 3. make virtual environment
     ```
-    python3 -m venv venv
+    brew install python@3.11
+    python3.10 -m venv venv
     source venv/bin/activate
 
     pip install -r requirements.txt
     ```
+4. intall faiss
+    - (only Available GPU) `pip install faiss-gpu`
 
 #### [2] Setup environments
 
@@ -55,13 +62,19 @@ flowchart TD
     cd milvus_db                   # cd datadrift_dataclinic/db/milvus_db
     docker compose up -d
     ```
+
 2. build Ollama
-    - [initial settings](docs/build_ollama.md)
-    - pull models
+    
+    2.1 [initial settings](docs/build_ollama.md)
+    
+    2.2 pull models
+        
         ```
         cat ollama-models.txt | xargs -n 1 ollama pull
         ```
-    - (optional) To check the installed models:
+    
+    2.3 (optional) To check the installed models:
+        
         ```
         ollama list
         ```
@@ -81,8 +94,7 @@ flowchart TD
     - (mac) `pkill -f streamlit`
 
 ### Stacks
-<img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white" height="22"> <img src="https://img.shields.io/badge/Pytorch-EE4C2C?style=for-the-badge&logo=Pytorch&logoColor=white" height="22"> <img src="https://img.shields.io/badge/HuggingFace-FFD21E?style=for-the-badge&logo=HuggingFace&logoColor=white" height="22"> <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white" height="22"> <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=HTML5&logoColor=white" height="22"> <img src="https://img.shields.io/badge/Milvus-00A1EA?style=for-the-badge&logo=Milvus&logoColor=white" height="22"> <img src="https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logo=Ollama&logoColor=white" height="22"> <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=LangChain&logoColor=white" height="22">
-
+<img src="https://img.shields.io/badge/Python-3776AB?style=flat&logo=Python&logoColor=white" height="24"> <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=flat&logo=Streamlit&logoColor=white" height="24"> <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=HTML5&logoColor=white" height="24"> <img src="https://img.shields.io/badge/CSS-663399?style=flat&logo=CSS&logoColor=white" height="24"> <img src="https://img.shields.io/badge/Milvus-00A1EA?style=flat&logo=Milvus&logoColor=white" height="24"> <img src="https://img.shields.io/badge/Ollama-000000?style=flat&logo=Ollama&logoColor=white" height="24"> <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=flat&logo=LangChain&logoColor=white" height="24"> <img src="https://img.shields.io/badge/Pytorch-EE4C2C?style=flat&logo=Pytorch&logoColor=white" height="24"> <img src="https://img.shields.io/badge/HuggingFace-FFD21E?style=flat&logo=HuggingFace&logoColor=white" height="24">  
 
 
 ## Acknowledgements (사사)
