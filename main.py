@@ -4,6 +4,7 @@ import os
 import importlib.util
 import io
 import contextlib
+import subprocess
 
 # 페이지 설정
 st.set_page_config(
@@ -126,6 +127,50 @@ def render_sidebar():
                 
                 with st.expander(f"🗑️ '{dataset_name}' 결과", expanded=True):
                     st.code(output, language="text")
+
+        
+        st.markdown("---")
+        st.markdown("### Installed Models", 
+           help="로컬에 설치된 Ollama 모델 목록을 확인합니다.")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            show_clicked = st.button("Show Ollama List", key="show_ollama_list")
+        
+        with col2:
+            add_clicked = st.button("Add Ollama Model", key="add_ollama_model")
+
+        if show_clicked:
+            result = subprocess.run(['ollama', 'list'], 
+                                      capture_output=True, 
+                                      text=True, 
+                                      check=True)
+                
+            with st.expander("Ollama Models", expanded=True):
+                st.code(result.stdout, language="text")
+        
+        if add_clicked:
+            st.session_state.show_model_input = True
+        
+        if st.session_state.get('show_model_input', False):
+            model_name = st.text_input(
+                "Model Name", 
+                placeholder="모델 이름을 입력하세요 (예: llama3.2:1b)",
+                key="model_name_input"
+            )
+            
+            if st.button("📥 Download", key="download_model", type="primary"):
+                if model_name:
+                    with st.spinner(f"'{model_name}' 다운로드 중..."):
+                        result = subprocess.run(['ollama', 'pull', model_name], 
+                                                      capture_output=True, 
+                                                      text=True, 
+                                                      check=True)
+                        st.success(f"✅ {model_name}!")
+                        st.session_state.show_model_input = False
+                else:
+                    st.warning("⚠️ 모델 이름을 입력하세요.")
+            
         return selected_main
 
 def render_selected_page(main_page):

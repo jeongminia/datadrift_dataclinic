@@ -35,7 +35,7 @@ flowchart TD
 
 
 #### [1] How to Start DataDrift_Dataclinic 
-- This project works properly only in environments where CUDA is available.
+This project works properly only in environments where CUDA is available.
 
 1. pull this repository
     ```
@@ -72,20 +72,20 @@ flowchart TD
     
     2.1 [🔗 initial setup](docs/build_ollama.md)
     
-    2.2 (optional) check space
+    2.2 check space
 
         bash models/check_space.sh
 
-    2.2 pull models
+    2.3 pull models
+        : choose [1] or [2]
         
+        # [1] If you have limited storage space or want to reduce download time:
         
-        cat models/ollama-models.txt | xargs -n 1 ollama pull
+        cat models/setup_essential_models.txt | xargs -n 1 ollama pull
         
-    
-    2.3 (optional) To check the installed models:
+        # [2] If you have sufficient storage space:
         
-        
-        ollama list
+        cat models/setup_all_models.txt | xargs -n 1 ollama pull
         
 
 #### [3] Usage Instructions
