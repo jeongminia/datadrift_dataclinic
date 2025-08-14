@@ -19,4 +19,4 @@
     ```
     - [Additional Troubleshooting] If errors still occur, comment out the version line in the docker-compose.yml file.
         
-        ![example-fix_milvus_yaml](fix_milvus_yaml.png)
+        ![example-fix_milvus_yaml](img/fix_milvus_yaml.png)

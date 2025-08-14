@@ -48,7 +48,9 @@ def update_metadata_to_vectordb(dataset_name):
         metadata_id = existing_metadata["id"]
         
         # 기존 메타데이터 삭제
-        collection.delete(f"id == {metadata_id}")
+        delete_expr = f"id in [{metadata_id}]"
+        st.write(f"🔍 Delete expression: {delete_expr}")  # 디버깅용
+        collection.delete(delete_expr)
         collection.flush()
         
         # 세션에서 드리프트 관련 데이터 가져오기
