@@ -336,7 +336,7 @@ def render_home_page():
         """
         <div style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
                     padding: 20px; border-radius: 10px; margin-bottom: 30px;">
-            <h3 style="color: white; text-align: center; margin: 0;">Welcome to Data Drift Analysis System</h3>
+            <h3 style="color: white; text-align: center; margin: 0;">Welcome to Datadrift Dataclinic</h3>
             <div style="color: white; text-align: center; margin-top: 10px;">
                 📊 <b>Database Pipeline</b> → 🔍 <b>Drift Analysis</b> → 📄 <b>Export Report</b>
             </div>
