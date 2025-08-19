@@ -8,12 +8,17 @@
 - 개발 및 유지 관리 기관 : 한국전자기술연구원(KETI)
 - 최종 검토 기관 : __한국전자기술연구원(KETI)__
 
-### Full Flow
---------
+## DataDrift Dataclinic
+
 ![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-26.1.3-0db7ed?logo=Docker&logoColor=white) ![Streamlit](https://img.shields.io/badge/Streamlit-1.48.0-ff4b4b?logo=streamlit&logoColor=white) [![EvidentlyAI](https://img.shields.io/badge/EvidentlyAI-0.5.1-ed0302?logo=EvidentlyAI&logoColor=white)](https://github.com/evidentlyai/evidently/tree/v0.5.1)
+
+
+An interactive Streamlit-based AI dashboard for detecting and analyzing data drift in text datasets. Supports both FAISS and Milvus vector stores, and can integrate with Ollama LLMs.
 
 ![main_page](docs/img/main_page.png)
 
+### App Overview
+The app is organized into **three main pipelines**, as shown below:
 
 ```mermaid
 flowchart TD
@@ -35,6 +40,7 @@ flowchart TD
     end
 ```
 
+### Installation
 
 #### [1] How to Start DataDrift_Dataclinic 
 This project works properly only in environments where CUDA is available.
