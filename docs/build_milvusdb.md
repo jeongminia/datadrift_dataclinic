@@ -22,11 +22,10 @@
    ```
 
    * If you see a `permission denied` error, it means your current user is not added to the `docker` group. Run the following commands:
-
-   ```bash
-   sudo usermod -aG docker $USER
-   newgrp docker
-   ```
+        ```bash
+        sudo usermod -aG docker $USER
+        newgrp docker
+        ```
 
 ### ▪️ Install Milvus
 
