@@ -1,22 +1,77 @@
-### Install Milvus Vector Database
+### ▪️ Install Vector Database for Text Data
 ---
-#### Initial Setup
-    cd db/milvus_db                             # cd datadrift_dataclinic/db/milvus_db
-    docker compose up -d
 
+#### Check Docker & Docker Compose
 
-#### If the initial setup fails, 
+1. Check Docker version
 
-1. Remove existing files
+   ```bash
+   docker --version
+   ```
+
+2. Check Docker Compose version
+
+   ```bash
+   docker compose version
+   ```
+
+3. Verify permissions
+
+   ```bash
+   docker ps
+   ```
+
+   * If you see a `permission denied` error, it means your current user is not added to the `docker` group. Run the following commands:
+
+   ```bash
+   sudo usermod -aG docker $USER
+   newgrp docker
+   ```
+
+※ If either step 1 or 2 does not return a version or indicates that Docker/Docker Compose is not installed, proceed to the "(option) Install Docker & Docker Compose" section and run bash setup_docker.sh.
+
+#### (option) Install Docker & Docker Compose
+
+If Docker and Docker Compose are not installed, execute the script below:
+
+```
+bash setup_docker.sh
+```
+
+### ▪️ Install Milvus
+
+---
+#### Initial Settings
+1. Check directory
+    ```
+    cd db/milvus_db                      # cd datadrift_dataclinic/db/milvus_db
+    ```
+
+2. Remove existing files
     ```
     rm -rf db/milvus_db/docker-compose.yml
     rm -rf db/milvus_db/volumes
     ```
-
-2. Download the docker-compose.yml file
+3. Remove containers
+    ```
+    docker compose down -v
+    ```
+4. Download the docker-compose.yml file
     ```
     wget https://github.com/milvus-io/milvus/releases/download/v2.3.1/milvus-standalone-docker-compose.yml -O docker-compose.yml
     ```
     - [Additional Troubleshooting] If errors still occur, comment out the version line in the docker-compose.yml file.
         
         ![example-fix_milvus_yaml](img/fix_milvus_yaml.png)
+
+#### Start Milvus
+1. Excute Milvus
+    ```
+    docker compose up -d
+    ```
+
+2. Check containers
+    ```
+    docker ps
+    ```
+    - Verify that **standalone**, **minio**, and **etcd** are all properly installed and running
