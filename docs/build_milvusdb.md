@@ -28,16 +28,6 @@
    newgrp docker
    ```
 
-※ If either step 1 or 2 does not return a version or indicates that Docker/Docker Compose is not installed, proceed to the "(option) Install Docker & Docker Compose" section and run bash setup_docker.sh.
-
-#### (option) Install Docker & Docker Compose
-
-If Docker and Docker Compose are not installed, execute the script below:
-
-```
-bash setup_docker.sh
-```
-
 ### ▪️ Install Milvus
 
 ---
@@ -55,6 +45,8 @@ bash setup_docker.sh
 3. Remove containers
     ```
     docker compose down -v
+
+    docker rm -f $(docker ps -aq --filter "name=milvus")
     ```
 4. Download the docker-compose.yml file
     ```

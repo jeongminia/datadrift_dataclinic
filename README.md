@@ -10,7 +10,7 @@
 
 ## DataDrift Dataclinic
 
-![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-26.1.3-0db7ed?logo=Docker&logoColor=white) ![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04-0db7ed?logo=ubuntu&logoColor=white) ![Streamlit](https://img.shields.io/badge/Streamlit-1.48.0-ff4b4b?logo=streamlit&logoColor=white) [![EvidentlyAI](https://img.shields.io/badge/EvidentlyAI-0.5.1-ed0302?logo=EvidentlyAI&logoColor=white)](https://github.com/evidentlyai/evidently/tree/v0.5.1)
+![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-26.1.3-0db7ed?logo=Docker&logoColor=white) ![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04-e95420?logo=ubuntu&logoColor=white) ![Streamlit](https://img.shields.io/badge/Streamlit-1.48.0-ff4b4b?logo=streamlit&logoColor=white) [![EvidentlyAI](https://img.shields.io/badge/EvidentlyAI-0.5.1-ed0302?logo=EvidentlyAI&logoColor=white)](https://github.com/evidentlyai/evidently/tree/v0.5.1)
 
 
 An interactive Streamlit-based AI dashboard for detecting and analyzing data drift in text datasets. Supports both FAISS and Milvus vector stores, and can integrate with Ollama LLMs.
@@ -70,26 +70,11 @@ This project works properly only in environments where CUDA is available.
 
 #### [2] Setup environments
 
-1. [🔗 build Milvus DB](docs/build_milvusdb.md)
+1. [🔗 build Docker & Docker Compose](docs/build_docker.md)
 
-2. build Ollama
-    
-    2.1 [🔗 initial setup](docs/build_ollama.md)
-    
-    2.2 check space
+2. [🔗 build Milvus DB](docs/build_milvusdb.md)
 
-        bash models/check_space.sh
-
-    2.3 pull models
-        : choose [1] or [2]
-        
-        # [1] If you have limited storage space or want to reduce download time:
-        
-        cat models/setup_essential_models.txt | xargs -n 1 ollama pull
-        
-        # [2] If you have sufficient storage space:
-        
-        cat models/setup_all_models.txt | xargs -n 1 ollama pull
+3. [🔗 build Ollama](docs/build_ollama.md)
         
 
 #### [3] Usage Instructions
@@ -123,6 +108,7 @@ This project works properly only in environments where CUDA is available.
 │  ├─ milvus_db/
 │  └─ pdf_db/
 ├─ docs
+│  ├─ build_docker.md
 │  ├─ build_milvusdb.md
 │  ├─ build_ollama.md
 │  ├─ drift_data/

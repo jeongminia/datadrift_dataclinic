@@ -63,3 +63,21 @@ NVIDIA GPU installed.
     sudo systemctl restart ollama
     systemctl status ollama                # Should be active (running)
     ```
+
+### ▪️ Pull Models 
+---
+1. check space
+    ```
+    bash models/check_space.sh
+    ```
+
+2. pull models
+        : choose [1] or [2]
+        
+        # [1] If you have limited storage space or want to reduce download time:
+        
+        cat models/setup_essential_models.txt | xargs -n 1 ollama pull
+        
+        # [2] If you have sufficient storage space:
+        
+        cat models/setup_all_models.txt | xargs -n 1 ollama pull
