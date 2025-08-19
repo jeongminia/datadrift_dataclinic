@@ -10,7 +10,7 @@
 
 ## DataDrift Dataclinic
 
-![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-26.1.3-0db7ed?logo=Docker&logoColor=white) ![Streamlit](https://img.shields.io/badge/Streamlit-1.48.0-ff4b4b?logo=streamlit&logoColor=white) [![EvidentlyAI](https://img.shields.io/badge/EvidentlyAI-0.5.1-ed0302?logo=EvidentlyAI&logoColor=white)](https://github.com/evidentlyai/evidently/tree/v0.5.1)
+![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-26.1.3-0db7ed?logo=Docker&logoColor=white) ![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04-0db7ed?logo=ubuntu&logoColor=white) ![Streamlit](https://img.shields.io/badge/Streamlit-1.48.0-ff4b4b?logo=streamlit&logoColor=white) [![EvidentlyAI](https://img.shields.io/badge/EvidentlyAI-0.5.1-ed0302?logo=EvidentlyAI&logoColor=white)](https://github.com/evidentlyai/evidently/tree/v0.5.1)
 
 
 An interactive Streamlit-based AI dashboard for detecting and analyzing data drift in text datasets. Supports both FAISS and Milvus vector stores, and can integrate with Ollama LLMs.
@@ -70,11 +70,7 @@ This project works properly only in environments where CUDA is available.
 
 #### [2] Setup environments
 
-1. [🔗 build Milvus DB](docs/build_milvusdb)
-    ```
-    cd db/milvus_db                   # cd datadrift_dataclinic/db/milvus_db
-    docker compose up -d
-    ```
+1. [🔗 build Milvus DB](docs/build_milvusdb.md)
 
 2. build Ollama
     
