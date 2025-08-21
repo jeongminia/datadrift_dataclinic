@@ -89,7 +89,7 @@ def render():
     dashboard.save_html(visualization_report_path)
     with open(visualization_report_path, "r") as f:
         html_content = f.read()
-    components.html(html_content, height=800, scrolling=True, width=1600)
+    components.html(html_content, height=800, scrolling=True) #  width=1600
 
     if any(df.isnull().values.any() for df in [train_df, valid_df, test_df]):
         st.error("One or more datasets contain missing values. Please handle the missing values and upload the datasets again.")

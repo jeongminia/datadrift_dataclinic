@@ -17,29 +17,6 @@ An interactive Streamlit-based AI dashboard for detecting and analyzing data dri
 
 ![main_page](docs/img/main_page.png)
 
-### App Overview
-The app is organized into **three main pipelines**, as shown below:
-
-```mermaid
-flowchart TD
-    subgraph app_report["app/report/"]
-        A1[Load Results] --> A2[Build LLM]
-        A2 --> A3[Generate Report]
-    end
-
-    subgraph app_drift["app/drift/"]
-        B1[Load Embeddings] --> B2[Embeddings Visualization]
-        B2 --> B3[Detect Drift]
-    end
-
-    subgraph app_database["app/database/"]
-        C1[Upload Data] --> C2[Load Data]
-        C2 --> C3[Text Visualization]
-        C3 --> C4[Embedding]
-        C4 --> C5[Store in DB]
-    end
-```
-
 ### Installation
 
 #### [1] How to Start DataDrift_Dataclinic 
@@ -86,6 +63,9 @@ This project works properly only in environments where CUDA is available.
     ```
     streamlit run main.py
     ```
+    
+    > **📖 For detailed step-by-step usage guide and demo videos, see [Service Usage Guide](docs/view_services.md)**
+
 3. END streamlit 
 
     - (window) `ctrl` + `c`
@@ -111,6 +91,7 @@ This project works properly only in environments where CUDA is available.
 │  ├─ build_docker.md
 │  ├─ build_milvusdb.md
 │  ├─ build_ollama.md
+│  ├─ view_services.md
 │  ├─ drift_data/
 │  └─ img/
 ├─ main.py
@@ -118,7 +99,8 @@ This project works properly only in environments where CUDA is available.
 │  ├─ check_space.sh
 │  ├─ setup_all_models.txt
 │  └─ setup_essential_models.txt
-├─ reports/
+├─ reports
+│  └─ final/
 ├─ requirements.txt
 ├─ static/
 └─ utils.py
