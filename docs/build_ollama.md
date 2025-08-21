@@ -81,3 +81,7 @@ NVIDIA GPU installed.
         # [2] If you have sufficient storage space:
         
         cat models/setup_all_models.txt | xargs -n 1 ollama pull
+    - To install and test with a single model only, specify the desired model name and run:
+        ```
+        ollama pull [---model_name---]
+        ```

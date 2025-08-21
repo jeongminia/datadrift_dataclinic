@@ -38,15 +38,22 @@
 
 2. Remove existing files
     ```
-    rm -rf db/milvus_db/docker-compose.yml
-    rm -rf db/milvus_db/volumes
+    rm -rf docker-compose.yml
+    sudo rm -rf volumes
     ```
+    - milvus_db/docker-compose.yml 실제로도 사라졌는지, 경로에서 확인. 아직 존재한다면 해당 파일 영구적으로 삭제 진행
 3. Remove containers
     ```
     docker compose down -v
 
     docker rm -f $(docker ps -aq --filter "name=milvus")
     ```
+    - discard 'volumes' dir
+        ```
+        sudo rm -rf volumes
+        mkdir -p volumes
+        chmod 755 volumes
+        ```
 4. Download the docker-compose.yml file
     ```
     wget https://github.com/milvus-io/milvus/releases/download/v2.3.1/milvus-standalone-docker-compose.yml -O docker-compose.yml
@@ -60,9 +67,22 @@
     ```
     docker compose up -d
     ```
+    - if it doesn't work,
+        ```
+        docker-compose up -d
+        ```
 
 2. Check containers
     ```
     docker ps
     ```
     - Verify that **standalone**, **minio**, and **etcd** are all properly installed and running
+    
+3. start docekr
+    ```
+    # Docker 데몬 시작 
+    sudo systemctl start docker
+
+    # Docker 데몬 상태 확인
+    sudo systemctl status docker
+    ```
