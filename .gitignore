@@ -168,9 +168,6 @@ cython_debug/
 *.log
 *.part*
 db/milvus_db/volumes/
-#db/milvus_db/volumes/milvus/
-#db/milvus_db/volumes/minio/
-#db/milvus_db/etcd/
 
 # pdf_db for RAG
 #dashboard/pdf_db/
