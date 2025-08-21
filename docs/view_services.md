@@ -56,3 +56,5 @@ __🎯 Complete workflow__ : `database` → `drift` → `report` → __Check [`f
 | --- | --- | --- | --- |
 | video |  [📽️ link](https://drive.google.com/file/d/1kI8gr2l7bfTphnWSlsVGZ_0TTRbbYXy1/view?usp=drive_link) | [📽️ link](https://drive.google.com/file/d/1hz6OROAqq7Zg_QCnvw0rQQ1yOgkQnwF8/view?usp=drive_link) | [📽️ link](https://drive.google.com/file/d/1FSSwlzElAy_bbFaLEJ8wxVWnQbmC8yKX/view?usp=drive_link) |
 | code |  [🔗 link](../app/database/) | [🔗 link](../app/drift/) | [🔗 link](../app/report/) |
+
+> For quick testing, you can use the sample data available in [data(law, kohate)](../docs/drift_data)
