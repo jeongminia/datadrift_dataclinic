@@ -17,6 +17,9 @@ An interactive Streamlit-based AI dashboard for detecting and analyzing data dri
 
 ![main_page](docs/img/main_page.png)
 
+__📽️ Demo Video Link__ |
+[Database](https://drive.google.com/file/d/1kI8gr2l7bfTphnWSlsVGZ_0TTRbbYXy1/view?usp=drive_link) | [Drift](https://drive.google.com/file/d/1hz6OROAqq7Zg_QCnvw0rQQ1yOgkQnwF8/view?usp=drive_link) | [Report](https://drive.google.com/file/d/1FSSwlzElAy_bbFaLEJ8wxVWnQbmC8yKX/view?usp=drive_link) |
+
 ### Installation
 
 #### [1] How to Start DataDrift_Dataclinic 
